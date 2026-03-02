@@ -496,7 +496,7 @@ export class Model {
     get buttonLabel() {
         if (this.isWalletConnected) {
             if (this.isStakeTabActive) {
-                return 'daal do'
+                return 'Send'
                 // return 'Stake'
             } else {
                 if (this.unstakeOption === 'unstake') {

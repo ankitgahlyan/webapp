@@ -8,6 +8,7 @@ import checkOrange from './assets/check-orange.svg'
 import { QrScanner } from './core/components/common/QrScanner'
 import { useState } from 'react'
 import { QrCode } from 'lucide-react'
+import Receive from './core/receive';
 
 interface Props {
     model: Model
@@ -32,11 +33,11 @@ const StakeUnstake = observer(({ model }: Props) => {
 
     return (
         <div className='mx-auto w-full max-w-screen-lg font-body text-brown dark:text-dark-50'>
-            <p className='pt-4 text-center text-3xl font-bold'>f*king aA </p>
+            <p className='pt-4 text-center text-3xl font-bold'>Foss-Fiat</p>
             <p className='my-8 text-center'>
                 {model.isStakeTabActive
-                    ? 'Stake TON and receive hTON while staking:no its not true'
-                    : 'Unstake hTON and receive TON and rewards: nor this true'}
+                    ? 'free and open source alternative to Fiat Currency'
+                    : 'receive to this address'}
             </p>
 
             <div className='dark:bg-tabbar mx-auto my-8 w-max rounded-full bg-milky p-0.5 dark:bg-dark-400 dark:text-white'>
@@ -52,7 +53,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                             model.setActiveTab('stake')
                         }}
                     >
-                        Dena h
+                        Send
                     </li>
                     <li
                         className='z-[1] m-1 inline-block w-36 cursor-pointer rounded-full py-1 text-center'
@@ -60,7 +61,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                             model.setActiveTab('unstake')
                         }}
                     >
-                        Lena h
+                        Receive
                     </li>
                 </ul>
             </div>
@@ -81,7 +82,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                 >
                     <div className='mx-4 rounded-t-2xl bg-brown px-8 pb-12 pt-4 text-sm text-white dark:bg-dark-600 dark:text-dark-50'>
                         <div className='flex flex-row flex-wrap'>
-                            <p className='font-light'>fees ka jugaad</p>
+                            <p className='font-light'>Ton Amount</p>
                             <p className='ml-auto font-medium'>{model.tonBalanceFormatted}</p>
                         </div>
 
@@ -99,7 +100,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                         <div className='my-4 h-px bg-white opacity-40'></div>
 
                         <div className='flex flex-row flex-wrap'>
-                            <p className='font-light'>maal kitna h</p>
+                            <p className='font-light'>MINT Amount</p>
                             <p className='ml-auto font-medium'>{model.mintBalanceFormatted}</p>
                         </div>
 
@@ -119,7 +120,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                 </div>
 
                 <div className='mx-4 -mt-8 rounded-2xl bg-white p-8 shadow-sm dark:bg-dark-700'>
-                    <p>{model.isStakeTabActive ? 'Snake' : 'Unstake'}</p>
+                    <p>{model.isStakeTabActive ? 'Send Tokens' : 'Receive Tokens'}</p>
 
                     <label>
                         <div
@@ -127,19 +128,21 @@ const StakeUnstake = observer(({ model }: Props) => {
                                 'mb-8 mt-4 flex flex-row rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAddressValid
                                     ? ''
-                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
+                                    : ' border-red focus-within:border-red dark:border-red dark:focus-within:border-red')
                             }
                         >
                             <img src={hton} className={'w-7' + (model.isStakeTabActive ? '' : ' hidden')} />
-                            <img src={hton} className={'w-7' + (model.isStakeTabActive ? ' hidden' : '')} />
+                            <div className={(model.isStakeTabActive ? 'hidden' : '')}>
+                                <Receive model={model}/>
+                            </div>
                             <input
                                 type='text'
                                 inputMode='text'
-                                placeholder=' abe kisko daalna hai'
+                                placeholder='0Q... receiver address'
                                 size={1}
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAddressValid ? '' : ' text-orange dark:text-orange')
+                                    (model.isAddressValid ? '' : ' text-red dark:text-red')
                                 }
                                 value={model.receiver}
                                 onInput={(e) => {
@@ -158,7 +161,6 @@ const StakeUnstake = observer(({ model }: Props) => {
                             //     }
                             // }}
                             />
-                            <button onClick={handleScannerOpen}><QrCode /></button>
                             <QrScanner
                                 isVisible={isScannerVisible}
                                 onClose={handleScannerClose}
@@ -170,12 +172,13 @@ const StakeUnstake = observer(({ model }: Props) => {
                                     'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
                                     (model.isAddressValid
                                         ? ''
-                                        : ' bg-orange text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
+                                        : ' bg-red text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
                                 }
                                 onClick={model.setReceiverToSelf}
                             >
-                                mere ko hi daal do
+                                Self
                             </button>
+                            <button onClick={handleScannerOpen}><QrCode /></button>
                         </div>
                     </label>
 
@@ -185,7 +188,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                                 'mb-8 mt-4 flex flex-row rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAmountValid
                                     ? ''
-                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
+                                    : ' border-red focus-within:border-red dark:border-red dark:focus-within:border-red')
                             }
                         >
                             <img src={ton} className={'w-7' + (model.isStakeTabActive ? '' : ' hidden')} />
@@ -193,11 +196,11 @@ const StakeUnstake = observer(({ model }: Props) => {
                             <input
                                 type='number'
                                 inputMode='decimal'
-                                placeholder=' daalna kitna h be'
+                                placeholder='amount to transfer'
                                 size={1}
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAmountValid ? '' : ' text-orange dark:text-orange')
+                                    (model.isAmountValid ? '' : ' text-red dark:text-red')
                                 }
                                 value={model.amount}
                                 onInput={(e) => {
@@ -221,11 +224,11 @@ const StakeUnstake = observer(({ model }: Props) => {
                                     'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
                                     (model.isAmountValid
                                         ? ''
-                                        : ' bg-orange text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
+                                        : ' bg-red text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
                                 }
                                 onClick={model.setAmountToMax}
                             >
-                                saara daal do
+                                Max
                             </button>
                         </div>
                     </label>
@@ -239,7 +242,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                         <div
                             className={
                                 'flex flex-1 cursor-pointer select-none flex-row flex-nowrap rounded-lg border-2 bg-milky p-4 pr-2 text-sm dark:text-brown' +
-                                (model.unstakeOption === 'unstake' ? ' border-orange' : ' border-milky')
+                                (model.unstakeOption === 'unstake' ? ' border-red' : ' border-milky')
                             }
                             onClick={() => {
                                 model.setUnstakeOption('unstake')
@@ -265,7 +268,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                         <div
                             className={
                                 'flex flex-1 cursor-pointer select-none flex-row flex-nowrap rounded-lg border-2 bg-milky p-4 pr-2 text-sm dark:text-brown' +
-                                (model.unstakeOption === 'swap' ? ' border-orange' : ' border-milky')
+                                (model.unstakeOption === 'swap' ? ' border-red' : ' border-milky')
                             }
                             onClick={() => {
                                 model.setUnstakeOption('swap')
@@ -281,7 +284,7 @@ const StakeUnstake = observer(({ model }: Props) => {
 
                     <button
                         id='submit'
-                        className='h-14 w-full rounded-2xl bg-orange text-lg font-medium text-white disabled:opacity-80 dark:text-dark-600'
+                        className='h-14 w-full rounded-2xl bg-red text-lg font-medium text-white disabled:opacity-80 dark:text-dark-600'
                         disabled={!model.isButtonEnabled}
                         onClick={(e) => {
                             if (model.isWalletConnected) {
@@ -300,7 +303,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                         {model.buttonLabel}
                     </button>
 
-                    <div className='mt-12 text-sm font-medium'>
+                    {/* <div className='mt-12 text-sm font-medium'>
                         <div className='my-4 flex flex-row flex-wrap'>
                             <p>You will receive</p>
                             <p className='ml-auto'>{model.youWillReceive}</p>
@@ -323,7 +326,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                                     : model.averageUnstakeFeeFormatted}
                             </p>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

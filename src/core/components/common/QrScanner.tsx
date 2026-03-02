@@ -1,7 +1,5 @@
-import { Html5Qrcode } from 'html5-qrcode';
-// import button from '../ui/button/button.svelte';
-import { QrCode, X } from 'lucide-static';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 interface QrScannerProps {
 	isVisible: boolean;
@@ -16,18 +14,13 @@ export const QrScanner: FC<QrScannerProps> = ({
 	onClose,
 	hint = 'Point your camera at a TON Connect QR code',
 }) => {
-	const [isReady, setIsReady] = useState(false);
 	const scanLockRef = useRef(false);
-	// const [value, setValue] = useState(props.receiver);
-	const [showQRScanner, setShowQRScanner] = useState(false);
-
-	let qrScanner: Html5Qrcode | null = null;
-	// let qrScannerReady = $state(false);
-	// let error = $state('');
+	// ref to hold scanner instance synchronously
+	const qrScannerRef = useRef<Html5Qrcode>(undefined);
+	const [qrScanner, setQRScanner] = useState<Html5Qrcode>();
 
 	const resetScanner = useCallback(() => {
 		scanLockRef.current = false;
-		setIsReady(false);
 	}, []);
 
 	useEffect(() => {
@@ -51,7 +44,6 @@ export const QrScanner: FC<QrScannerProps> = ({
 
 	useEffect(() => {
 		if (!isVisible) return;
-		setIsReady(true);
 		initializeQRScanner();
 	}, [isVisible]);
 
@@ -60,27 +52,26 @@ export const QrScanner: FC<QrScannerProps> = ({
 	}
 
 	async function initializeQRScanner() {
-		// Show the scanner UI first to render the element
-		setShowQRScanner(true);
-		// Wait for DOM to update
-		// await tick();
-
-		const cameras = await Html5Qrcode.getCameras();
-		if (!qrScanner) {
-			qrScanner = new Html5Qrcode('qr-reader');
+		if (!qrScannerRef.current) {
+			qrScannerRef.current = new Html5Qrcode('qr');
+			setQRScanner(qrScannerRef.current);
 		}
 
+		const cameras = await Html5Qrcode.getCameras();
+		// await new Promise(resolve => setTimeout(resolve, 5000));
+
 		try {
-			await qrScanner.start(
-				cameras.length > 1 ? cameras[1].id : cameras[0].id,
+			await qrScannerRef.current.start(
+				cameras[1]?.id ?? cameras[0]?.id,
+				// (cameras[1]?.id ?? cameras[0]?.id) as string,
 				undefined,
 				onScanSuccess,
-				() => { } // onScanError: Silently ignore QR scanning errors (continuous scanning attempts)
+				() => {
+					// onScanError: Silently ignore QR scanning errors (continuous scanning attempts)
+				},
 			);
 		} catch (err: any) {
-			// error = 'Failed to initialize camera for QR scanning';
 			console.error('QR Scanner initialization failed:', err);
-			setShowQRScanner(false);
 		}
 	}
 
@@ -100,13 +91,13 @@ export const QrScanner: FC<QrScannerProps> = ({
 
 	async function stopQRScanner() {
 		// if (qrScanner && isVisible) {
-			try {
-				onClose();
-				setShowQRScanner(false);
-				await qrScanner!.stop();
-			} catch (err: any) {
-				console.error('Error stopping QR scanner:', err);
-			}
+		try {
+			// setShowQRScanner(false);
+			await qrScanner!.stop();
+			onClose();
+		} catch (err: any) {
+			console.error('Error stopping QR scanner:', err);
+		}
 		// }
 	}
 
@@ -129,11 +120,10 @@ export const QrScanner: FC<QrScannerProps> = ({
 			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
 				<div className="relative w-full max-w-sm">
 					<div className="space-y-4">
-						<button onClick={stopQRScanner} className="h-auto p-1">
-							{/* <X className="h-5 w-5" /> */}
-							X
+						<button onClick={stopQRScanner}>
+							xxx CLOSE xxx
 						</button>
-						<div id="qr-reader" className="w-full rounded-lg"></div>
+						<div id="qr" className="w-full rounded-lg"></div>
 					</div>
 				</div>
 			</div>
