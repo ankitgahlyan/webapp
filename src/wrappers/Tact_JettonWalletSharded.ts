@@ -1159,7 +1159,7 @@ export function storeProvideWalletAddress(src: ProvideWalletAddress) {
         const b_0 = builder;
         b_0.storeUint(745978227, 32);
         b_0.storeUint(src.queryId, 64);
-        b_0.storeAddress(src.owner
+        b_0.storeAddress(src.owner);
         b_0.storeBit(src.includeAddress);
     };
 }

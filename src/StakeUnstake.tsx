@@ -7,7 +7,7 @@ import questionDark from './assets/question-dark.svg'
 import checkOrange from './assets/check-orange.svg'
 import { QrScanner } from './core/components/common/QrScanner'
 import { useState } from 'react'
-import { QrCode, ScanQrCode } from 'lucide-react'
+import { QrCode } from 'lucide-react'
 
 interface Props {
     model: Model
@@ -158,7 +158,7 @@ const StakeUnstake = observer(({ model }: Props) => {
                             //     }
                             // }}
                             />
-                            <button onClick={handleScannerOpen}><QrCode/></button>
+                            <button onClick={handleScannerOpen}><QrCode /></button>
                             <QrScanner
                                 isVisible={isScannerVisible}
                                 onClose={handleScannerClose}
