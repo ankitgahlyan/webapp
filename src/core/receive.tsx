@@ -26,8 +26,9 @@ const Receive = observer(({ model }: ReceiveProps) => {
     return (
         <div className="container mx-auto max-w-lg px-4 py-8">
             <button
-                className="mb-4 inline-flex items-center text-sm text-blue-600 hover:underline"
-                onClick={() => (window.location.href = '/')}
+                className="text-white mb-4 inline-flex items-center text-sm text-blue-600 hover:underline"
+                onClick={() => (model.setActiveTab('send'))}
+                // onClick={() => (window.location.href = '/')}
             >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
@@ -60,7 +61,7 @@ const Receive = observer(({ model }: ReceiveProps) => {
                                 />
                             </div>
                             <p className="text-muted-foreground mt-4 text-center text-sm">
-                                gimme gimme fundssshhh...
+                                gimme gimme some fundssshhh...
                             </p>
                         </div>
 
@@ -100,7 +101,7 @@ const Receive = observer(({ model }: ReceiveProps) => {
                         </button>
 
                         {/* Warning */}
-                        <div className="flex gap-3 rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
+                        {/* <div className="flex gap-3 rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
                             <AlertCircle className="h-5 w-5 shrink-0 text-yellow-600" />
                             <div>
                                 <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
@@ -111,7 +112,7 @@ const Receive = observer(({ model }: ReceiveProps) => {
                                     from other blockchains may result in permanent loss.
                                 </p>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             )}

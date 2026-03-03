@@ -19,7 +19,7 @@ export const QrScanner: FC<QrScannerProps> = ({
 	const qrScannerRef = useRef<Html5Qrcode>(undefined);
 	// const [qrScanner, setQRScanner] = useState<Html5Qrcode>();
 	const [cameras, setCameras] = useState<CameraDevice[]>([]);
-	const [cameraIndex, setCameraIndex] = useState(0);
+	const [cameraIndex, setCameraIndex] = useState(1);
 
 	const resetScanner = useCallback(() => {
 		scanLockRef.current = false;
@@ -56,28 +56,16 @@ export const QrScanner: FC<QrScannerProps> = ({
 	async function initializeQRScanner() {
 		if (!qrScannerRef.current) {
 			qrScannerRef.current = new Html5Qrcode('qr');
-			// setQRScanner(qrScannerRef.current);
 		}
 
 		const cams = await Html5Qrcode.getCameras();
 		setCameras(cams);
-		// await new Promise(resolve => setTimeout(resolve, 5000));
-
-		// choose initial camera index (prefer rear/back)
-		let idx = cams.findIndex(c => /back|rear|environment/i.test(c.label));
-		if (idx === -1) idx = cams.length > 1 ? cams.length - 1 : 0;
+		const idx = cams.length > 1 ? 1 : 0;
 		setCameraIndex(idx);
 
 		try {
-			// pick a rear-facing camera if available (labels often contain back/rear/environment)
-			const preferredCam =
-				cameras.find(c => /back|rear|environment/i.test(c.label)) ||
-				(cameras.length > 1 ? cameras[cameras.length - 1] : cameras[0]);
-
 			await qrScannerRef.current.start(
-				preferredCam.id,
-				// cameras[1]?.id ?? cameras[0]?.id,
-				// (cameras[1]?.id ?? cameras[0]?.id) as string,
+				cams[idx].id,
 				undefined,
 				onScanSuccess,
 				() => {
@@ -105,7 +93,7 @@ export const QrScanner: FC<QrScannerProps> = ({
 
 	async function stopQRScanner() {
 		try {
-			await qrScannerRef.current?.stop();
+			await qrScannerRef.current!.stop();
 			onClose();
 		} catch (err: any) {
 			console.error('Error stopping QR scanner:', err);
@@ -113,14 +101,14 @@ export const QrScanner: FC<QrScannerProps> = ({
 	}
 
 	async function flipCamera() {
-		if (!qrScannerRef.current || cameras.length < 2) return;
+		// if (!qrScannerRef.current || cameras.length < 2) return;
 		const next = (cameraIndex + 1) % cameras.length;
 		setCameraIndex(next);
 		try {
-			await qrScannerRef.current.stop();
+			await qrScannerRef.current!.stop();
 		} catch { }
 		try {
-			await qrScannerRef.current.start(
+			await qrScannerRef.current!.start(
 				cameras[next].id,
 				undefined,
 				onScanSuccess,
@@ -171,11 +159,11 @@ export const QrScanner: FC<QrScannerProps> = ({
 									}}
 									className="text-white"
 								>
-									Flip
+									Flip Camera
 								</button>
 							)}
 						</div>
-						<div id="qr" className="w-full rounded-lg"></div>
+						<div id="qr" className="w-full h-full rounded-lg"></div>
 					</div>
 				</div>
 			</div>

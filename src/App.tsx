@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Model } from './Model.ts'
 import Header from './Header.tsx'
 import OldWalletUpgrade from './OldWalletUpgrade.tsx'
-import StakeUnstake from './StakeUnstake.tsx'
+import SendReceive from './SendReceive.tsx'
 import Defi from './Defi.tsx'
 import Reward from './Reward.tsx'
 import Wait from './Wait.tsx'
@@ -23,10 +23,10 @@ interface Props {
 const App = observer(({ model }: Props) => {
     let page = (
         <>
-            <OldWalletUpgrade model={model} />
-            <StakeUnstake model={model} />
+            {/* <OldWalletUpgrade model={model} /> */}
+            <SendReceive model={model} />
             <Wait model={model} />
-            <Stats model={model} />
+            {/* <Stats model={model} /> */}
         </>
     )
     if (model.activePage === 'defi') {
@@ -39,7 +39,7 @@ const App = observer(({ model }: Props) => {
         <>
             <Header model={model} />
             {page}
-            <Footer model={model} />
+            {/* <Footer model={model} /> */}
             <LoadingIndicator model={model} />
             <ErrorDisplay model={model} />
         </>

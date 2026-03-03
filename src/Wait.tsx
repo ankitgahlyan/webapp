@@ -75,7 +75,7 @@ const Wait = observer(({ model }: Props) => {
         progress = <></>
         heading = (
             <h1 className='text-center text-xl font-bold'>
-                Successfully {model.isStakeTabActive ? 'staked' : 'unstaked'}
+                Successfully {model.isSendTabActive ? 'staked' : 'unstaked'}
             </h1>
         )
         button = (

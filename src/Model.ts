@@ -1,7 +1,7 @@
-import { getHttpV4Endpoint, getHttpV4Endpoints, Network } from '@orbs-network/ton-access'
+import { Network } from '@orbs-network/ton-access'
 import { TonConnectUI, THEME, CHAIN, SendTransactionRequest } from '@tonconnect/ui'
 import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx'
-import { Address, Dictionary, OpenedContract, Slice, TonClient4, beginCell, comment, fromNano, toNano } from '@ton/ton'
+import { Address, Dictionary, OpenedContract, TonClient4, beginCell, comment, fromNano, toNano } from '@ton/ton'
 import {
     ParticipationState,
     Times,
@@ -10,20 +10,17 @@ import {
     Parent,
     TreasuryConfig,
     WalletState,
-    maxAmountToStake,
     opUnstakeTokens,
     treasuryAddresses,
     feeUnstake,
-    createDepositMessage,
-    createUnstakeMessage,
 } from '@hipo-finance/sdk'
 import { OldTreasury } from './OldTreasury'
 import { FossFi, FossFiConfig } from './wrappers/fi/FossFi'
-import { FossFiWallet, FossFiWalletConfig, JettonTransfer, storeJettonTransfer } from './wrappers/fi/FossFiWallet'
+import { FossFiWallet, FossFiWalletConfig } from './wrappers/fi/FossFiWallet'
 
 type ActivePage = 'stake' | 'reward' | 'defi'
 
-type ActiveTab = 'stake' | 'unstake'
+type ActiveTab = 'send' | 'receive'
 
 type UnstakeOption = 'unstake' | 'swap'
 
@@ -69,7 +66,7 @@ const oldTreasuryAddresses: Record<Network, Address> = {
 
 const defaultNetwork: Network = 'testnet'
 const defaultActivePage: ActivePage = 'stake'
-const defaultActiveTab: ActiveTab = 'stake'
+const defaultActiveTab: ActiveTab = 'send'
 
 const tonConnectButtonRootId = 'ton-connect-button'
 
@@ -166,7 +163,7 @@ export class Model {
 
             isWalletConnected: computed,
             isMainnet: computed,
-            isStakeTabActive: computed,
+            isSendTabActive: computed,
             tonBalanceFormatted: computed,
             // htonBalance: computed,
             // htonBalanceFormatted: computed,
@@ -285,8 +282,8 @@ export class Model {
         return this.network === 'mainnet'
     }
 
-    get isStakeTabActive() {
-        return this.activeTab === 'stake'
+    get isSendTabActive() {
+        return this.activeTab === 'send'
     }
 
     get tonBalanceFormatted() {
@@ -431,10 +428,10 @@ export class Model {
     }
 
     get maxAmount() {
-        const isStakeTabActive = this.isStakeTabActive
-        const tonBalance = this.tonBalance
+        const isSendTabActive = this.isSendTabActive
+        // const tonBalance = this.tonBalance
         const walletState = this.walletState
-        if (isStakeTabActive) {
+        if (isSendTabActive) {
             // reserve enough TON for user's ton wallet storage fee + enough funds for future unstake
             // return maxAmountToStake(tonBalance ?? 0n)
             return this.fiJettonState?.balance ?? 0n
@@ -483,11 +480,11 @@ export class Model {
         // const htonBalance = this.walletState?.tokens
         const mintBalance = this.fiJettonState?.balance
         const haveBalance = tonBalance != null && mintBalance != null
-        // const haveBalance = this.isStakeTabActive ? tonBalance != null : mintBalance != null
-        const isStakeTabActive = this.isStakeTabActive
+        // const haveBalance = this.isSendTabActive ? tonBalance != null : mintBalance != null
+        const isSendTabActive = this.isSendTabActive
         const unstakeOption = this.unstakeOption
         if (this.isWalletConnected) {
-            return (isAmountValid && isAmountPositive && haveBalance && isAddressValid) || (!isStakeTabActive && unstakeOption === 'swap')
+            return (isAmountValid && isAmountPositive && haveBalance && isAddressValid) || (!isSendTabActive && unstakeOption === 'swap')
         } else {
             return true
         }
@@ -495,7 +492,7 @@ export class Model {
 
     get buttonLabel() {
         if (this.isWalletConnected) {
-            if (this.isStakeTabActive) {
+            if (this.isSendTabActive) {
                 return 'Send'
                 // return 'Stake'
             } else {
@@ -521,20 +518,20 @@ export class Model {
     get youWillReceive() {
         const rate = this.exchangeRate
         const nano = this.amountInNano
-        const isStakeTabActive = this.isStakeTabActive
+        const isSendTabActive = this.isSendTabActive
         if (rate == null) {
             return
         } else if (nano == null || !this.isAmountValid || !this.isAmountPositive) {
-            return isStakeTabActive ? 'hTON' : 'TON'
+            return isSendTabActive ? 'hTON' : 'TON'
         } else {
-            return `~ ${formatNano(Number(nano) * rate)} ${isStakeTabActive ? 'hTON' : 'TON'}`
+            return `~ ${formatNano(Number(nano) * rate)} ${isSendTabActive ? 'hTON' : 'TON'}`
         }
     }
 
     get exchangeRate() {
         const state = this.treasuryState
         if (state != null) {
-            if (this.isStakeTabActive) {
+            if (this.isSendTabActive) {
                 return Number(state.totalTokens) / Number(state.totalCoins) || 1
             } else {
                 return Number(state.totalCoins) / Number(state.totalTokens) || 1
@@ -1160,7 +1157,7 @@ export class Model {
         ) {
             const queryId = generateRandomQueryId()
 
-            // const message = this.isStakeTabActive
+            // const message = this.isSendTabActive
             //     ? createDepositMessage(this.treasury.address, this.amountInNano, queryId)
             //     : createUnstakeMessage(this.wallet.address, this.amountInNano, queryId)
 
@@ -1208,31 +1205,28 @@ export class Model {
             this.tonBalance != null &&
             this.mintBalance != null
         ) {
-            const queryId = generateRandomQueryId()
-
-            const msg: JettonTransfer = {
-                $$type: 'JettonTransfer',
-                queryId,
-                amount: this.amountInNano,
-                destination: Address.parse(this.receiver.trim()),
-                responseDestination: this.address,
-                customPayload: null,
-                forwardTonAmount: 0n,
-                forwardPayload: beginCell().asSlice()
-            }
+            // const msg: JettonTransfer = {
+            //     $$type: 'JettonTransfer',
+            //     queryId,
+            //     amount: this.amountInNano,
+            //     destination: Address.parse(this.receiver.trim()),
+            //     responseDestination: this.address,
+            //     customPayload: null,
+            //     forwardTonAmount: 0n,
+            //     forwardPayload: beginCell().asSlice()
+            // }
             // const message = createDepositMessage(this.fiJetton.address, this.amountInNano, queryId)
             // const storedMsg = beginCell().store(storeJettonTransfer(msg)).endCell()
 
             const tb = beginCell()
                 .storeUint(0xf8a7ea5, 32)
-                .storeUint(0, 64) // op, queryId
+                .storeUint(generateRandomQueryId(), 64) // op, queryId
                 .storeCoins(this.amountInNano)
                 .storeAddress(Address.parse(this.receiver.trim()))
                 .storeAddress(this.address)
                 .storeMaybeRef(undefined) // custom payload
                 .storeCoins(toNano(1n))
                 .storeMaybeRef(comment('hi'))
-                // .storeMaybeRef(beginCell().storeStringRefTail(forwardPayload))
                 .endCell();
 
             const tx: SendTransactionRequest = {
@@ -1484,7 +1478,7 @@ export class Model {
                     }
                 }
                 if (key === 'tab') {
-                    if (value === 'stake' || value === 'unstake') {
+                    if (value === 'send' || value === 'receive') {
                         fragmentState.activeTab = value
                     }
                 }
