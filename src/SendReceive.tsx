@@ -248,6 +248,23 @@ const SendReceive = observer(({ model }: Props) => {
                                     model.setComment(e.target.value)
                                 }}
                             />
+                            <label htmlFor="gas" className="sr-only">
+                                gas/fees
+                            </label>
+                            <input
+                                id="gas"
+                                type="number"
+                                inputMode="decimal"
+                                step={0.05}
+                                placeholder="gas/fees: min 0.55"
+                                className={
+                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50'
+                                }
+                                value={model.gas}
+                                onChange={(e) => {
+                                    model.setGas(e.target.value)
+                                }}
+                            />
                         </div>
 
                         {/* <div

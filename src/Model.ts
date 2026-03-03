@@ -100,6 +100,7 @@ export class Model {
     amount = ''
     receiver = ''
     comment = ''
+    gas = '0.55'
     unstakeOption: UnstakeOption = 'unstake'
     waitForTransaction: WaitForTransaction = 'no'
     ongoingRequests = 0
@@ -154,6 +155,7 @@ export class Model {
             amount: observable,
             receiver: observable,
             comment: observable,
+            gas: observable,
             unstakeOption: observable,
             waitForTransaction: observable,
             ongoingRequests: observable,
@@ -213,6 +215,7 @@ export class Model {
             setAmount: action,
             setReceiver: action,
             setComment: action,
+            setGas: action,
             setReceiverToSelf: action,
             setAmountToMax: action,
             setWaitForTransaction: action,
@@ -661,6 +664,7 @@ export class Model {
             this.amount = ''
             this.receiver = ''
             this.comment = ''
+            this.gas = '0.55'
             this.errorMessage = ''
             clearTimeout(this.timeoutConnectTonAccess)
             clearTimeout(this.timeoutReadTimes)
@@ -708,6 +712,7 @@ export class Model {
             this.amount = ''
             this.receiver = ''
             this.comment = ''
+            this.gas = '0.55'
         }
     }
 
@@ -735,6 +740,10 @@ export class Model {
 
     setComment = (comment: string) => {
         this.comment = comment
+    }
+
+    setGas = (gas: string) => {
+        this.gas = gas
     }
 
     setWaitForTransaction = (wait: WaitForTransaction) => {
@@ -1245,7 +1254,7 @@ export class Model {
                 messages: [
                     {
                         address: this.fiJetton.address.toString(),
-                        amount: toNano(.55).toString(),
+                        amount: toNano(this.gas).toString(),
                         payload: tb.toBoc().toString('base64'),
                     },
                 ],
