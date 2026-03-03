@@ -1,7 +1,5 @@
 {
-    "url": "https://app.hipo.finance",
+    "url": "https://fuckups.netlify.app",
     "name": "Fi",
-    "iconUrl": "https://app.hipo.finance/logo.png",
-    "termsOfUseUrl": "https://docs.hipo.finance/legal-agreements/terms-of-use",
-    "privacyPolicyUrl": "https://docs.hipo.finance/legal-agreements/privacy-policy"
+    "iconUrl": "https://app.hipo.finance/logo.png"
 }
