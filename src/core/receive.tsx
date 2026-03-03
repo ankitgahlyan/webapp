@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Model } from './../Model';
-import { ArrowLeft, Copy, Check, Wallet, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Copy, Check } from 'lucide-react';
 
 interface ReceiveProps {
     model: Model;
@@ -28,7 +28,7 @@ const Receive = observer(({ model }: ReceiveProps) => {
             <button
                 className="text-white mb-4 inline-flex items-center text-sm text-blue-600 hover:underline"
                 onClick={() => (model.setActiveTab('send'))}
-                // onClick={() => (window.location.href = '/')}
+            // onClick={() => (window.location.href = '/')}
             >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
@@ -36,23 +36,17 @@ const Receive = observer(({ model }: ReceiveProps) => {
 
             {userAddress && (
                 <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-dark-700">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
-                                <Wallet className="h-5 w-5 text-green-500" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-medium">Receive Funds</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Share your address to receive TON
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className="space-y-6">
                         {/* QR Code */}
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // close when clicking outside inner container
+                            if (e.target === e.currentTarget) {
+                                model.setActiveTab('send');
+                            }
+                        }}
+                        >
                             <div className="border-border rounded-xl border-2 bg-white p-4">
                                 <img
                                     src={generateQR(userAddress)}
@@ -66,25 +60,15 @@ const Receive = observer(({ model }: ReceiveProps) => {
                         </div>
 
                         {/* Address */}
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">Your Address</span>
-                                <span className="font-mono text-xs">
-                                    {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
-                                </span>
-                            </div>
-                            <div className="relative">
-                                <div className="bg-muted rounded-lg border p-4 font-mono text-sm break-all">
-                                    {userAddress}
-                                </div>
+                        <div className="relative">
+                            <div className="bg-muted rounded-lg border p-4 font-mono text-sm break-all">
+                                {userAddress}
                             </div>
                         </div>
 
                         {/* Copy Button */}
                         <button
-                            className={`w-full rounded bg-blue-500 py-2 text-white hover:bg-blue-600 focus:outline-none ${
-                                copied ? 'opacity-80' : ''
-                            }`}
+                            className={`w-full rounded bg-blue-500 py-2 text-white hover:bg-blue-600 focus:outline-none ${copied ? 'opacity-80' : ''}`}
                             onClick={copyAddress}
                         >
                             {copied ? (

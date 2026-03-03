@@ -99,6 +99,7 @@ export class Model {
     activeTab: ActiveTab = defaultActiveTab
     amount = ''
     receiver = ''
+    comment = ''
     unstakeOption: UnstakeOption = 'unstake'
     waitForTransaction: WaitForTransaction = 'no'
     ongoingRequests = 0
@@ -152,6 +153,7 @@ export class Model {
             activeTab: observable,
             amount: observable,
             receiver: observable,
+            comment: observable,
             unstakeOption: observable,
             waitForTransaction: observable,
             ongoingRequests: observable,
@@ -210,6 +212,7 @@ export class Model {
             setUnstakeOption: action,
             setAmount: action,
             setReceiver: action,
+            setComment: action,
             setReceiverToSelf: action,
             setAmountToMax: action,
             setWaitForTransaction: action,
@@ -657,6 +660,7 @@ export class Model {
             this.walletState = undefined
             this.amount = ''
             this.receiver = ''
+            this.comment = ''
             this.errorMessage = ''
             clearTimeout(this.timeoutConnectTonAccess)
             clearTimeout(this.timeoutReadTimes)
@@ -703,6 +707,7 @@ export class Model {
             this.activeTab = activeTab
             this.amount = ''
             this.receiver = ''
+            this.comment = ''
         }
     }
 
@@ -716,16 +721,20 @@ export class Model {
         this.amount = amount
     }
 
+    setAmountToMax = () => {
+        this.amount = fromNano(this.maxAmount)
+    }
+    
     setReceiver = (receiver: string) => {
         this.receiver = receiver
     }
 
-    setAmountToMax = () => {
-        this.amount = fromNano(this.maxAmount)
-    }
-
     setReceiverToSelf = () => {
         this.receiver = this.address?.toString({ testOnly: true, bounceable: false }) ?? ''
+    }
+
+    setComment = (comment: string) => {
+        this.comment = comment
     }
 
     setWaitForTransaction = (wait: WaitForTransaction) => {
@@ -1226,7 +1235,7 @@ export class Model {
                 .storeAddress(this.address)
                 .storeMaybeRef(undefined) // custom payload
                 .storeCoins(toNano(1n))
-                .storeMaybeRef(comment('hi'))
+                .storeMaybeRef(comment(this.comment))
                 .endCell();
 
             const tx: SendTransactionRequest = {
@@ -1236,7 +1245,7 @@ export class Model {
                 messages: [
                     {
                         address: this.fiJetton.address.toString(),
-                        amount: toNano(.5).toString(),
+                        amount: toNano(.55).toString(),
                         payload: tb.toBoc().toString('base64'),
                     },
                 ],
@@ -1247,6 +1256,7 @@ export class Model {
                 .then(() => {
                     this.setAmount('')
                     this.setReceiver('')
+                    this.setComment('')
                 })
         }
     }
@@ -1265,7 +1275,7 @@ export class Model {
         try {
             clearTimeout(this.timeoutReadLastBlock)
 
-            for (let i = 0; i < 100; i += 1) {
+            for (let i = 0; i < 10; i += 1) {
                 await sleep(waitForCompletionDelay)
 
                 const lastBlock = (await retry(() => tonClient.getLastBlock())).last.seqno

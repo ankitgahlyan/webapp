@@ -223,6 +223,33 @@ const SendReceive = observer(({ model }: Props) => {
                             </button>
                         </div>
 
+                        {/* comment section */}
+                        <div
+                            className={
+                                'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
+                                (model.isAmountValid
+                                    ? ''
+                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
+                            }
+                        >
+                            <label htmlFor="comment" className="sr-only">
+                                comments
+                            </label>
+                            <input
+                                id="comment"
+                                type="text"
+                                inputMode="text"
+                                placeholder="e.g: for coffee"
+                                className={
+                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50'
+                                }
+                                value={model.comment}
+                                onChange={(e) => {
+                                    model.setComment(e.target.value)
+                                }}
+                            />
+                        </div>
+
                         {/* <div
                         className={
                             'flex flex-row gap-4 overflow-hidden transition-all motion-reduce:transition-none' +
