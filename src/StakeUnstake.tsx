@@ -122,116 +122,109 @@ const StakeUnstake = observer(({ model }: Props) => {
                 <div className='mx-4 -mt-8 rounded-2xl bg-white p-8 shadow-sm dark:bg-dark-700'>
                     <p>{model.isStakeTabActive ? 'Send Tokens' : 'Receive Tokens'}</p>
 
-                    <label>
-                        <div
+                    {/* receiver input section */}
+                    <div
+                        className={
+                            'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
+                            (model.isAddressValid
+                                ? ''
+                                : ' border-red focus-within:border-red dark:border-red dark:focus-within:border-red')
+                        }
+                    >
+                        <img src={hton} className={'w-7' + (model.isStakeTabActive ? '' : ' hidden')} />
+                        <div className={(model.isStakeTabActive ? 'hidden' : '')}>
+                            <Receive model={model} />
+                        </div>
+                        <label htmlFor="receiver" className="sr-only">
+                            Recipient address
+                        </label>
+                        <input
+                            id="receiver"
+                            type="text"
+                            inputMode="text"
+                            placeholder="0Q... receiver address"
                             className={
-                                'mb-8 mt-4 flex flex-row rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
+                                'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
+                                (model.isAddressValid ? '' : ' text-red dark:text-red')
+                            }
+                            value={model.receiver}
+                            onChange={(e) => model.setReceiver(e.target.value)}
+                        />
+                        <QrScanner
+                            isVisible={isScannerVisible}
+                            onClose={handleScannerClose}
+                            onScan={handleScanRecipient}
+                        />
+
+                        <button
+                            type="button"
+                            className={
+                                'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
                                 (model.isAddressValid
                                     ? ''
-                                    : ' border-red focus-within:border-red dark:border-red dark:focus-within:border-red')
+                                    : ' bg-red text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
                             }
+                            onClick={model.setReceiverToSelf}
                         >
-                            <img src={hton} className={'w-7' + (model.isStakeTabActive ? '' : ' hidden')} />
-                            <div className={(model.isStakeTabActive ? 'hidden' : '')}>
-                                <Receive model={model}/>
-                            </div>
-                            <input
-                                type='text'
-                                inputMode='text'
-                                placeholder='0Q... receiver address'
-                                size={1}
-                                className={
-                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAddressValid ? '' : ' text-red dark:text-red')
-                                }
-                                value={model.receiver}
-                                onInput={(e) => {
-                                    const target = e.target as HTMLInputElement
-                                    // const value = target.value.replace(/,/g, '.')
-                                    model.setReceiver(target.value)
-                                }}
-                            // onKeyDown={(e) => {
-                            //     if (e.key === 'Enter' && model.isButtonEnabled) {
-                            //         const button = document.querySelector<HTMLInputElement>('#submit')
-                            //         if (button != null) {
-                            //             button.click()
-                            //             const target = e.target as HTMLInputElement
-                            //             target.blur()
-                            //         }
-                            //     }
-                            // }}
-                            />
-                            <QrScanner
-                                isVisible={isScannerVisible}
-                                onClose={handleScannerClose}
-                                onScan={handleScanRecipient}
-                            />
+                            Self
+                        </button>
+                        <button type="button" onClick={handleScannerOpen} className="p-2">
+                            <QrCode />
+                        </button>
+                    </div>
 
-                            <button
-                                className={
-                                    'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
-                                    (model.isAddressValid
-                                        ? ''
-                                        : ' bg-red text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
-                                }
-                                onClick={model.setReceiverToSelf}
-                            >
-                                Self
-                            </button>
-                            <button onClick={handleScannerOpen}><QrCode /></button>
-                        </div>
-                    </label>
-
-                    <label>
-                        <div
+                    {/* amount input section */}
+                    <div
+                        className={
+                            'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
+                            (model.isAmountValid
+                                ? ''
+                                : ' border-red focus-within:border-red dark:border-red dark:focus-within:border-red')
+                        }
+                    >
+                        <img src={ton} className={'w-7' + (model.isStakeTabActive ? '' : ' hidden')} />
+                        <img src={hton} className={'w-7' + (model.isStakeTabActive ? ' hidden' : '')} />
+                        <label htmlFor="amount" className="sr-only">
+                            Amount to transfer
+                        </label>
+                        <input
+                            id="amount"
+                            type="number"
+                            inputMode="decimal"
+                            placeholder="amount to transfer"
                             className={
-                                'mb-8 mt-4 flex flex-row rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
+                                'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
+                                (model.isAmountValid ? '' : ' text-red dark:text-red')
+                            }
+                            value={model.amount}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/,/g, '.')
+                                model.setAmount(value)
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && model.isButtonEnabled) {
+                                    const button = document.querySelector<HTMLInputElement>('#submit')
+                                    if (button != null) {
+                                        button.click()
+                                        const target = e.target as HTMLInputElement
+                                        target.blur()
+                                    }
+                                }
+                            }}
+                        />
+                        <button
+                            type="button"
+                            className={
+                                'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
                                 (model.isAmountValid
                                     ? ''
-                                    : ' border-red focus-within:border-red dark:border-red dark:focus-within:border-red')
+                                    : ' bg-red text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
                             }
+                            onClick={model.setAmountToMax}
                         >
-                            <img src={ton} className={'w-7' + (model.isStakeTabActive ? '' : ' hidden')} />
-                            <img src={hton} className={'w-7' + (model.isStakeTabActive ? ' hidden' : '')} />
-                            <input
-                                type='number'
-                                inputMode='decimal'
-                                placeholder='amount to transfer'
-                                size={1}
-                                className={
-                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAmountValid ? '' : ' text-red dark:text-red')
-                                }
-                                value={model.amount}
-                                onInput={(e) => {
-                                    const target = e.target as HTMLInputElement
-                                    const value = target.value.replace(/,/g, '.')
-                                    model.setAmount(value)
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && model.isButtonEnabled) {
-                                        const button = document.querySelector<HTMLInputElement>('#submit')
-                                        if (button != null) {
-                                            button.click()
-                                            const target = e.target as HTMLInputElement
-                                            target.blur()
-                                        }
-                                    }
-                                }}
-                            />
-                            <button
-                                className={
-                                    'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
-                                    (model.isAmountValid
-                                        ? ''
-                                        : ' bg-red text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
-                                }
-                                onClick={model.setAmountToMax}
-                            >
-                                Max
-                            </button>
-                        </div>
-                    </label>
+                            Max
+                        </button>
+                    </div>
 
                     <div
                         className={
