@@ -188,6 +188,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 id="amount"
                                 type="number"
                                 inputMode="decimal"
+                                step={100}
                                 placeholder="amount to transfer"
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
