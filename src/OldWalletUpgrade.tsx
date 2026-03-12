@@ -26,7 +26,7 @@ const OldWalletUpgrade = observer(({ model }: Props) => {
                     After confirming, it may take a few minutes to receive the new hTON. Don&apos;t worry!
                 </p>
                 <button
-                    className='my-4 rounded-2xl bg-orange px-16 py-2 text-lg font-medium text-white dark:text-dark-600'
+                    className='my-4 rounded-2xl bg-c6 px-16 py-2 text-lg font-medium text-white dark:text-dark-600'
                     onClick={model.upgradeOldWallet}
                 >
                     Upgrade

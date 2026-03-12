@@ -3,8 +3,8 @@ import { Model } from './Model.ts'
 import Header from './Header.tsx'
 import OldWalletUpgrade from './OldWalletUpgrade.tsx'
 import SendReceive from './SendReceive.tsx'
-import Defi from './Defi.tsx'
-import Reward from './Reward.tsx'
+import Settings from './Settings.tsx'
+import History from './History.tsx'
 import Wait from './Wait.tsx'
 import Stats from './Stats.tsx'
 import Footer from './Footer.tsx'
@@ -29,10 +29,10 @@ const App = observer(({ model }: Props) => {
             {/* <Stats model={model} /> */}
         </>
     )
-    if (model.activePage === 'defi') {
-        page = <Defi model={model} />
-    } else if (model.activePage === 'reward') {
-        page = <Reward model={model} />
+    if (model.activePage === 'settings') {
+        page = <Settings model={model} />
+    } else if (model.activePage === 'history') {
+        page = <History model={model} />
     }
 
     return (

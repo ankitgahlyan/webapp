@@ -4,7 +4,7 @@ import ton from './assets/ton.svg'
 import hton from './assets/hton.svg'
 // import question from './assets/question.svg'
 // import questionDark from './assets/question-dark.svg'
-// import checkOrange from './assets/check-orange.svg'
+// import checkOrange from './assets/check-c6.svg'
 import { QrScanner } from './core/components/common/QrScanner'
 import { useState } from 'react'
 import { QrCode } from 'lucide-react'
@@ -40,7 +40,7 @@ const SendReceive = observer(({ model }: Props) => {
                     <ul
                         className={
                             'tab-bar relative flex select-none flex-nowrap' +
-                            (model.isSendTabActive ? ' stake' : ' unstake')
+                            (model.isSendTabActive ? ' home' : ' unstake')
                         }
                     >
                         <li
@@ -124,7 +124,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAddressValid
                                     ? ''
-                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
+                                    : ' border-c6 focus-within:border-c6 dark:border-c6 dark:focus-within:border-c6')
                             }
                         >
                             <img src={hton} className={'w-7' + (model.isSendTabActive ? '' : ' hidden')} />
@@ -138,7 +138,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 placeholder="0Q... receiver address"
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAddressValid ? '' : ' text-orange dark:text-orange')
+                                    (model.isAddressValid ? '' : ' text-c6 dark:text-c6')
                                 }
                                 value={model.receiver}
                                 onChange={(e) => model.setReceiver(e.target.value)}
@@ -159,7 +159,7 @@ const SendReceive = observer(({ model }: Props) => {
                                     'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
                                     (model.isAddressValid
                                         ? ''
-                                        : ' bg-orange text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
+                                        : ' bg-c6 text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
                                 }
                                 onClick={model.setReceiverToSelf}
                             >
@@ -176,7 +176,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAmountValid
                                     ? ''
-                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
+                                    : ' border-c6 focus-within:border-c6 dark:border-c6 dark:focus-within:border-c6')
                             }
                         >
                             <img src={ton} className={'w-7' + (model.isSendTabActive ? '' : ' hidden')} />
@@ -192,7 +192,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 placeholder="amount to transfer"
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAmountValid ? '' : ' text-orange dark:text-orange')
+                                    (model.isAmountValid ? '' : ' text-c6 dark:text-c6')
                                 }
                                 value={model.amount}
                                 onChange={(e) => {
@@ -216,7 +216,7 @@ const SendReceive = observer(({ model }: Props) => {
                                     'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
                                     (model.isAmountValid
                                         ? ''
-                                        : ' bg-orange text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
+                                        : ' bg-c6 text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
                                 }
                                 onClick={model.setAmountToMax}
                             >
@@ -230,7 +230,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAmountValid
                                     ? ''
-                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
+                                    : ' border-c6 focus-within:border-c6 dark:border-c6 dark:focus-within:border-c6')
                             }
                         >
                             <label htmlFor="comment" className="sr-only">
@@ -277,7 +277,7 @@ const SendReceive = observer(({ model }: Props) => {
                         <div
                         className={
                             'flex flex-1 cursor-pointer select-none flex-row flex-nowrap rounded-lg border-2 bg-milky p-4 pr-2 text-sm dark:text-brown' +
-                                (model.unstakeOption === 'unstake' ? ' border-orange' : ' border-milky')
+                                (model.unstakeOption === 'unstake' ? ' border-c6' : ' border-milky')
                                 }
                             onClick={() => {
                                 model.setUnstakeOption('unstake')
@@ -303,7 +303,7 @@ const SendReceive = observer(({ model }: Props) => {
                         <div
                             className={
                                 'flex flex-1 cursor-pointer select-none flex-row flex-nowrap rounded-lg border-2 bg-milky p-4 pr-2 text-sm dark:text-brown' +
-                                (model.unstakeOption === 'swap' ? ' border-orange' : ' border-milky')
+                                (model.unstakeOption === 'swap' ? ' border-c6' : ' border-milky')
                             }
                             onClick={() => {
                                 model.setUnstakeOption('swap')
@@ -319,7 +319,7 @@ const SendReceive = observer(({ model }: Props) => {
 
                         <button
                             id='submit'
-                            className='h-14 w-full rounded-2xl bg-orange text-lg font-medium text-white disabled:opacity-80 dark:text-dark-600'
+                            className='h-14 w-full rounded-2xl bg-c6 text-lg font-medium text-white disabled:opacity-80 dark:text-dark-600'
                             disabled={!model.isButtonEnabled}
                             onClick={(e) => {
                                 if (model.isWalletConnected) {

@@ -34,7 +34,7 @@ body {
     background-color: #483637;
 }
 
-.tab-bar.stake::after {
+.tab-bar.home::after {
     left: 0;
 }
 

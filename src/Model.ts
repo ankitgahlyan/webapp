@@ -18,7 +18,7 @@ import { OldTreasury } from './OldTreasury'
 import { FossFi, FossFiConfig } from './wrappers/fi/FossFi'
 import { FossFiWallet, FossFiWalletConfig } from './wrappers/fi/FossFiWallet'
 
-type ActivePage = 'stake' | 'reward' | 'defi'
+type ActivePage = 'home' | 'history' | 'settings'
 
 type ActiveTab = 'send' | 'receive'
 
@@ -65,7 +65,7 @@ const oldTreasuryAddresses: Record<Network, Address> = {
 }
 
 const defaultNetwork: Network = 'testnet'
-const defaultActivePage: ActivePage = 'stake'
+const defaultActivePage: ActivePage = 'home'
 const defaultActiveTab: ActiveTab = 'send'
 
 const tonConnectButtonRootId = 'ton-connect-button'
@@ -273,7 +273,7 @@ export class Model {
             const walletAddress = this.walletAddress
             const activePage = this.activePage
             const walletRewardsFetchState = this.walletRewardsFetchState
-            if (walletAddress == null || activePage !== 'reward' || walletRewardsFetchState !== 'init') {
+            if (walletAddress == null || activePage !== 'history' || walletRewardsFetchState !== 'init') {
                 return
             }
             this.loadWalletRewards()
@@ -500,7 +500,7 @@ export class Model {
         if (this.isWalletConnected) {
             if (this.isSendTabActive) {
                 return 'Send'
-                // return 'Stake'
+                // return 'Home'
             } else {
                 if (this.unstakeOption === 'unstake') {
                     return 'Unstake'
@@ -804,12 +804,12 @@ export class Model {
                 hpoSumRewards: +rewards.hpo_sum_rewars,
                 htonSumRewards: +rewards.hton_sum_rewards,
                 earnedRewards: rewards.earned_rewards
-                    .filter((reward: any) => +reward.ton_reward > 0 || +reward.hpo_reward > 0)
-                    .map((reward: any) => ({
-                        roundSince: new Date(reward.round_since * 1_000),
-                        time: new Date(reward.time * 1_000),
-                        tonReward: +reward.ton_reward,
-                        hpoReward: +reward.hpo_reward,
+                    .filter((history: any) => +history.ton_reward > 0 || +history.hpo_reward > 0)
+                    .map((history: any) => ({
+                        roundSince: new Date(history.round_since * 1_000),
+                        time: new Date(history.time * 1_000),
+                        tonReward: +history.ton_reward,
+                        hpoReward: +history.hpo_reward,
                     })),
             }
 
@@ -1158,7 +1158,7 @@ export class Model {
     }
 
     controlBackgroundJobs = () => {
-        if (!document.hidden && this.activePage === 'stake') {
+        if (!document.hidden && this.activePage === 'home') {
             this.resume()
         } else {
             this.pause()
@@ -1492,7 +1492,7 @@ export class Model {
                     }
                 }
                 if (key === 'page') {
-                    if (value === 'stake' || value === 'reward' || value === 'defi') {
+                    if (value === 'home' || value === 'history' || value === 'settings') {
                         fragmentState.activePage = value
                     }
                 }

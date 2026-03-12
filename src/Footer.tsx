@@ -13,7 +13,7 @@ const Footer = observer(({ model }: Props) => {
             <div className='mx-auto flex w-full max-w-screen-lg flex-col justify-center px-8 py-8 sm:flex sm:flex-row-reverse sm:items-start sm:px-0'>
                 <div className='mx-auto flex flex-row flex-wrap'>
                     <div className='mx-8 my-4'>
-                        <h3 className='font-bold text-orange dark:text-brown'>Social</h3>
+                        <h3 className='font-bold text-c6 dark:text-brown'>Social</h3>
                         <a className='my-4 block text-sm' href='https://t.me/HipoFinance' target='hipo_telegram'>
                             Telegram
                         </a>
@@ -33,7 +33,7 @@ const Footer = observer(({ model }: Props) => {
                     </div>
 
                     <div className='mx-8 my-4'>
-                        <h3 className='font-bold text-orange dark:text-brown'>Community</h3>
+                        <h3 className='font-bold text-c6 dark:text-brown'>Community</h3>
                         <a className='my-4 block text-sm' href='https://t.me/hipo_chat' target='hipo_chat'>
                             Hipo Chat
                         </a>
@@ -43,7 +43,7 @@ const Footer = observer(({ model }: Props) => {
                     </div>
 
                     <div className='mx-8 my-4'>
-                        <h3 className='font-bold text-orange dark:text-brown'>Docs</h3>
+                        <h3 className='font-bold text-c6 dark:text-brown'>Docs</h3>
                         <a className='my-4 block text-sm' href='https://github.com/HipoFinance' target='hipo_github'>
                             GitHub
                         </a>
@@ -58,7 +58,7 @@ const Footer = observer(({ model }: Props) => {
 
                 <div className='mx-auto flex max-w-96 flex-col gap-4 px-8 pb-16 sm:w-1/2'>
                     <div
-                        className='flex select-none flex-row items-center gap-4 font-logo text-2xl dark:text-orange'
+                        className='flex select-none flex-row items-center gap-4 font-logo text-2xl dark:text-c6'
                         onClick={model.switchNetwork}
                     >
                         <img src={logo} className='-ml-4 -mr-3 h-20 dark:hidden' />

@@ -69,115 +69,115 @@ const Header = observer(({ model }: Props) => {
                     <li
                         className={
                             'flex-1 cursor-pointer whitespace-nowrap pt-3 text-center sm:ml-4 sm:flex-none sm:pt-0' +
-                            (model.activePage === 'stake' ? ' text-dark-600' : ' text-brown')
+                            (model.activePage === 'home' ? ' text-dark-600' : ' text-brown')
                         }
                         onClick={() => {
-                            model.setActivePage('stake')
+                            model.setActivePage('home')
                         }}
                     >
                         <div className='flex flex-col items-center sm:flex-row sm:pl-2'>
                             <img
                                 src={pageStakeBrown}
-                                className={'h-4 dark:!hidden' + (model.activePage !== 'stake' ? ' block' : ' hidden')}
+                                className={'h-4 dark:!hidden' + (model.activePage !== 'home' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageStakeWhite}
                                 className={
-                                    'hidden h-4' + (model.activePage !== 'stake' ? ' dark:!block' : ' sm:dark:!block')
+                                    'hidden h-4' + (model.activePage !== 'home' ? ' dark:!block' : ' sm:dark:!block')
                                 }
                             />
                             <img
                                 src={pageStakeOrange}
-                                className={'h-4 sm:hidden' + (model.activePage === 'stake' ? ' block' : ' hidden')}
+                                className={'h-4 sm:hidden' + (model.activePage === 'home' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageStakeBlack}
                                 className={
-                                    'hidden h-4' + (model.activePage === 'stake' ? ' dark:!hidden sm:block' : '')
+                                    'hidden h-4' + (model.activePage === 'home' ? ' dark:!hidden sm:block' : '')
                                 }
                             />
-                            <span className='p-2 dark:text-white'>Stake</span>
+                            <span className='p-2 dark:text-white'>Home</span>
                         </div>
                         <div
                             className={
-                                'mt-1 hidden h-1 rounded-full bg-orange' +
-                                (model.activePage === 'stake' ? ' sm:!block' : '')
+                                'mt-1 hidden h-1 rounded-full bg-c6' +
+                                (model.activePage === 'home' ? ' sm:!block' : '')
                             }
                         ></div>
                     </li>
                     <li
                         className={
                             'flex-1 cursor-pointer whitespace-nowrap pt-3 text-center sm:ml-4 sm:flex-none sm:pt-0' +
-                            (model.activePage === 'reward' ? ' text-dark-600' : ' text-brown')
+                            (model.activePage === 'history' ? ' text-dark-600' : ' text-brown')
                         }
                         onClick={() => {
-                            model.setActivePage('reward')
+                            model.setActivePage('history')
                         }}
                     >
                         <div className='flex flex-col items-center sm:flex-row sm:pl-2'>
                             <img
                                 src={pageRewardBrown}
-                                className={'h-4 dark:!hidden' + (model.activePage !== 'reward' ? ' block' : ' hidden')}
+                                className={'h-4 dark:!hidden' + (model.activePage !== 'history' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageRewardWhite}
                                 className={
-                                    'hidden h-4' + (model.activePage !== 'reward' ? ' dark:!block' : ' sm:dark:!block')
+                                    'hidden h-4' + (model.activePage !== 'history' ? ' dark:!block' : ' sm:dark:!block')
                                 }
                             />
                             <img
                                 src={pageRewardOrange}
-                                className={'h-4 sm:hidden' + (model.activePage === 'reward' ? ' block' : ' hidden')}
+                                className={'h-4 sm:hidden' + (model.activePage === 'history' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageRewardBlack}
                                 className={
-                                    'hidden h-4' + (model.activePage === 'reward' ? ' dark:!hidden sm:block' : '')
+                                    'hidden h-4' + (model.activePage === 'history' ? ' dark:!hidden sm:block' : '')
                                 }
                             />
-                            <span className='p-2 dark:text-white'>Reward</span>
+                            <span className='p-2 dark:text-white'>History</span>
                         </div>
                         <div
                             className={
-                                'mt-1 hidden h-1 rounded-full bg-orange' +
-                                (model.activePage === 'reward' ? ' sm:!block' : '')
+                                'mt-1 hidden h-1 rounded-full bg-c6' +
+                                (model.activePage === 'history' ? ' sm:!block' : '')
                             }
                         ></div>
                     </li>
                     <li
                         className={
                             'flex-1 cursor-pointer whitespace-nowrap pt-3 text-center sm:ml-4 sm:flex-none sm:pt-0' +
-                            (model.activePage === 'defi' ? ' text-dark-600' : ' text-brown')
+                            (model.activePage === 'settings' ? ' text-dark-600' : ' text-brown')
                         }
                         onClick={() => {
-                            model.setActivePage('defi')
+                            model.setActivePage('settings')
                         }}
                     >
                         <div className='flex flex-col items-center sm:flex-row sm:pl-2'>
                             <img
                                 src={pageDefiBrown}
-                                className={'h-4 dark:!hidden' + (model.activePage !== 'defi' ? ' block' : ' hidden')}
+                                className={'h-4 dark:!hidden' + (model.activePage !== 'settings' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageDefiWhite}
                                 className={
-                                    'hidden h-4' + (model.activePage !== 'defi' ? ' dark:!block' : ' sm:dark:!block')
+                                    'hidden h-4' + (model.activePage !== 'settings' ? ' dark:!block' : ' sm:dark:!block')
                                 }
                             />
                             <img
                                 src={pageDefiOrange}
-                                className={'h-4 sm:hidden' + (model.activePage === 'defi' ? ' block' : ' hidden')}
+                                className={'h-4 sm:hidden' + (model.activePage === 'settings' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageDefiBlack}
-                                className={'hidden h-4' + (model.activePage === 'defi' ? ' dark:!hidden sm:block' : '')}
+                                className={'hidden h-4' + (model.activePage === 'settings' ? ' dark:!hidden sm:block' : '')}
                             />
-                            <span className='p-2 dark:text-white'>DeFi</span>
+                            <span className='p-2 dark:text-white'>Settings</span>
                         </div>
                         <div
                             className={
-                                'mt-1 hidden h-1 rounded-full bg-orange' +
-                                (model.activePage === 'defi' ? ' sm:!block' : '')
+                                'mt-1 hidden h-1 rounded-full bg-c6' +
+                                (model.activePage === 'settings' ? ' sm:!block' : '')
                             }
                         ></div>
                     </li>

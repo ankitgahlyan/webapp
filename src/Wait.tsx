@@ -57,7 +57,7 @@ const Wait = observer(({ model }: Props) => {
         message = <p className='mt-4 text-center'>Despite multiple attempts, we could not locate it.</p>
         button = (
             <button
-                className='mt-4 h-14 w-full rounded-2xl bg-orange text-lg font-medium text-white dark:text-dark-600'
+                className='mt-4 h-14 w-full rounded-2xl bg-c6 text-lg font-medium text-white dark:text-dark-600'
                 onClick={() => {
                     model.setWaitForTransaction('no')
                 }}
@@ -80,7 +80,7 @@ const Wait = observer(({ model }: Props) => {
         )
         button = (
             <button
-                className='mt-4 h-14 w-full rounded-2xl bg-orange text-lg font-medium text-white dark:text-dark-600'
+                className='mt-4 h-14 w-full rounded-2xl bg-c6 text-lg font-medium text-white dark:text-dark-600'
                 onClick={() => {
                     model.setWaitForTransaction('no')
                 }}

@@ -1,0 +1,634 @@
+import "@stdlib/tvm-lowlevel"
+import "@stdlib/gas-payments"
+import "../common/fees-management"
+import "jetton-utils"
+import "storage"
+import "../common/consts"
+import "../common/errors"
+import "../common/messages"
+import "../common/sharding"
+import "../lottery/messages"
+import "../followers/messages"
+
+type AllowedMessageToWallet =
+    | AskToTransfer
+    | AskToBurn
+    | AuthorityAction
+    | InternalTransferStep
+    | InternalInvite
+    | InternalDeActivate
+    | Payback
+    | RequestUpgradeCode
+    | SetStatus
+    | TopUpTons
+    | TransferNotificationForRecipient // forwards invite notif invitor0 owner
+    | Upgrade
+    | VotingAction
+
+    | EnterLottery
+
+    | UnFollow
+    | UnFollowInternal
+
+type AllowedCustomPayload = CustomPayloadMsg
+
+type BounceOpToHandle = EnterLottery
+                        | InternalTransferStep
+                        | InternalInvite
+                        | VotingAction
+
+                        | UnFollowInternal
+
+// type BounceRich = InternalInvite
+// global store: FiWalletStore = lazy FiWalletStore.load();
+global code: cell?; // todo: authorityActionUpgradables 
+
+fun onBouncedMessage(in: InMessageBounced): void {
+    // todo: do we need to check correct sender here?
+    in.bouncedBody.skipBouncedPrefix();
+    val msg = lazy BounceOpToHandle.fromSlice(in.bouncedBody);
+    var store = lazy FiWalletStore.load();
+    var restoreAmount: coins = 0;
+    match (msg) {
+        EnterLottery => {restoreAmount = LOTTERY_ENTRY_AMT},
+
+        // todo fixme: ignore < 1 ton symantic txns
+        InternalTransferStep => {
+            restoreAmount = msg.jettonAmount; // safe to fetch jettonAmount, because it's in the beginning of a message
+        },
+
+        // NotifyMinter => restoreAmount = msg.jettonAmount,
+        InternalInvite => {
+            restoreAmount = - MBRP_AMOUNT + ton("1"); // 
+            // store.maps.load().invited.delete(in.senderAddress); // jettonAddrs are saved for bounceHandling// store.connections -= 1;
+        },
+
+        VotingAction => {}, // todo: need?
+
+        UnFollowInternal => {
+            restoreAmount = - MBRP_AMOUNT;
+        },
+    }
+
+    // todo: need? to burnForce for async reasons
+    store.jettonBalance += restoreAmount;
+    store.save(); // todo learn: where to call this
+}
+
+fun onInternalMessage(in: InMessage): void {
+    val msg = lazy AllowedMessageToWallet.fromSlice(in.body);
+    var store = lazy FiWalletStore.load();
+    var time = lazy store.timestamps.load();
+    var addrs = lazy store.addresses.load();
+    var trustedAddrs = lazy addrs.trustedJettonAddrs.load();
+    var maps = lazy store.maps.load();
+    var nomins = lazy addrs.nomInAddrs.load();
+
+    match (msg) {
+        InternalTransferStep => {
+            checkCorrectSenderInternal(in.senderAddress, msg.transferInitiator);
+            // sync version
+            // assert (msg.version == store.version) throw UPGRADE;
+            if (msg.version == store.version) {
+                // continue
+            } else if (msg.version < store.version) {
+                sendUpgrade(in.senderAddress, addrs.owner, store.version);
+            } else {
+                requestUpgrade(in.senderAddress, addrs.owner, store.version);
+            }
+            // val incomingTransfersLocked = ((self.status & 2) == 2);
+            // val incomingTransfersLocked = (store.locked != false);
+            // require(!incomingTransfersLocked, "Incoming transfers are locked");
+            store.jettonBalance += msg.jettonAmount;
+
+            var payload = msg.forwardPayload;
+            if (payload.remainingBitsCount() >= 32) {
+                // check if transferred as loan
+                val opcode = payload.loadUint(32);
+                if (opcode == 0x0000) {
+                    // todo: transfer personal tokens if requirement is unfulfilled
+                    var unexpected0 = "failed".hash();
+                    val remSlice = payload.hash();
+                    var a = beginCell().storeSlice("fails").toSlice();
+                    val unexpected = payload.bitsEqual("fail"); // UTF-8 string
+                    val noexpect = cmpStringTail(mutate payload, mutate a); // UTF-8 string
+                    assert (!unexpected & !noexpect & !(unexpected0 == remSlice)) throw INCORRECT_RECEIVER;
+                }
+            }
+
+            if (msg.transferredAsCredit) {
+                // trigger personal token minting
+                val mintBody = MintNewJettons {
+                    queryId: msg.queryId,
+                    mintRecipient: msg.transferInitiator,
+                    tonAmount: ton("0.1"), // todo: need for deployment
+                    internalTransferMsg: InternalTransferStep {
+                        queryId: msg.queryId,
+                        jettonAmount: msg.jettonAmount,
+                        version: 0,
+                        transferredAsCredit: true,
+                        transferInitiator: createAddressNone().castToInternal(), // doesn't matter
+                        sendExcessesTo: null,
+                        forwardTonAmount: ton("0.0001"),
+                        forwardPayload: msg.forwardPayload,
+                        
+                    }.toCell(),
+                    
+                };
+                createMessage({
+                    bounce: BounceMode.NoBounce,
+                    value: ton("0.1"),
+                    dest: trustedAddrs.personalJettonMinter!, // fails if not set
+                    body: mintBody,
+                    
+                }).send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS);
+            }
+
+            notifyOwner(msg.queryId, msg.transferInitiator, addrs.owner, msg.jettonAmount, msg.forwardPayload);
+
+            val excessesTo = msg.sendExcessesTo != null ? msg.sendExcessesTo : msg.transferInitiator;
+            sendExcesses(msg.queryId, in.valueCoins, excessesTo);
+        }
+
+        AskToTransfer => {
+            // todo : or sender == authorityAccount/minter for force transfer in disputes USDT like control
+            // val isFromMaster = in.senderAddress == trustedAddrs.minterAddr;
+            // val outgoingTransfersAllowed = ((store.status & 1) == 0);
+            // val outgoingTransfersAllowed = (store.locked != true);
+            // require(outgoingTransfersAllowed || isFromMaster, "Contract is locked");
+            // require(sender() == self.owner || isFromMaster, "Incorrect sender");
+            assert (in.senderAddress == addrs.owner) throw ERROR_NOT_OWNER;
+            // assert (false, 0); // todo what it does?
+            msg.forwardPayload.checkIsCorrectTLBEither();
+            assert (
+                msg.transferRecipient.getWorkchain() == MY_WORKCHAIN
+            ) throw ERROR_WRONG_WORKCHAIN;
+            assert (in.valueCoins > ton("0.5"), ERROR_NOT_ENOUGH_GAS); // todo : bench and update
+            // checkAmountIsEnoughToTransfer(in.valueCoins, msg.forwardTonAmount, in.originalForwardFee);
+
+            var transferredAsCredit = false;
+            // check customPayload
+            if (msg.customPayload != null) {
+                // parse
+                val customMsg = AllowedCustomPayload.fromCell(msg.customPayload, {assertEndAfterReading: true, throwIfOpcodeDoesNotMatch: 63});
+                match (customMsg) {
+                    CustomPayloadMsg => {
+                        // do something now send custom msg to contracts etc.
+                        transferredAsCredit = customMsg.queryId == 1;
+                        // notifyOwner(msg.queryId, msg.transferInitiator, addrs.owner, msg.jettonAmount, msg.forwardPayload);
+                    },
+                    // else => {}, // need2b exhaustive?
+                }
+
+            }
+
+            if (msg.jettonAmount >= ton("1")) {
+                if (msg.transferRecipient != in.senderAddress) {
+                    // no self-transfer
+                    // normal txn
+                    // todo: fixed fees for now. use subscription based instead that'll be like credit score
+                    var burnAmount = 0;
+                    if (store.txnCount > 100) {
+                        store.txnCount = 0;
+                        burnAmount = ton("101");
+                        val notifyMinterMsg = createMessage({
+                            bounce: BounceMode.NoBounce,
+                            dest: trustedAddrs.minterAddr,
+                            value: ton("0.01"),
+                            body: NotifyMinter {
+                                queryId: 0, // to inform about BURN
+                                jettonAmount: burnAmount,
+                                burnInitiator: addrs.owner,
+                                sendExcessesTo: msg.sendExcessesTo,
+                            },
+                        });
+                        notifyMinterMsg.send(SEND_MODE_PAY_FEES_SEPARATELY |
+                        SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                    } else {
+                        store.txnCount += 1;
+                    }
+
+                    assert (
+                        store.jettonBalance >=
+                        msg.jettonAmount + burnAmount
+                    ) throw ERROR_BALANCE_ERROR;
+                    store.jettonBalance -= msg.jettonAmount + burnAmount;
+
+                    var toLeaveOnBalance = contract.getOriginalBalance() - in.valueCoins +
+                    contract.getStorageDuePayment();
+                    reserveToncoinsOnBalance(
+                        max(toLeaveOnBalance, calculateJettonWalletMinStorageFee()),
+                        RESERVE_MODE_AT_MOST
+                    );
+                    val transferMsg = createMessage({
+                        bounce: BounceMode.Only256BitsOfBody,
+                        dest: msg.transferRecipient.getAddrFiWallet(), // only id accounts allowed
+                        value: 0,
+                        body: InternalTransferStep {
+                            queryId: msg.queryId,
+                            jettonAmount: msg.jettonAmount,
+                            version: store.version,
+                            transferredAsCredit,
+                            transferInitiator: addrs.owner,
+                            sendExcessesTo: msg.sendExcessesTo,
+                            forwardTonAmount: msg.forwardTonAmount,
+                            forwardPayload: msg.forwardPayload,
+                        },
+                    });
+                    transferMsg.send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_BOUNCE_ON_ACTION_FAIL); // return;
+                } else {
+                    // for getting funding for public works
+                    // self.applyGrant(sender, msg.amount);
+                    // return;
+                    // set creditNeed
+                    store.creditNeed = msg.jettonAmount;
+                }
+            } else {
+                match (msg.jettonAmount) {
+                    ton("0.101") => {
+                        // claim weekly grant
+                        val now = blockchain.now();
+                        assert (now > (time.accountInit + ACTIVATION_WAIT)) throw WAIT_MORE; // claim starts after a week
+                        assert (
+                            // for 2 years, weekly 11,111 tokens can be claimed
+                            (now < MAX_CLAIM_PERIOD + time.accountInit) &&
+                            (now > ACTIVATION_WAIT + time.lastClaim)
+                        ) throw WAIT_MORE;
+
+                        // votingPower based mint
+                        var claimAmount = ton("11111") + (ton("1") * store.receivedVotes);
+
+                        store.jettonBalance += claimAmount;
+                        time.lastClaim = now;
+                        // inform minter about new tokens mint
+                        val notifyMinterMsg = createMessage({
+                            bounce: BounceMode.NoBounce,
+                            dest: trustedAddrs.minterAddr,
+                            value: 0,
+                            body: NotifyMinter {
+                                queryId: msg.queryId, // to inform about MINT
+                                jettonAmount: claimAmount,
+                                burnInitiator: addrs.owner,
+                                sendExcessesTo: msg.sendExcessesTo,
+                            },
+                        });
+                        notifyMinterMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
+                        SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                    }
+
+                    ton("0.1") => {
+                        idActionChecks(store); // active, !reported
+                        val now = blockchain.now();
+                        assert (((now > (time.lastInvite + INVITE_WAIT)) & (now > (time.accountInit + ACTIVATION_WAIT))) | (in.senderAddress == addrs.treasury)) throw WAIT_MORE; // invite every 4 hours, spam protection
+                        assert (store.connections < 250) throw MAX_CONNECTIONS;
+                        store.connections += 1;
+                        time.lastInvite = now;
+                        // store
+                        // why?
+                        // reward
+                        store.jettonBalance += MBRP_AMOUNT - ton("1"); // 1 goes to invitee
+
+                        val inviteInternal = createMessage({
+                            bounce: BounceMode.Only256BitsOfBody, // 
+                            dest: calcDeployFiWallet(
+                                msg.transferRecipient,
+                                addrs.treasury,
+                                trustedAddrs.minterAddr,
+                                store.baseFiWalletCode,
+                                addrs.others.load().UnFollowCode,
+                            ), // deploy in invite + standalone for idLess accounts
+                            value: 0,
+                            body: InternalInvite {
+                                queryId: msg.queryId,
+                                version: store.version,
+                                sender: addrs.owner,
+                                invitor: nomins.invitor!, // todo null for dead?
+                                currentWalletCode: contract.getCode(),
+                                currentStorage: null,
+                                forwardPayload: msg.forwardPayload,
+                            },
+                        });
+                        inviteInternal.send(SEND_MODE_BOUNCE_ON_ACTION_FAIL |
+                        SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE);
+                    }
+
+                    // voting
+                    ton("0.11") => {
+                        // check if votingPower exists
+                        assert (store.votes) throw NO_VOTES_AVAILABLE;
+                        assert (
+                            msg.transferRecipient != in.senderAddress
+                        ) throw INCORRECT_RECEIVER; // no self-voting
+                        val candidate = msg.transferRecipient.getAddrFiWallet();
+                        store.votes = 0;
+                        maps.votedFor.set(candidate, 10); // store to unVoteLater + total votes sent
+
+                        val votingMsg = createMessage({
+                            bounce: BounceMode.NoBounce, // todo: ok?
+                            dest: candidate,
+                            value: 0,
+                            body: VotingAction {
+                                // positiveVote: true, // default
+                                // count: 10, // default
+                                sender: addrs.owner,
+                            },
+                        });
+                        votingMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
+                        SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                    }
+
+                    // claim votes back
+                    ton("0.12") => {
+                        // assert (!store.votes) throw NOT_VOTED_YET; // noNeed
+                        val candidate = msg.transferRecipient.getAddrFiWallet();
+                        val exists = maps.votedFor.deleteAndGetDeleted(candidate);
+                        assert (exists.isFound) throw NOT_VOTED_YET;
+                        store.votes += exists.loadValue();
+
+                        val votingMsg = createMessage({
+                            bounce: BounceMode.NoBounce,
+                            dest: candidate,
+                            value: 0,
+                            body: VotingAction {
+                                positiveVote: false,
+                                sender: addrs.owner,
+                            },
+                        });
+                        votingMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
+                        SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                    }
+
+                    ton("0.23") => {
+                        // just use single for both txn
+                        msg.transferRecipient.deActivate(msg.jettonAmount, store); // todo fixme when implementing native ui then use jettonAddrs directly
+                    }
+
+                    ton("0.999") => {
+                        // todo: fixme
+                        requestUpgrade(
+                            trustedAddrs.minterAddr,
+                            addrs.owner,
+                            store.version
+                        );
+                    }
+
+                    ton("0.404") => {
+                        // send AuthorityAction
+                        assert (
+                            store.isAuthorityAccount || in.senderAddress == addrs.treasury
+                        ) throw INCORRECT_SENDER;
+
+                        val authorityMsg = createMessage({
+                            bounce: BounceMode.Only256BitsOfBody,
+                            dest: msg.transferRecipient.getAddrFiWallet(),
+                            value: 0,
+                            body: AuthorityAction { sender: addrs.owner },
+                        });
+                        authorityMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
+                        SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                    }
+
+                    ton("0.99") => {
+                        store.jettonBalance -= LOTTERY_ENTRY_AMT; // todo: fixme check all deductions
+                        enterLottery(addrs.owner, trustedAddrs.minterAddr, LOTTERY_ENTRY_AMT); // todo: fixme: use lottery addr
+                    }
+
+                    ton("0.777") => {
+                        if (trustedAddrs.personalJettonMinter == null) {
+                            trustedAddrs.personalJettonMinter = msg.transferRecipient;
+                        } // else ignore
+                    }
+
+                    else => {},
+                }
+            }
+        }
+
+        Payback => {
+            assert (in.senderAddress == trustedAddrs.personalJettonMinter!) throw INCORRECT_SENDER;
+            
+            assert (msg.amount < store.jettonBalance) throw INSUFFICIENT_BALANCE;
+            store.jettonBalance -= msg.amount; // goes to -ve if required
+
+            val transferMsg = createMessage({
+                bounce: BounceMode.Only256BitsOfBody,
+                dest: msg.sender.getAddrFiWallet(), // only id accounts allowed
+                value: 0,
+                body: InternalTransferStep {
+                    queryId: msg.queryId,
+                    jettonAmount: msg.amount,
+                    version: store.version,
+                    transferInitiator: addrs.owner,
+                    sendExcessesTo: null,
+                    forwardTonAmount: 0,
+                    forwardPayload: createEmptySlice(),
+                },
+            });
+            transferMsg.send( SEND_MODE_REGULAR | SEND_MODE_IGNORE_ERRORS );
+        },
+
+        InternalInvite => {
+            // assert (store.jettonBalance == ton("1")) throw ALREADY_INVITED;
+            assert (!store.active) throw ALREADY_INVITED; // cheap calc first/failFast
+            assert (in.senderAddress == msg.sender.getAddrFiWallet()) throw INCORRECT_SENDER;
+
+            store.active = true;
+            store.jettonBalance = ton("1"); // for semantic txns.
+            if (!time.accountInit) {
+                time.accountInit = blockchain.now();
+                nomins.nominee = in.senderAddress; // must be null at init
+                addrs.id = msg.forwardPayload.toCell();
+
+                if (msg.version > store.version) {
+                    store.version = msg.version;
+                    contract.setCodePostponed(msg.currentWalletCode);
+                    setTvmRegisterC3(transformSliceToContinuation(msg.currentWalletCode.beginParse()));
+                    hotUpgradeFiWalletData(msg.currentStorage);
+
+                }
+            }
+
+            nomins.invitor = in.senderAddress; // contract addr
+            nomins.invitor0 = msg.invitor; // todo: null, can deactivate acc
+
+            // notifyOwner(msg.queryId, msg.sender, msg.invitor, ton("0.1"), msg.forwardPayload);
+
+            val notifyMinterMsg = createMessage({
+                bounce: BounceMode.NoBounce,
+                dest: trustedAddrs.minterAddr,
+                value: ton("0.001"),
+                body: InformMinterInviteInternal {
+                    queryId: msg.queryId,
+                    sender: addrs.owner, // different for mint for addr calc
+                    invitor: msg.sender, // just invitor not invitor0
+                    forwardPayload: msg.forwardPayload, // for broadcast, ledger update
+                },
+            });
+            notifyMinterMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+
+            // send excesses
+            // sendExcesses(msg.queryId, in.valueCoins, msg.sender);
+        }
+
+        // both invitor & invitor0 can deactivate
+        InternalDeActivate => {
+            // need to check correctInternalSender() for STORED jettonAddrs
+            assert (
+                (in.senderAddress == nomins.invitor0!) | (in.senderAddress == nomins.invitor!)
+            ) throw INVITE_FIRST; // throws if invitor0 null
+
+            store.active = !store.active;
+        }
+
+        // DeActivate accounts
+        AuthorityAction => {
+            checkCorrectSenderInternal(in.senderAddress, msg.sender);
+            store.active = !store.active; // todo fixme: action override by others(invitor0 etc)
+            if (store.jettonBalance) {
+                val transferMsg = createMessage({
+                        bounce: BounceMode.Only256BitsOfBody,
+                        dest: in.senderAddress, // to authority
+                        value: 0,
+                        body: InternalTransferStep {
+                            queryId: 0,
+                            jettonAmount: store.jettonBalance, // all coins
+                            version: store.version,
+                            transferInitiator: addrs.owner,
+                            sendExcessesTo: addrs.owner,
+                            forwardTonAmount: 0,
+                            forwardPayload: "authorityFreeze", // todo
+                        },
+                    });
+                    transferMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+            }
+        }
+
+        // for granular control
+        SetStatus => {
+            // todo fixme : check correct sender
+            store.status = msg.status;
+        }
+
+        RequestUpgradeCode => {
+            checkCorrectSenderInternal(in.senderAddress, msg.sender);
+            sendUpgrade(in.senderAddress, addrs.owner, store.version);
+        },
+
+        Upgrade => {
+            checkCorrectSenderInternal(in.senderAddress, msg.sender);
+            if (store.version < msg.walletVersion) {
+                // ignore if manually upgraded
+                store.version = msg.walletVersion;
+                contract.setCodePostponed(msg.newCode!);
+                setTvmRegisterC3(transformSliceToContinuation(msg.newCode!.beginParse()));
+                // any migration logic
+                hotUpgradeFiWalletData(msg.newData);
+            }
+        }
+
+        VotingAction => {
+            checkCorrectSenderInternal(in.senderAddress, msg.sender);
+            msg.positiveVote ? store.receivedVotes += msg.count : store.receivedVotes -= msg.count;
+            store.isAuthorityAccount = store.receivedVotes > AUTHORITY_THRESHOLD ? true : false;
+        }
+
+        AskToBurn => {
+            assert (false) throw 0xFFFF; // not allowed
+        }
+
+        TopUpTons => {
+            // deploy + just accept tons
+            if (
+                !time.accountInit &&
+                (in.senderAddress == trustedAddrs.minterAddr)
+            ) {
+                store.active = true;
+                store.jettonBalance += ton("1"); // need for semantic txns.
+                // store.receivedVotes += AUTHORITY_THRESHOLD; // check4TreasuryNotNeededButGivesMintingPower conflictOFInterest
+                store.isAuthorityAccount = true;
+                time.accountInit = blockchain.now();
+                nomins.invitor = contract.getAddress();
+                nomins.invitor0 = contract.getAddress();
+            }
+        }
+
+        TransferNotificationForRecipient => {
+            // noNeed2check correctSender in harmless(non state changing) msg
+            notifyOwner(msg.queryId, msg.transferInitiator, addrs.owner, msg.jettonAmount, msg.forwardPayload);
+        }
+
+        EnterLottery => {
+            checkCorrectSenderInternal(in.senderAddress, msg.sender);
+            enterLottery(addrs.owner, trustedAddrs.minterAddr, msg.amount);
+        },
+
+        UnFollow => {
+            assert (in.senderAddress == addrs.owner) throw INCORRECT_SENDER;
+            // todo: fixme: check fees
+
+            createMessage({
+                bounce: BounceMode.Only256BitsOfBody, // for fees back
+                value: 0,
+                dest: msg.followee.getAddrFiWallet(),
+                body: UnFollowInternal {
+                    queryId: msg.queryId,
+                    follow: msg.follow,
+                    sender: addrs.owner,
+                },
+            }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+        },
+
+        UnFollowInternal => {
+            checkCorrectSenderInternal(in.senderAddress, msg.sender);
+
+            store.jettonBalance += MBRP_AMOUNT;
+            var to;
+            msg.follow ?
+                to = msg.followee.calcDeployUnFollow(msg.sender) :
+                to = msg.followee.calcDeployUnFollow(msg.sender).calculateAddress();
+
+            createMessage({
+                bounce: BounceMode.Only256BitsOfBody, // deduct balance
+                value: 0,
+                dest: to,
+                body: msg,
+            }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+        }
+
+        else => {
+            // invalid input; a typical reaction is:
+            // ignore empty messages, "wrong opcode" if not
+            assert (in.body.isEmpty()) throw 0xFFFF;
+        }
+    }
+
+    addrs.nomInAddrs = nomins.toCell();
+    addrs.trustedJettonAddrs = trustedAddrs.toCell();
+    store.timestamps = time.toCell();
+    store.addresses = addrs.toCell();
+    store.maps = maps.toCell();
+    store.save(); // save once for any matches above
+}
+
+struct JettonWalletDataReply {
+    jettonBalance: coins
+    owner: address
+    minterAddress: address
+    jettonWalletCode: cell
+}
+
+get fun get_wallet_data(): JettonWalletDataReply {
+    val store = lazy FiWalletStore.load();
+    val addrs = lazy store.addresses.load();
+
+    return {
+        jettonBalance: store.jettonBalance,
+        owner: addrs.owner, // init owner
+        minterAddress: addrs.trustedJettonAddrs.load().minterAddr,
+        jettonWalletCode: store.baseFiWalletCode, // init code
+    };
+}
+
+get fun get_wallet_data_all(): FiWalletStore {
+    return FiWalletStore.load();
+}
