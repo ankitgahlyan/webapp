@@ -1,6 +1,93 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --border-width-*: initial;
+  --border-width-1: 1px;
+
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-orange: #ff7e73;
+  --color-brown: #776464;
+  --color-choco: #291f20;
+  --color-milky: #efebe5;
+  --color-blue: #0a88ca;
+  --color-lightblue: #d6ecf7;
+  --color-attention: #ffd2d4;
+  --color-attentiondark: #ffedef;
+  --color-black: #000000;
+
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
+
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #166534;
+  --color-green-900: #14532d;
+  --color-green-950: #052e16;
+
+  --color-dark-50: #f2f2f2;
+  --color-dark-100: #eaeaea;
+  --color-dark-200: #ffa39b;
+  --color-dark-300: #94a3b8;
+  --color-dark-400: #8b807f;
+  --color-dark-500: #776464;
+  --color-dark-600: #483637;
+  --color-dark-700: #464343;
+  --color-dark-800: #333131;
+  --color-dark-900: #2d2a2a;
+  --color-dark-950: #221f1f;
+
+  --color-c1: #b8aa9c;
+  --color-c2: #71665f;
+  --color-c3: #f4f1ed;
+  --color-c4: #f2ebfb;
+  --color-c5: #ccccff;
+  --color-c6: #7e22ce;
+  --color-c7: #0e0e0e;
+  --color-transparent: transparent;
+
+  --font-*: initial;
+  --font-body:
+    Poppins, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-logo:
+    Eczar, ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 body {
     background: radial-gradient(farthest-corner at 10% 10%, #feeae8 5%, #f4f4f4 30%, #f4f4f400 30%),
@@ -46,5 +133,5 @@ body {
     box-shadow: none;
     transform: none;
     display: flex;
-    @apply rounded-2xl shadow-sm;
+    @apply rounded-2xl shadow-xs;
 }

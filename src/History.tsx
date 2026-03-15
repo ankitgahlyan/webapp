@@ -30,7 +30,7 @@ const Referral = observer(({ model }: Props) => {
         <p>send any questions via <a href="https://t.me/keeperXBot">TELEGRAM</a></p>
     </div>
     // return (
-    //     <div className='mx-auto w-full max-w-screen-lg p-4 pb-32 font-body text-brown dark:text-dark-50'>
+    //     <div className='mx-auto w-full max-w-(--breakpoint-lg) p-4 pb-32 font-body text-brown dark:text-dark-50'>
     //         <p className='px-8 pt-4 text-center text-3xl font-bold'>Staking Rewards</p>
     //         <p className='mb-4 mt-2 px-8 text-center'>Track your hTON rewards.</p>
 

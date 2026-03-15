@@ -24,9 +24,9 @@ interface Props {
 
 const Header = observer(({ model }: Props) => {
     return (
-        <div className='mx-auto w-full max-w-screen-lg font-body text-brown dark:text-dark-50'>
+        <div className='mx-auto w-full max-w-(--breakpoint-lg) font-body text-brown dark:text-dark-50'>
             {!model.isBannerClosed && (
-                <div className='fixed left-0 right-0 top-0 z-50 mx-auto max-w-screen-lg'>
+                <div className='fixed left-0 right-0 top-0 z-50 mx-auto max-w-(--breakpoint-lg)'>
                     <div className='w-fiull relative mx-4 my-4 flex flex-col-reverse items-start justify-items-end gap-0 rounded-2xl border-1 border-c6 bg-c4 px-4 py-2 md:flex-row md:items-center md:justify-between md:gap-4'>
                         <div className='flex w-full flex-col items-center justify-between gap-2 md:flex-row'>
                             <div className='text-c7'>
@@ -78,12 +78,12 @@ const Header = observer(({ model }: Props) => {
                         <div className='flex flex-col items-center sm:flex-row sm:pl-2'>
                             <img
                                 src={pageStakeBrown}
-                                className={'h-4 dark:!hidden' + (model.activePage !== 'home' ? ' block' : ' hidden')}
+                                className={'h-4 dark:hidden!' + (model.activePage !== 'home' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageStakeWhite}
                                 className={
-                                    'hidden h-4' + (model.activePage !== 'home' ? ' dark:!block' : ' sm:dark:!block')
+                                    'hidden h-4' + (model.activePage !== 'home' ? ' dark:block!' : ' sm:dark:block!')
                                 }
                             />
                             <img
@@ -93,7 +93,7 @@ const Header = observer(({ model }: Props) => {
                             <img
                                 src={pageStakeBlack}
                                 className={
-                                    'hidden h-4' + (model.activePage === 'home' ? ' dark:!hidden sm:block' : '')
+                                    'hidden h-4' + (model.activePage === 'home' ? ' dark:hidden! sm:block' : '')
                                 }
                             />
                             <span className='p-2 dark:text-white'>Home</span>
@@ -101,7 +101,7 @@ const Header = observer(({ model }: Props) => {
                         <div
                             className={
                                 'mt-1 hidden h-1 rounded-full bg-c6' +
-                                (model.activePage === 'home' ? ' sm:!block' : '')
+                                (model.activePage === 'home' ? ' sm:block!' : '')
                             }
                         ></div>
                     </li>
@@ -117,12 +117,12 @@ const Header = observer(({ model }: Props) => {
                         <div className='flex flex-col items-center sm:flex-row sm:pl-2'>
                             <img
                                 src={pageRewardBrown}
-                                className={'h-4 dark:!hidden' + (model.activePage !== 'history' ? ' block' : ' hidden')}
+                                className={'h-4 dark:hidden!' + (model.activePage !== 'history' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageRewardWhite}
                                 className={
-                                    'hidden h-4' + (model.activePage !== 'history' ? ' dark:!block' : ' sm:dark:!block')
+                                    'hidden h-4' + (model.activePage !== 'history' ? ' dark:block!' : ' sm:dark:block!')
                                 }
                             />
                             <img
@@ -132,7 +132,7 @@ const Header = observer(({ model }: Props) => {
                             <img
                                 src={pageRewardBlack}
                                 className={
-                                    'hidden h-4' + (model.activePage === 'history' ? ' dark:!hidden sm:block' : '')
+                                    'hidden h-4' + (model.activePage === 'history' ? ' dark:hidden! sm:block' : '')
                                 }
                             />
                             <span className='p-2 dark:text-white'>History</span>
@@ -140,7 +140,7 @@ const Header = observer(({ model }: Props) => {
                         <div
                             className={
                                 'mt-1 hidden h-1 rounded-full bg-c6' +
-                                (model.activePage === 'history' ? ' sm:!block' : '')
+                                (model.activePage === 'history' ? ' sm:block!' : '')
                             }
                         ></div>
                     </li>
@@ -156,12 +156,12 @@ const Header = observer(({ model }: Props) => {
                         <div className='flex flex-col items-center sm:flex-row sm:pl-2'>
                             <img
                                 src={pageDefiBrown}
-                                className={'h-4 dark:!hidden' + (model.activePage !== 'settings' ? ' block' : ' hidden')}
+                                className={'h-4 dark:hidden!' + (model.activePage !== 'settings' ? ' block' : ' hidden')}
                             />
                             <img
                                 src={pageDefiWhite}
                                 className={
-                                    'hidden h-4' + (model.activePage !== 'settings' ? ' dark:!block' : ' sm:dark:!block')
+                                    'hidden h-4' + (model.activePage !== 'settings' ? ' dark:block!' : ' sm:dark:block!')
                                 }
                             />
                             <img
@@ -170,14 +170,14 @@ const Header = observer(({ model }: Props) => {
                             />
                             <img
                                 src={pageDefiBlack}
-                                className={'hidden h-4' + (model.activePage === 'settings' ? ' dark:!hidden sm:block' : '')}
+                                className={'hidden h-4' + (model.activePage === 'settings' ? ' dark:hidden! sm:block' : '')}
                             />
                             <span className='p-2 dark:text-white'>Settings</span>
                         </div>
                         <div
                             className={
                                 'mt-1 hidden h-1 rounded-full bg-c6' +
-                                (model.activePage === 'settings' ? ' sm:!block' : '')
+                                (model.activePage === 'settings' ? ' sm:block!' : '')
                             }
                         ></div>
                     </li>

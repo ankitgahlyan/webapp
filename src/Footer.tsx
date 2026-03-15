@@ -10,7 +10,7 @@ interface Props {
 const Footer = observer(({ model }: Props) => {
     return (
         <div className='mt-auto bg-milky font-body text-brown dark:bg-dark-900 dark:text-dark-50'>
-            <div className='mx-auto flex w-full max-w-screen-lg flex-col justify-center px-8 py-8 sm:flex sm:flex-row-reverse sm:items-start sm:px-0'>
+            <div className='mx-auto flex w-full max-w-(--breakpoint-lg) flex-col justify-center px-8 py-8 sm:flex sm:flex-row-reverse sm:items-start sm:px-0'>
                 <div className='mx-auto flex flex-row flex-wrap'>
                     <div className='mx-8 my-4'>
                         <h3 className='font-bold text-c6 dark:text-brown'>Social</h3>

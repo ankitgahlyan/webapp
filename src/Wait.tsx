@@ -101,7 +101,7 @@ const Wait = observer(({ model }: Props) => {
         return (
             <div
                 className={
-                    'fixed left-0 top-0 z-[1000] flex h-full w-full overflow-y-auto bg-black bg-opacity-40 p-8 text-brown dark:text-dark-50'
+                    'fixed left-0 top-0 z-1000 flex h-full w-full overflow-y-auto bg-black bg-opacity-40 p-8 text-brown dark:text-dark-50'
                 }
             >
                 <div className='m-auto w-96 max-w-sm rounded-3xl bg-milky p-8 shadow-2xl dark:bg-dark-700'>

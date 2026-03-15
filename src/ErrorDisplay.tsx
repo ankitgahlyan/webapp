@@ -11,7 +11,7 @@ const ErrorDisplay = observer(({ model }: Props) => {
     return (
         <div
             className={
-                'fixed bottom-20 left-6 flex max-w-screen-sm rounded-2xl bg-c6 p-2 text-white drop-shadow dark:text-dark-600 sm:bottom-2' +
+                'fixed bottom-20 left-6 flex max-w-(--breakpoint-sm) rounded-2xl bg-c6 p-2 text-white drop-shadow-sm dark:text-dark-600 sm:bottom-2' +
                 (model.errorMessage === '' ? ' hidden' : '')
             }
         >

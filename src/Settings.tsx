@@ -14,9 +14,9 @@ interface Props {
 const Referral = observer(({ model }: Props) => {
     return <h1 className='text-white'>coming not so soon...</h1>
     // return (
-    //     <div className='mx-auto w-full max-w-screen-lg p-4 pb-32 font-body text-brown dark:text-dark-50'>
+    //     <div className='mx-auto w-full max-w-(--breakpoint-lg) p-4 pb-32 font-body text-brown dark:text-dark-50'>
     //         <p className='px-8 pt-4 text-center text-3xl font-bold'>What Can I Do with hTON?</p>
-    //         <p className='mx-auto my-8 max-w-[32rem] px-8 text-center text-xl'>
+    //         <p className='mx-auto my-8 max-w-lg px-8 text-center text-xl'>
     //             Maximize the potential of your capital with hTON in TON Settings protocols
     //         </p>
 

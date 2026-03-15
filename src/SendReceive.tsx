@@ -28,7 +28,7 @@ const SendReceive = observer(({ model }: Props) => {
             <div className={model.isSendTabActive ? 'hidden' : ''}>
                 <Receive model={model} />
             </div>
-            <div className={'mx-auto w-full max-w-screen-lg font-body text-brown dark:text-dark-50' + (model.isSendTabActive ? '' : 'hidden')}>
+            <div className={'mx-auto w-full max-w-(--breakpoint-lg) font-body text-brown dark:text-dark-50' + (model.isSendTabActive ? '' : 'hidden')}>
                 <p className='pt-4 text-center text-3xl font-bold'>Foss-Fiat</p>
                 <p className='my-8 text-center'>
                     {model.isSendTabActive
@@ -44,7 +44,7 @@ const SendReceive = observer(({ model }: Props) => {
                         }
                     >
                         <li
-                            className='z-[1] m-1 inline-block w-36 cursor-pointer rounded-full py-1 text-center'
+                            className='z-1 m-1 inline-block w-36 cursor-pointer rounded-full py-1 text-center'
                             onClick={() => {
                                 model.setActiveTab('send')
                             }}
@@ -52,7 +52,7 @@ const SendReceive = observer(({ model }: Props) => {
                             Send
                         </li>
                         <li
-                            className='z-[1] m-1 inline-block w-36 cursor-pointer rounded-full py-1 text-center'
+                            className='z-1 m-1 inline-block w-36 cursor-pointer rounded-full py-1 text-center'
                             onClick={() => {
                                 model.setActiveTab('receive')
                             }}
@@ -73,7 +73,7 @@ const SendReceive = observer(({ model }: Props) => {
                     <div
                         className={
                             'overflow-hidden transition-all duration-700 motion-reduce:transition-none' +
-                            (model.isWalletConnected ? ' max-h-[20rem]' : ' max-h-0')
+                            (model.isWalletConnected ? ' max-h-80' : ' max-h-0')
                         }
                     >
                         <div className='mx-4 rounded-t-2xl bg-brown px-8 pb-12 pt-4 text-sm text-white dark:bg-dark-600 dark:text-dark-50'>
@@ -115,7 +115,7 @@ const SendReceive = observer(({ model }: Props) => {
                         </div>
                     </div>
 
-                    <div className='mx-4 -mt-8 rounded-2xl bg-white p-8 shadow-sm dark:bg-dark-700'>
+                    <div className='mx-4 -mt-8 rounded-2xl bg-white p-8 shadow-xs dark:bg-dark-700'>
                         <p>{model.isSendTabActive ? 'Send Tokens' : 'Receive Tokens'}</p>
 
                         {/* receiver input section */}
@@ -137,7 +137,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 inputMode="text"
                                 placeholder="0Q... receiver address"
                                 className={
-                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
+                                    'h-full w-full flex-1 px-3 text-lg focus:outline-hidden dark:bg-dark-900 dark:text-dark-50' +
                                     (model.isAddressValid ? '' : ' text-c6 dark:text-c6')
                                 }
                                 value={model.receiver}
@@ -156,10 +156,10 @@ const SendReceive = observer(({ model }: Props) => {
                             <button
                                 type="button"
                                 className={
-                                    'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
+                                    'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-hidden active:bg-gray-300 dark:text-dark-600' +
                                     (model.isAddressValid
                                         ? ''
-                                        : ' bg-c6 text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
+                                        : ' bg-c6 text-white hover:bg-brown! active:bg-dark-600! dark:hover:text-dark-50')
                                 }
                                 onClick={model.setReceiverToSelf}
                             >
@@ -191,7 +191,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 step={100}
                                 placeholder="amount to transfer"
                                 className={
-                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50' +
+                                    'h-full w-full flex-1 px-3 text-lg focus:outline-hidden dark:bg-dark-900 dark:text-dark-50' +
                                     (model.isAmountValid ? '' : ' text-c6 dark:text-c6')
                                 }
                                 value={model.amount}
@@ -213,10 +213,10 @@ const SendReceive = observer(({ model }: Props) => {
                             <button
                                 type="button"
                                 className={
-                                    'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-none active:bg-gray-300 dark:text-dark-600' +
+                                    'rounded-lg bg-milky px-3 text-xs hover:bg-gray-200 focus:outline-hidden active:bg-gray-300 dark:text-dark-600' +
                                     (model.isAmountValid
                                         ? ''
-                                        : ' bg-c6 text-white hover:!bg-brown active:!bg-dark-600 dark:hover:text-dark-50')
+                                        : ' bg-c6 text-white hover:bg-brown! active:bg-dark-600! dark:hover:text-dark-50')
                                 }
                                 onClick={model.setAmountToMax}
                             >
@@ -242,7 +242,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 inputMode="text"
                                 placeholder="e.g: for coffee"
                                 className={
-                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50'
+                                    'h-full w-full flex-1 px-3 text-lg focus:outline-hidden dark:bg-dark-900 dark:text-dark-50'
                                 }
                                 value={model.comment}
                                 onChange={(e) => {
@@ -259,7 +259,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 step={0.05}
                                 placeholder="gas/fees: min 0.55"
                                 className={
-                                    'h-full w-full flex-1 px-3 text-lg focus:outline-none dark:bg-dark-900 dark:text-dark-50'
+                                    'h-full w-full flex-1 px-3 text-lg focus:outline-hidden dark:bg-dark-900 dark:text-dark-50'
                                 }
                                 value={model.gas}
                                 onChange={(e) => {

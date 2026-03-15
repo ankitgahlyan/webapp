@@ -35,7 +35,7 @@ const Receive = observer(({ model }: ReceiveProps) => {
             </button>
 
             {userAddress && (
-                <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-dark-700">
+                <div className="rounded-lg border bg-white p-6 shadow-xs dark:bg-dark-700">
                     <div className="space-y-6">
                         {/* QR Code */}
                         <div className="flex flex-col items-center"
@@ -68,7 +68,7 @@ const Receive = observer(({ model }: ReceiveProps) => {
 
                         {/* Copy Button */}
                         <button
-                            className={`w-full rounded bg-blue-500 py-2 text-white hover:bg-blue-600 focus:outline-none ${copied ? 'opacity-80' : ''}`}
+                            className={`w-full rounded-sm bg-blue-500 py-2 text-white hover:bg-blue-600 focus:outline-hidden ${copied ? 'opacity-80' : ''}`}
                             onClick={copyAddress}
                         >
                             {copied ? (
