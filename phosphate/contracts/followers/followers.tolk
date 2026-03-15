@@ -10,7 +10,7 @@ fun onBouncedMessage(in: InMessageBounced) {
 }
 
 fun onInternalMessage(in: InMessage) {
-    val msg = lazy UnFollowersMsg.fromCell(in.body);
+    val msg = lazy UnFollowersMsg.fromSlice(in.body);
     var store = lazy UnFollowStore.load();
 
     match (msg) {

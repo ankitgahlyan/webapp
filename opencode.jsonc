@@ -1,0 +1,75 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"agent": {
+		"code-reviewer": {
+			"description": "Reviews code for best practices and potential issues",
+			// "model": "anthropic/claude-sonnet-4-5",
+			"prompt": "You are a code reviewer. Focus on security, performance, and maintainability.",
+			"tools": {
+				// Disable file modification tools for review-only agent
+				"write": false,
+				"edit": false
+			}
+		}
+	},
+	"command": {
+		"test": {
+			"template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
+			"description": "Run tests with coverage",
+			"agent": "build",
+			"model": "anthropic/claude-haiku-4-5"
+		},
+		"component": {
+			"template": "Create a new react component named $ARGUMENTS with TypeScript support.\nInclude proper typing and basic structure.",
+			"description": "Create a new component"
+		}
+	},
+	"permission": {
+		"edit": "ask",
+		"bash": "ask"
+	},
+	"watcher": {
+		"ignore": [
+			"node_modules/**",
+			"dist/**",
+			".git/**"
+		]
+	},
+	"mcp": {
+		// "next-devtools": {
+		// 	"command": "npx",
+		// 	"args": [
+		// 		"-y",
+		// 		"next-devtools-mcp@latest"
+		// 	]
+		// },
+		"ton": {
+			"type": "remote",
+			"url": "https://docs.ton.org/mcp"
+		},
+		"context7": {
+			"type": "local",
+			"command": [
+				"pnpm",
+				"dlx",
+				"@upstash/context7-mcp@1.0.31"
+			],
+			// "environment": {
+			// 	"CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+			// }
+			// "gallery": "https://api.mcp.github.com",
+			// "version": "1.0.31"
+		},
+		// "context7-remote": {
+		// 	"type": "remote",
+		// 	"url": "https://mcp.context7.com/mcp",
+		// 	"headers": {
+		// 		"CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+		// 	}
+		// },
+		"gh_grep": {
+			"type": "remote",
+			"url": "https://mcp.grep.app"
+		},
+	}
+}

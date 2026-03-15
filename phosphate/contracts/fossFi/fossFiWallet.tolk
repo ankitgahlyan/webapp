@@ -29,6 +29,7 @@ type AllowedMessageToWallet =
 
     | UnFollow
     | UnFollowInternal
+    | Destroy
 
 type AllowedCustomPayload = CustomPayloadMsg
 
@@ -295,7 +296,6 @@ fun onInternalMessage(in: InMessage): void {
                                 addrs.treasury,
                                 trustedAddrs.minterAddr,
                                 store.baseFiWalletCode,
-                                addrs.others.load().UnFollowCode,
                             ), // deploy in invite + standalone for idLess accounts
                             value: 0,
                             body: InternalInvite {
@@ -339,7 +339,6 @@ fun onInternalMessage(in: InMessage): void {
 
                     // claim votes back
                     ton("0.12") => {
-                        // assert (!store.votes) throw NOT_VOTED_YET; // noNeed
                         val candidate = msg.transferRecipient.getAddrFiWallet();
                         val exists = maps.votedFor.deleteAndGetDeleted(candidate);
                         assert (exists.isFound) throw NOT_VOTED_YET;
@@ -566,33 +565,48 @@ fun onInternalMessage(in: InMessage): void {
             assert (in.senderAddress == addrs.owner) throw INCORRECT_SENDER;
             // todo: fixme: check fees
 
-            createMessage({
-                bounce: BounceMode.Only256BitsOfBody, // for fees back
-                value: 0,
-                dest: msg.followee.getAddrFiWallet(),
-                body: UnFollowInternal {
-                    queryId: msg.queryId,
-                    follow: msg.follow,
-                    sender: addrs.owner,
-                },
-            }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+            // todo: implement via minter as proxy
+            // createMessage({
+            //     bounce: BounceMode.Only256BitsOfBody, // for fees back
+            //     value: 0,
+            //     dest: msg.followee.getAddrFiWallet(),
+            //     body: UnFollowInternal {
+            //         queryId: msg.queryId,
+            //         follow: msg.follow,
+            //         sender: addrs.owner,
+            //     },
+            // }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
         },
 
         UnFollowInternal => {
             checkCorrectSenderInternal(in.senderAddress, msg.sender);
 
-            store.jettonBalance += MBRP_AMOUNT;
-            var to;
-            msg.follow ?
-                to = msg.followee.calcDeployUnFollow(msg.sender) :
-                to = msg.followee.calcDeployUnFollow(msg.sender).calculateAddress();
+            // store.jettonBalance += MBRP_AMOUNT;
+            // var to;
+            // msg.follow ?
+            //     to = msg.followee.calcDeployUnFollow(msg.sender) :
+            //     to = msg.followee.calcDeployUnFollow(msg.sender).calculateAddress();
 
+            // createMessage({
+            //     bounce: BounceMode.Only256BitsOfBody, // deduct balance
+            //     value: 0,
+            //     dest: to,
+            //     body: msg,
+            // }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+        }
+
+        // testnetOnly
+        Destroy => {
+            assert (in.senderAddress == addrs.owner) throw INCORRECT_SENDER;
+            
             createMessage({
-                bounce: BounceMode.Only256BitsOfBody, // deduct balance
+                bounce: BounceMode.NoBounce,
                 value: 0,
-                dest: to,
-                body: msg,
-            }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                dest: in.senderAddress,
+                body: ReturnExcessesBack {
+                    queryId: 0,
+                },
+            }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
         }
 
         else => {

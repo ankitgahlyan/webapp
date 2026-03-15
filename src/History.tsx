@@ -1,15 +1,34 @@
 import { observer } from 'mobx-react-lite'
 import { Model } from './Model'
-import gift from './assets/hpo-hton-ton-gift.webp'
-import ton from './assets/ton.svg'
-import hpo from './assets/hpo.svg'
+// import gift from './assets/hpo-hton-ton-gift.webp'
+// import ton from './assets/ton.svg'
+// import hpo from './assets/hpo.svg'
 
 interface Props {
     model: Model
 }
 
 const Referral = observer(({ model }: Props) => {
-    return <p className='text-white'>coming soon...</p>;
+    return <div className='m-auto p-4 border-purple-500 bg-black text-white'>
+        <div className='font-bold'>
+            FAQ's
+        </div>
+        <div className='text-sm text-red-500'>Q. why do we exist?</div>
+        <div className='text-sm text-green-500'>A. to fullfill THE PROMISE of BITCOIN.</div>
+        Q. what's THE PROMISE? <br />
+        A. to create a p2p cash. <br />
+        Q. why we need a p2p cash? <br />
+        A. for interest-free credit. <br />
+        Q. 
+        Q. why bitcoin failed? <br />
+        A. coz it is just a digital version of already failed system (gold standard). <br />
+        Q. why gold standard failed? <br />
+        A. it introduced self-imposed constraints. <br />
+        Q. why will we succeed? <br />
+        A. coz it's a decentralised version of a successful system (fiat).
+
+        <p>send any questions via <a href="https://t.me/keeperXBot">TELEGRAM</a></p>
+    </div>
     // return (
     //     <div className='mx-auto w-full max-w-screen-lg p-4 pb-32 font-body text-brown dark:text-dark-50'>
     //         <p className='px-8 pt-4 text-center text-3xl font-bold'>Staking Rewards</p>

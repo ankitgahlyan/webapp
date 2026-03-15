@@ -33,7 +33,8 @@ export async function run(provider: NetworkProvider) {
         others: beginCell()
         .storeRef(Cell.fromHex(lotteryCodeFile.hex)) // lottery code
         .storeRef(Cell.fromHex(fiWalletCodeFile.hex)) // latestFiWalletCode
-        .storeRef(Cell.fromHex(unFollowCodeFile.hex)) // UnFollowers code
+        // .storeRef(Cell.fromHex(unFollowCodeFile.hex)) // UnFollowers code
+        .storeRef(beginCell().endCell())
         .storeRef(beginCell().endCell())
         .endCell(),
     };

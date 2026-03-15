@@ -1,0 +1,19 @@
+{
+    "env": {
+        "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+        "ANTHROPIC_AUTH_TOKEN": "",
+        "ANTHROPIC_API_KEY": "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",
+        "ANTHROPIC_MODEL": "openrouter/free"
+    },
+    "extraKnownMarketplaces": {
+        "nx-claude-plugins": {
+            "source": {
+                "source": "github",
+                "repo": "nrwl/nx-ai-agents-config"
+            }
+        }
+    },
+    "enabledPlugins": {
+        "nx@nx-claude-plugins": true
+    }
+}

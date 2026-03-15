@@ -23,7 +23,7 @@ struct Addresses {
 }
 
 struct FiWalletCodes {
-    UnFollowCode: cell
+    a: cell
     b: cell
     c: cell
     d: cell
@@ -32,7 +32,7 @@ struct FiWalletCodes {
 struct FiCodes {
     lotteryCode: cell
     latestFiWalletCode: cell
-    UnFollowCode: cell
+    c: cell
     d: cell
 }
 

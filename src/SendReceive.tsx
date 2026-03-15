@@ -82,7 +82,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 <p className='ml-auto font-medium'>{model.tonBalanceFormatted}</p>
                             </div>
 
-                            {model.stakingInProgressDetails.map((value) => (
+                            {/* {model.stakingInProgressDetails.map((value) => (
                                 <div key={(value.estimated ?? '') + value.amount} className='flex flex-row flex-wrap'>
                                     <p className='font-light opacity-70'>
                                         {value.estimated == null
@@ -91,7 +91,7 @@ const SendReceive = observer(({ model }: Props) => {
                                     </p>
                                     <p className='ml-auto font-medium opacity-70'>{value.amount}</p>
                                 </div>
-                            ))}
+                            ))} */}
 
                             <div className='my-4 h-px bg-white opacity-40'></div>
 
@@ -100,7 +100,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 <p className='ml-auto font-medium'>{model.mintBalanceFormatted}</p>
                             </div>
 
-                            <div
+                            {/* <div
                                 className={
                                     'flex flex-row flex-wrap' + (model.unstakingInProgressDetails != null ? '' : ' hidden')
                                 }
@@ -111,7 +111,7 @@ const SendReceive = observer(({ model }: Props) => {
                                         : 'In progress, done by ' + model.unstakingInProgressDetails.estimated}
                                 </p>
                                 <p className='ml-auto font-medium opacity-70'>{model.unstakingInProgressFormatted}</p>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -323,11 +323,7 @@ const SendReceive = observer(({ model }: Props) => {
                             disabled={!model.isButtonEnabled}
                             onClick={(e) => {
                                 if (model.isWalletConnected) {
-                                    if (model.isSendTabActive || model.unstakeOption === 'unstake') {
-                                        model.sendTxn()
-                                    } else {
-                                        window.open(model.swapUrl, 'hipo_swap')
-                                    }
+                                    model.sendTxn()
                                 } else {
                                     model.connect()
                                 }

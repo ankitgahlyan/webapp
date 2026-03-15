@@ -2,18 +2,18 @@ import { Network } from '@orbs-network/ton-access'
 import { TonConnectUI, THEME, CHAIN, SendTransactionRequest } from '@tonconnect/ui'
 import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx'
 import { Address, Dictionary, OpenedContract, TonClient4, beginCell, comment, fromNano, toNano } from '@ton/ton'
-import {
-    ParticipationState,
-    Times,
-    Treasury,
-    Wallet,
-    Parent,
-    TreasuryConfig,
-    WalletState,
-    opUnstakeTokens,
-    treasuryAddresses,
-    feeUnstake,
-} from '@hipo-finance/sdk'
+// import {
+//     ParticipationState,
+//     Times,
+//     Treasury,
+//     Wallet,
+//     Parent,
+//     TreasuryConfig,
+//     WalletState,
+//     opUnstakeTokens,
+//     treasuryAddresses,
+//     feeUnstake,
+// } from '@hipo-finance/sdk'
 import { OldTreasury } from './OldTreasury'
 import { FossFi, FossFiConfig } from './wrappers/fi/FossFi'
 import { FossFiWallet, FossFiWalletConfig } from './wrappers/fi/FossFiWallet'
@@ -82,12 +82,12 @@ export class Model {
     address?: Address
     tonBalance?: bigint
     // mintBalance?: bigint
-    treasury?: OpenedContract<Treasury>
-    treasuryState?: TreasuryConfig
-    times?: Times
+    // treasury?: OpenedContract<Treasury>
+    // treasuryState?: TreasuryConfig
+    // times?: Times
     walletAddress?: Address
-    wallet?: OpenedContract<Wallet>
-    walletState?: WalletState
+    // wallet?: OpenedContract<Wallet>
+    // walletState?: WalletState
     fi?: OpenedContract<FossFi>
     fiState?: FossFiConfig
     fiJetton?: OpenedContract<FossFiWallet>
@@ -141,12 +141,12 @@ export class Model {
             tonClient: observable,
             address: observable,
             tonBalance: observable,
-            treasury: observable,
-            treasuryState: observable,
-            times: observable,
+            // treasury: observable,
+            // treasuryState: observable,
+            // times: observable,
             walletAddress: observable,
-            wallet: observable,
-            walletState: observable,
+            // wallet: observable,
+            // walletState: observable,
             oldWalletAddress: observable,
             oldWalletTokens: observable,
             newWalletTokens: observable,
@@ -173,16 +173,16 @@ export class Model {
             // htonBalanceFormatted: computed,
             // mintBalance: computed,
             // mintBalanceFormatted: computed,
-            htonBalanceInTon: computed,
-            htonBalanceInTonAfterOneYear: computed,
-            profitAfterOneYear: computed,
-            profitAfterOneYearOnLastLevel: computed,
+            // htonBalanceInTon: computed,
+            // htonBalanceInTonAfterOneYear: computed,
+            // profitAfterOneYear: computed,
+            // profitAfterOneYearOnLastLevel: computed,
             oldWalletTokensFormatted: computed,
             newWalletTokensFormatted: computed,
-            unstakingInProgressFormatted: computed,
-            unstakingInProgressDetails: computed,
-            stakingInProgressFormatted: computed,
-            stakingInProgressDetails: computed,
+            // unstakingInProgressFormatted: computed,
+            // unstakingInProgressDetails: computed,
+            // stakingInProgressFormatted: computed,
+            // stakingInProgressDetails: computed,
             maxAmount: computed,
             amountInNano: computed,
             isAmountValid: computed,
@@ -190,25 +190,25 @@ export class Model {
             isAmountPositive: computed,
             isButtonEnabled: computed,
             buttonLabel: computed,
-            swapUrl: computed,
-            youWillReceive: computed,
-            exchangeRate: computed,
-            exchangeRateFormatted: computed,
-            averageStakeFeeFormatted: computed,
-            averageUnstakeFeeFormatted: computed,
-            unstakeHours: computed,
-            explorerHref: computed,
-            apy: computed,
-            apyFormatted: computed,
-            protocolFee: computed,
-            currentlyStaked: computed,
+            // swapUrl: computed,
+            // youWillReceive: computed,
+            // exchangeRate: computed,
+            // exchangeRateFormatted: computed,
+            // averageStakeFeeFormatted: computed,
+            // averageUnstakeFeeFormatted: computed,
+            // unstakeHours: computed,
+            // explorerHref: computed,
+            // apy: computed,
+            // apyFormatted: computed,
+            // protocolFee: computed,
+            // currentlyStaked: computed,
             holdersCountFormatted: computed,
             claimWalletRewardsLabel: computed,
 
             setNetwork: action,
             setTonClient: action,
             setAddress: action,
-            setTimes: action,
+            // setTimes: action,
             setActivePage: action,
             setActiveTab: action,
             setUnstakeOption: action,
@@ -308,65 +308,65 @@ export class Model {
         }
     }
 
-    get htonBalanceInTon() {
-        const state = this.treasuryState
-        if (state != null && this.walletState != null) {
-            const rate = Number(state.totalCoins) / Number(state.totalTokens) || 1
-            const balance = Number(this.walletState.tokens ?? 0n) * rate
-            return '≈ ' + formatNano(balance) + ' TON'
-        }
-    }
+    // get htonBalanceInTon() {
+    //     const state = this.treasuryState
+    //     if (state != null && this.walletState != null) {
+    //         const rate = Number(state.totalCoins) / Number(state.totalTokens) || 1
+    //         const balance = Number(this.walletState.tokens ?? 0n) * rate
+    //         return '≈ ' + formatNano(balance) + ' TON'
+    //     }
+    // }
 
-    get htonBalanceInTonAfterOneYear() {
-        const apy = this.apy
-        const state = this.treasuryState
-        if (apy != null && state != null && this.walletState != null) {
-            const rate = Number(state.totalCoins) / Number(state.totalTokens) || 1
-            const balance = Number(this.walletState.tokens ?? 0n) * rate * (1 + apy)
-            return '≈ ' + formatNano(balance) + ' TON'
-        }
-    }
+    // get htonBalanceInTonAfterOneYear() {
+    //     const apy = this.apy
+    //     const state = this.treasuryState
+    //     if (apy != null && state != null && this.walletState != null) {
+    //         const rate = Number(state.totalCoins) / Number(state.totalTokens) || 1
+    //         const balance = Number(this.walletState.tokens ?? 0n) * rate * (1 + apy)
+    //         return '≈ ' + formatNano(balance) + ' TON'
+    //     }
+    // }
 
-    get profitAfterOneYear() {
-        const apy = this.apy
-        const state = this.treasuryState
-        if (apy == null || state == null || this.walletState == null) {
-            return
-        }
+    // get profitAfterOneYear() {
+    //     const apy = this.apy
+    //     const state = this.treasuryState
+    //     if (apy == null || state == null || this.walletState == null) {
+    //         return
+    //     }
 
-        const exchangeRate = Number(state.totalCoins) / Number(state.totalTokens) || 1
-        const rewardRate = this.walletRewards?.htonHpoRewardRate ?? 0
-        const clubLevel = this.walletRewards?.clubLevel ?? 0
-        const rewardCoefficients = this.walletRewards?.rewardCoefficients ?? [1]
-        const rewardCoefficient = rewardCoefficients[clubLevel] ?? 0
+    //     const exchangeRate = Number(state.totalCoins) / Number(state.totalTokens) || 1
+    //     const rewardRate = this.walletRewards?.htonHpoRewardRate ?? 0
+    //     const clubLevel = this.walletRewards?.clubLevel ?? 0
+    //     const rewardCoefficients = this.walletRewards?.rewardCoefficients ?? [1]
+    //     const rewardCoefficient = rewardCoefficients[clubLevel] ?? 0
 
-        const hton = Number(this.walletState.tokens ?? 0n)
-        const ton = hton * exchangeRate * apy
-        const hpo = hton * exchangeRate * rewardRate * rewardCoefficient * 20 * 12
+    //     const hton = Number(this.walletState.tokens ?? 0n)
+    //     const ton = hton * exchangeRate * apy
+    //     const hpo = hton * exchangeRate * rewardRate * rewardCoefficient * 20 * 12
 
-        if (hpo > 0.01) {
-            return formatNano(ton) + ' TON + ' + formatNano(hpo) + ' HPO'
-        } else {
-            return formatNano(ton) + ' TON'
-        }
-    }
+    //     if (hpo > 0.01) {
+    //         return formatNano(ton) + ' TON + ' + formatNano(hpo) + ' HPO'
+    //     } else {
+    //         return formatNano(ton) + ' TON'
+    //     }
+    // }
 
-    get profitAfterOneYearOnLastLevel() {
-        const state = this.treasuryState
-        if (state == null || this.walletState == null) {
-            return
-        }
+    // get profitAfterOneYearOnLastLevel() {
+    //     const state = this.treasuryState
+    //     if (state == null || this.walletState == null) {
+    //         return
+    //     }
 
-        const exchangeRate = Number(state.totalCoins) / Number(state.totalTokens) || 1
-        const rewardRate = this.walletRewards?.htonHpoRewardRate ?? 0
-        const rewardCoefficients = this.walletRewards?.rewardCoefficients ?? [1]
-        const rewardCoefficient = rewardCoefficients[rewardCoefficients.length - 1]
+    //     const exchangeRate = Number(state.totalCoins) / Number(state.totalTokens) || 1
+    //     const rewardRate = this.walletRewards?.htonHpoRewardRate ?? 0
+    //     const rewardCoefficients = this.walletRewards?.rewardCoefficients ?? [1]
+    //     const rewardCoefficient = rewardCoefficients[rewardCoefficients.length - 1]
 
-        const hton = Number(this.walletState.tokens ?? 0n)
-        const hpo = hton * exchangeRate * rewardRate * rewardCoefficient * 20 * 12
+    //     const hton = Number(this.walletState.tokens ?? 0n)
+    //     const hpo = hton * exchangeRate * rewardRate * rewardCoefficient * 20 * 12
 
-        return formatNano(hpo) + ' HPO'
-    }
+    //     return formatNano(hpo) + ' HPO'
+    // }
 
     get oldWalletTokensFormatted() {
         if (this.oldWalletTokens != null) {
@@ -380,70 +380,70 @@ export class Model {
         }
     }
 
-    get unstakingInProgressFormatted() {
-        return formatNano(this.walletState?.unstaking ?? 0n) + ' hTON'
-    }
+    // get unstakingInProgressFormatted() {
+    //     return formatNano(this.walletState?.unstaking ?? 0n) + ' hTON'
+    // }
 
-    get unstakingInProgressDetails() {
-        const value = this.walletState?.unstaking
-        if (value == null || value === 0n || this.treasuryState == null) {
-            return
-        }
-        let time = undefined
-        const firstParticipationKey = this.treasuryState.participations.keys()[0] ?? 0n
-        const firstParticipationValue = this.treasuryState.participations.get(firstParticipationKey)
-        if ((firstParticipationValue?.state ?? ParticipationState.Open) >= ParticipationState.Staked) {
-            time = firstParticipationValue?.stakeHeldUntil
-        }
-        return {
-            amount: formatNano(value) + ' hTON',
-            estimated: time == null ? undefined : formatDate(new Date((Number(time) + 5 * 60) * 1000)),
-        }
-    }
+    // get unstakingInProgressDetails() {
+    //     const value = this.walletState?.unstaking
+    //     if (value == null || value === 0n || this.treasuryState == null) {
+    //         return
+    //     }
+    //     let time = undefined
+    //     const firstParticipationKey = this.treasuryState.participations.keys()[0] ?? 0n
+    //     const firstParticipationValue = this.treasuryState.participations.get(firstParticipationKey)
+    //     if ((firstParticipationValue?.state ?? ParticipationState.Open) >= ParticipationState.Staked) {
+    //         time = firstParticipationValue?.stakeHeldUntil
+    //     }
+    //     return {
+    //         amount: formatNano(value) + ' hTON',
+    //         estimated: time == null ? undefined : formatDate(new Date((Number(time) + 5 * 60) * 1000)),
+    //     }
+    // }
 
-    get stakingInProgressFormatted() {
-        let result = 0n
-        const empty = Dictionary.empty(Dictionary.Keys.BigUint(32), Dictionary.Values.BigVarUint(4))
-        const staking = this.walletState?.staking ?? empty
-        const times = staking.keys()
-        for (const time of times) {
-            const value = staking.get(time)
-            if (value != null) {
-                result += value
-            }
-        }
-        return formatNano(result) + ' TON'
-    }
+    // get stakingInProgressFormatted() {
+    //     let result = 0n
+    //     const empty = Dictionary.empty(Dictionary.Keys.BigUint(32), Dictionary.Values.BigVarUint(4))
+    //     const staking = this.walletState?.staking ?? empty
+    //     const times = staking.keys()
+    //     for (const time of times) {
+    //         const value = staking.get(time)
+    //         if (value != null) {
+    //             result += value
+    //         }
+    //     }
+    //     return formatNano(result) + ' TON'
+    // }
 
-    get stakingInProgressDetails() {
-        const result = []
-        const empty = Dictionary.empty(Dictionary.Keys.BigUint(32), Dictionary.Values.BigVarUint(4))
-        const staking = this.walletState?.staking ?? empty
-        const times = staking.keys()
-        for (const time of times) {
-            const value = staking.get(time)
-            if (value != null) {
-                const until = this.treasuryState?.participations.get(time)?.stakeHeldUntil ?? 0n
-                result.push({
-                    amount: formatNano(value) + ' TON',
-                    estimated: until === 0n ? undefined : formatDate(new Date((Number(until) + 5 * 60) * 1000)),
-                })
-            }
-        }
-        return result
-    }
+    // get stakingInProgressDetails() {
+    //     const result = []
+    //     const empty = Dictionary.empty(Dictionary.Keys.BigUint(32), Dictionary.Values.BigVarUint(4))
+    //     const staking = this.walletState?.staking ?? empty
+    //     const times = staking.keys()
+    //     for (const time of times) {
+    //         const value = staking.get(time)
+    //         if (value != null) {
+    //             const until = this.treasuryState?.participations.get(time)?.stakeHeldUntil ?? 0n
+    //             result.push({
+    //                 amount: formatNano(value) + ' TON',
+    //                 estimated: until === 0n ? undefined : formatDate(new Date((Number(until) + 5 * 60) * 1000)),
+    //             })
+    //         }
+    //     }
+    //     return result
+    // }
 
     get maxAmount() {
-        const isSendTabActive = this.isSendTabActive
+        // const isSendTabActive = this.isSendTabActive
         // const tonBalance = this.tonBalance
-        const walletState = this.walletState
-        if (isSendTabActive) {
+        // const walletState = this.walletState
+        // if (isSendTabActive) {
             // reserve enough TON for user's ton wallet storage fee + enough funds for future unstake
             // return maxAmountToStake(tonBalance ?? 0n)
             return this.fiJettonState?.balance ?? 0n
-        } else {
-            return walletState?.tokens ?? 0n
-        }
+        // } else {
+            // return walletState?.tokens ?? 0n
+        // }
     }
 
     get amountInNano() {
@@ -457,7 +457,7 @@ export class Model {
 
     get isAmountValid() {
         const nano = this.amountInNano
-        return nano != null && nano >= 0n && (this.tonBalance == null || nano <= this.maxAmount)
+        return nano != null && nano >= 0n && (this.tonBalance == null || nano <= this.maxAmount!)
     }
 
     get isAddressValid() {
@@ -500,7 +500,6 @@ export class Model {
         if (this.isWalletConnected) {
             if (this.isSendTabActive) {
                 return 'Send'
-                // return 'Home'
             } else {
                 if (this.unstakeOption === 'unstake') {
                     return 'Unstake'
@@ -513,110 +512,110 @@ export class Model {
         }
     }
 
-    get swapUrl() {
-        let url = 'https://swap.coffee/dex?ft=EQDPdq8xjAhytYqfGSX8KcFWIReCufsB9Wdg0pLlYSO_h76w&st=TON'
-        if (this.isAmountValid && this.isAmountPositive) {
-            url += '&fa=' + this.amount
-        }
-        return url
-    }
+    // get swapUrl() {
+    //     let url = 'https://swap.coffee/dex?ft=EQDPdq8xjAhytYqfGSX8KcFWIReCufsB9Wdg0pLlYSO_h76w&st=TON'
+    //     if (this.isAmountValid && this.isAmountPositive) {
+    //         url += '&fa=' + this.amount
+    //     }
+    //     return url
+    // }
 
-    get youWillReceive() {
-        const rate = this.exchangeRate
-        const nano = this.amountInNano
-        const isSendTabActive = this.isSendTabActive
-        if (rate == null) {
-            return
-        } else if (nano == null || !this.isAmountValid || !this.isAmountPositive) {
-            return isSendTabActive ? 'hTON' : 'TON'
-        } else {
-            return `~ ${formatNano(Number(nano) * rate)} ${isSendTabActive ? 'hTON' : 'TON'}`
-        }
-    }
+    // get youWillReceive() {
+    //     const rate = this.exchangeRate
+    //     const nano = this.amountInNano
+    //     const isSendTabActive = this.isSendTabActive
+    //     if (rate == null) {
+    //         return
+    //     } else if (nano == null || !this.isAmountValid || !this.isAmountPositive) {
+    //         return isSendTabActive ? 'hTON' : 'TON'
+    //     } else {
+    //         return `~ ${formatNano(Number(nano) * rate)} ${isSendTabActive ? 'hTON' : 'TON'}`
+    //     }
+    // }
 
-    get exchangeRate() {
-        const state = this.treasuryState
-        if (state != null) {
-            if (this.isSendTabActive) {
-                return Number(state.totalTokens) / Number(state.totalCoins) || 1
-            } else {
-                return Number(state.totalCoins) / Number(state.totalTokens) || 1
-            }
-        }
-    }
+    // get exchangeRate() {
+    //     const state = this.treasuryState
+    //     if (state != null) {
+    //         if (this.isSendTabActive) {
+    //             return Number(state.totalTokens) / Number(state.totalCoins) || 1
+    //         } else {
+    //             return Number(state.totalCoins) / Number(state.totalTokens) || 1
+    //         }
+    //     }
+    // }
 
-    get exchangeRateFormatted() {
-        const state = this.treasuryState
-        if (state != null) {
-            const rate = (Number(state.totalCoins) / Number(state.totalTokens)) * 1000000000 || 1
-            return '1 hTON = ~ ' + formatNano(rate, 4) + ' TON'
-        }
-    }
+    // get exchangeRateFormatted() {
+    //     const state = this.treasuryState
+    //     if (state != null) {
+    //         const rate = (Number(state.totalCoins) / Number(state.totalTokens)) * 1000000000 || 1
+    //         return '1 hTON = ~ ' + formatNano(rate, 4) + ' TON'
+    //     }
+    // }
 
-    get averageStakeFeeFormatted() {
-        if (this.treasuryState != null) {
-            return formatNano(averageStakeFee, 3) + ' TON'
-        }
-    }
+    // get averageStakeFeeFormatted() {
+    //     if (this.treasuryState != null) {
+    //         return formatNano(averageStakeFee, 3) + ' TON'
+    //     }
+    // }
 
-    get averageUnstakeFeeFormatted() {
-        if (this.treasuryState != null) {
-            return formatNano(averageUnstakeFee, 3) + ' TON'
-        }
-    }
+    // get averageUnstakeFeeFormatted() {
+    //     if (this.treasuryState != null) {
+    //         return formatNano(averageUnstakeFee, 3) + ' TON'
+    //     }
+    // }
 
-    get unstakeHours() {
-        const times = this.times
-        const participations = this.treasuryState?.participations
-        if (times != null && participations != null) {
-            const keys = participations.keys().sort()
-            return formatUnstakeHours(participations.get(keys[0] ?? 0n)?.stakeHeldUntil ?? 0n)
-        }
-    }
+    // get unstakeHours() {
+    //     const times = this.times
+    //     const participations = this.treasuryState?.participations
+    //     if (times != null && participations != null) {
+    //         const keys = participations.keys().sort()
+    //         return formatUnstakeHours(participations.get(keys[0] ?? 0n)?.stakeHeldUntil ?? 0n)
+    //     }
+    // }
 
-    get explorerHref() {
-        const treasuryAddress = treasuryAddresses.get(this.network)
-        let address = ''
-        if (treasuryAddress != null) {
-            address = treasuryAddress.toString({ testOnly: !this.isMainnet })
-        }
-        return (this.isMainnet ? 'https://tonviewer.com/' : 'https://testnet.tonviewer.com/') + address
-    }
+    // get explorerHref() {
+    //     const treasuryAddress = treasuryAddresses.get(this.network)
+    //     let address = ''
+    //     if (treasuryAddress != null) {
+    //         address = treasuryAddress.toString({ testOnly: !this.isMainnet })
+    //     }
+    //     return (this.isMainnet ? 'https://tonviewer.com/' : 'https://testnet.tonviewer.com/') + address
+    // }
 
-    get apy() {
-        const times = this.times
-        const lastStaked = this.treasuryState?.lastStaked
-        const lastRecovered = this.treasuryState?.lastRecovered
-        if (times != null && lastStaked != null && lastRecovered != null) {
-            const duration = 2 * Number(times.nextRoundSince - times.currentRoundSince)
-            const year = 365 * 24 * 60 * 60
-            const compoundingFrequency = year / duration
-            return Math.pow(Number(lastRecovered) / Number(lastStaked) || 1, compoundingFrequency) - 1
-        }
-    }
+    // get apy() {
+    //     const times = this.times
+    //     const lastStaked = this.treasuryState?.lastStaked
+    //     const lastRecovered = this.treasuryState?.lastRecovered
+    //     if (times != null && lastStaked != null && lastRecovered != null) {
+    //         const duration = 2 * Number(times.nextRoundSince - times.currentRoundSince)
+    //         const year = 365 * 24 * 60 * 60
+    //         const compoundingFrequency = year / duration
+    //         return Math.pow(Number(lastRecovered) / Number(lastStaked) || 1, compoundingFrequency) - 1
+    //     }
+    // }
 
-    get apyFormatted() {
-        if (this.apy != null) {
-            return formatPercent(this.apy)
-        }
-    }
+    // get apyFormatted() {
+    //     if (this.apy != null) {
+    //         return formatPercent(this.apy)
+    //     }
+    // }
 
-    get protocolFee() {
-        const governanceFee = this.treasuryState?.governanceFee
-        if (governanceFee != null) {
-            return formatPercent(Number(governanceFee) / 65535)
-        }
-    }
+    // get protocolFee() {
+    //     const governanceFee = this.treasuryState?.governanceFee
+    //     if (governanceFee != null) {
+    //         return formatPercent(Number(governanceFee) / 65535)
+    //     }
+    // }
 
-    get currentlyStaked() {
-        if (this.treasuryState != null) {
-            return (
-                (Number(this.treasuryState.totalCoins) / 1000000000).toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                }) + ' TON'
-            )
-        }
-    }
+    // get currentlyStaked() {
+    //     if (this.treasuryState != null) {
+    //         return (
+    //             (Number(this.treasuryState.totalCoins) / 1000000000).toLocaleString(undefined, {
+    //                 maximumFractionDigits: 0,
+    //             }) + ' TON'
+    //         )
+    //     }
+    // }
 
     get holdersCountFormatted() {
         if (this.holdersCount != null) {
@@ -655,12 +654,12 @@ export class Model {
             this.tonClient = undefined
             this.setAddress(undefined)
             this.tonBalance = undefined
-            this.treasury = undefined
-            this.treasuryState = undefined
-            this.times = undefined
+            // this.treasury = undefined
+            // this.treasuryState = undefined
+            // this.times = undefined
             this.walletAddress = undefined
-            this.wallet = undefined
-            this.walletState = undefined
+            // this.wallet = undefined
+            // this.walletState = undefined
             this.amount = ''
             this.receiver = ''
             this.comment = ''
@@ -684,8 +683,8 @@ export class Model {
         this.address = address
         this.tonBalance = undefined
         this.walletAddress = undefined
-        this.wallet = undefined
-        this.walletState = undefined
+        // this.wallet = undefined
+        // this.walletState = undefined
         this.oldWalletAddress = undefined
         this.oldWalletTokens = undefined
         this.newWalletTokens = undefined
@@ -694,9 +693,9 @@ export class Model {
         this.walletRewards = undefined
     }
 
-    setTimes = (times?: Times) => {
-        this.times = times
-    }
+    // setTimes = (times?: Times) => {
+    //     this.times = times
+    // }
 
     setActivePage = (activePage: ActivePage) => {
         if (this.activePage !== activePage) {
@@ -845,142 +844,142 @@ export class Model {
         // }
     }
 
-    readTimes = () => {
-        const tonClient = this.tonClient
-        const treasuryAddress = treasuryAddresses.get(this.network)
-        clearTimeout(this.timeoutReadTimes)
-        if (document.hidden) {
-            return
-        }
-        this.timeoutReadTimes = setTimeout(this.readTimes, updateTimesDelay)
+    // readTimes = () => {
+    //     const tonClient = this.tonClient
+    //     const treasuryAddress = treasuryAddresses.get(this.network)
+    //     clearTimeout(this.timeoutReadTimes)
+    //     if (document.hidden) {
+    //         return
+    //     }
+    //     this.timeoutReadTimes = setTimeout(this.readTimes, updateTimesDelay)
 
-        if (tonClient == null || treasuryAddress == null) {
-            this.setTimes(undefined)
-            return
-        }
+    //     if (tonClient == null || treasuryAddress == null) {
+    //         this.setTimes(undefined)
+    //         return
+    //     }
 
-        const openedTreasury = tonClient.open(Treasury.createFromAddress(treasuryAddress))
-        retry(openedTreasury.getTimes)
-            .then(this.setTimes)
-            .catch(() => {
-                clearTimeout(this.timeoutReadTimes)
-                this.timeoutReadTimes = setTimeout(this.readTimes, retryDelay)
-            })
-    }
+    //     const openedTreasury = tonClient.open(Treasury.createFromAddress(treasuryAddress))
+    //     retry(openedTreasury.getTimes)
+    //         .then(this.setTimes)
+    //         .catch(() => {
+    //             clearTimeout(this.timeoutReadTimes)
+    //             this.timeoutReadTimes = setTimeout(this.readTimes, retryDelay)
+    //         })
+    // }
 
-    readLastBlock = async () => {
-        const tonClient = this.tonClient
-        const address = this.address
-        const treasuryAddress = treasuryAddresses.get(this.network)
-        clearTimeout(this.timeoutReadLastBlock)
-        if (document.hidden) {
-            return
-        }
-        this.timeoutReadLastBlock = setTimeout(() => void this.readLastBlock(), updateLastBlockDelay)
+    // readLastBlock = async () => {
+    //     const tonClient = this.tonClient
+    //     const address = this.address
+    //     const treasuryAddress = treasuryAddresses.get(this.network)
+    //     clearTimeout(this.timeoutReadLastBlock)
+    //     if (document.hidden) {
+    //         return
+    //     }
+    //     this.timeoutReadLastBlock = setTimeout(() => void this.readLastBlock(), updateLastBlockDelay)
 
-        if (tonClient == null || treasuryAddress == null) {
-            runInAction(() => {
-                this.tonBalance = undefined
-                this.treasury = undefined
-                this.treasuryState = undefined
-                this.walletAddress = undefined
-                this.wallet = undefined
-                this.walletState = undefined
-                this.oldWalletAddress = undefined
-                this.oldWalletTokens = undefined
-                this.newWalletTokens = undefined
-            })
-            return
-        }
+    //     if (tonClient == null || treasuryAddress == null) {
+    //         runInAction(() => {
+    //             this.tonBalance = undefined
+    //             this.treasury = undefined
+    //             this.treasuryState = undefined
+    //             this.walletAddress = undefined
+    //             this.wallet = undefined
+    //             this.walletState = undefined
+    //             this.oldWalletAddress = undefined
+    //             this.oldWalletTokens = undefined
+    //             this.newWalletTokens = undefined
+    //         })
+    //         return
+    //     }
 
-        try {
-            this.beginRequest()
-            const lastBlock = (await retry(() => tonClient.getLastBlock())).last.seqno
-            if (lastBlock < this.lastBlock) {
-                throw new Error('older block')
-            }
-            const treasury = tonClient.openAt(lastBlock, Treasury.createFromAddress(treasuryAddress))
+    //     try {
+    //         this.beginRequest()
+    //         const lastBlock = (await retry(() => tonClient.getLastBlock())).last.seqno
+    //         if (lastBlock < this.lastBlock) {
+    //             throw new Error('older block')
+    //         }
+    //         const treasury = tonClient.openAt(lastBlock, Treasury.createFromAddress(treasuryAddress))
 
-            const readTreasuryState = retry(treasury.getTreasuryState)
+    //         const readTreasuryState = retry(treasury.getTreasuryState)
 
-            const readTonBalance =
-                address == null
-                    ? Promise.resolve(undefined)
-                    : retry(() => tonClient.getAccountLite(lastBlock, address)).then((value) =>
-                        BigInt(value.account.balance.coins),
-                    )
+    //         const readTonBalance =
+    //             address == null
+    //                 ? Promise.resolve(undefined)
+    //                 : retry(() => tonClient.getAccountLite(lastBlock, address)).then((value) =>
+    //                     BigInt(value.account.balance.coins),
+    //                 )
 
-            const lastParent = this.treasuryState?.parent
-            const readWallet: Promise<[Address, OpenedContract<Wallet>, typeof this.walletState] | undefined> =
-                address == null || lastParent == null
-                    ? Promise.resolve(undefined)
-                    : (this.walletAddress != null
-                        ? Promise.resolve(this.walletAddress)
-                        : retry(() =>
-                            tonClient
-                                .openAt(lastBlock, Parent.createFromAddress(lastParent))
-                                .getWalletAddress(address),
-                        )
-                    ).then(async (walletAddress) => {
-                        const wallet = tonClient.openAt(lastBlock, Wallet.createFromAddress(walletAddress))
-                        const walletState = await wallet.getWalletState().catch((e: unknown) => {
-                            if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
-                                return undefined // wallet does not exists
-                            } else {
-                                throw e
-                            }
-                        })
-                        return [walletAddress, wallet, walletState]
-                    })
+    //         const lastParent = this.treasuryState?.parent
+    //         const readWallet: Promise<[Address, OpenedContract<Wallet>, typeof this.walletState] | undefined> =
+    //             address == null || lastParent == null
+    //                 ? Promise.resolve(undefined)
+    //                 : (this.walletAddress != null
+    //                     ? Promise.resolve(this.walletAddress)
+    //                     : retry(() =>
+    //                         tonClient
+    //                             .openAt(lastBlock, Parent.createFromAddress(lastParent))
+    //                             .getWalletAddress(address),
+    //                     )
+    //                 ).then(async (walletAddress) => {
+    //                     const wallet = tonClient.openAt(lastBlock, Wallet.createFromAddress(walletAddress))
+    //                     const walletState = await wallet.getWalletState().catch((e: unknown) => {
+    //                         if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
+    //                             return undefined // wallet does not exists
+    //                         } else {
+    //                             throw e
+    //                         }
+    //                     })
+    //                     return [walletAddress, wallet, walletState]
+    //                 })
 
-            const parallel: [
-                Promise<TreasuryConfig>,
-                Promise<bigint | undefined>,
-                Promise<[Address, OpenedContract<Wallet>, typeof this.walletState] | undefined>,
-            ] = [readTreasuryState, readTonBalance, readWallet]
-            const [treasuryState, tonBalance, hton] = await Promise.all(parallel)
-            let [walletAddress, wallet, walletState] = hton ?? []
+    //         const parallel: [
+    //             Promise<TreasuryConfig>,
+    //             Promise<bigint | undefined>,
+    //             Promise<[Address, OpenedContract<Wallet>, typeof this.walletState] | undefined>,
+    //         ] = [readTreasuryState, readTonBalance, readWallet]
+    //         const [treasuryState, tonBalance, hton] = await Promise.all(parallel)
+    //         let [walletAddress, wallet, walletState] = hton ?? []
 
-            if (walletAddress == null && address != null && treasuryState.parent != null) {
-                try {
-                    const openedParent = tonClient.openAt(lastBlock, Parent.createFromAddress(treasuryState.parent))
-                        ;[walletAddress, wallet, walletState] = await retry(() =>
-                            openedParent.getWalletAddress(address),
-                        ).then(async (walletAddress) => {
-                            const wallet = tonClient.openAt(lastBlock, Wallet.createFromAddress(walletAddress))
-                            const walletState = await wallet.getWalletState().catch((e: unknown) => {
-                                if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
-                                    return undefined // wallet does not exists
-                                } else {
-                                    throw e
-                                }
-                            })
-                            return [walletAddress, wallet, walletState]
-                        })
-                } catch {
-                    // ignore
-                }
-            }
+    //         if (walletAddress == null && address != null && treasuryState.parent != null) {
+    //             try {
+    //                 const openedParent = tonClient.openAt(lastBlock, Parent.createFromAddress(treasuryState.parent))
+    //                     ;[walletAddress, wallet, walletState] = await retry(() =>
+    //                         openedParent.getWalletAddress(address),
+    //                     ).then(async (walletAddress) => {
+    //                         const wallet = tonClient.openAt(lastBlock, Wallet.createFromAddress(walletAddress))
+    //                         const walletState = await wallet.getWalletState().catch((e: unknown) => {
+    //                             if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
+    //                                 return undefined // wallet does not exists
+    //                             } else {
+    //                                 throw e
+    //                             }
+    //                         })
+    //                         return [walletAddress, wallet, walletState]
+    //                     })
+    //             } catch {
+    //                 // ignore
+    //             }
+    //         }
 
-            runInAction(() => {
-                this.tonBalance = tonBalance
-                this.treasury = treasury
-                this.treasuryState = treasuryState
-                this.walletAddress = walletAddress
-                this.wallet = wallet
-                this.walletState = walletState
-                this.lastBlock = lastBlock
-            })
+    //         runInAction(() => {
+    //             this.tonBalance = tonBalance
+    //             this.treasury = treasury
+    //             this.treasuryState = treasuryState
+    //             this.walletAddress = walletAddress
+    //             this.wallet = wallet
+    //             this.walletState = walletState
+    //             this.lastBlock = lastBlock
+    //         })
 
-            await this.readOldWallet(tonClient, lastBlock, treasuryState)
-        } catch {
-            this.setErrorMessage(errorMessageTonAccess, retryDelay - 500)
-            clearTimeout(this.timeoutReadLastBlock)
-            this.timeoutReadLastBlock = setTimeout(() => void this.readLastBlock(), retryDelay)
-        } finally {
-            this.endRequest()
-        }
-    }
+    //         await this.readOldWallet(tonClient, lastBlock, treasuryState)
+    //     } catch {
+    //         this.setErrorMessage(errorMessageTonAccess, retryDelay - 500)
+    //         clearTimeout(this.timeoutReadLastBlock)
+    //         this.timeoutReadLastBlock = setTimeout(() => void this.readLastBlock(), retryDelay)
+    //     } finally {
+    //         this.endRequest()
+    //     }
+    // }
 
     readLastBlockState = async () => {
         const tonClient = this.tonClient
@@ -1103,49 +1102,49 @@ export class Model {
         }
     }
 
-    readOldWallet = async (tonClient: TonClient4, lastBlock: number, treasuryState: TreasuryConfig) => {
-        const address = this.address
-        const oldTreasuryAddress = oldTreasuryAddresses[this.network]
+    // readOldWallet = async (tonClient: TonClient4, lastBlock: number, treasuryState: TreasuryConfig) => {
+    //     const address = this.address
+    //     const oldTreasuryAddress = oldTreasuryAddresses[this.network]
 
-        const readOldWallet: Promise<[Address | undefined, bigint | undefined, bigint | undefined]> =
-            address == null || this.oldWalletAddress != null
-                ? Promise.resolve([this.oldWalletAddress, this.oldWalletTokens, this.newWalletTokens])
-                : Promise.resolve(tonClient.openAt(lastBlock, OldTreasury.createFromAddress(oldTreasuryAddress))).then(
-                    async (oldTreasury) => {
-                        const oldWalletAddress = await retry(() => oldTreasury.getWalletAddress(address))
-                        const oldWallet = tonClient.openAt(lastBlock, Wallet.createFromAddress(oldWalletAddress))
-                        const oldWalletTokens =
-                            (await retry(() =>
-                                oldWallet
-                                    .getWalletState()
-                                    .then((walletState) => walletState.tokens)
-                                    .catch((e: unknown) => {
-                                        if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
-                                            return undefined // wallet does not exists
-                                        } else {
-                                            throw e
-                                        }
-                                    }),
-                            )) ?? 0n
-                        let newWalletTokens = 0n
-                        if (oldWalletTokens > 0n) {
-                            const [oldTotalCoins, oldTotalTokens] = await retry(oldTreasury.getTotalCoinsAndTokens)
-                            if (oldTotalTokens > 0n && treasuryState.totalCoins > 0n) {
-                                const coins = (oldWalletTokens * oldTotalCoins) / oldTotalTokens
-                                newWalletTokens = (coins * treasuryState.totalTokens) / treasuryState.totalCoins
-                            }
-                        }
-                        return [oldWalletAddress, oldWalletTokens, newWalletTokens]
-                    },
-                )
-        const [oldWalletAddress, oldWalletTokens, newWalletTokens] = await readOldWallet
+    //     const readOldWallet: Promise<[Address | undefined, bigint | undefined, bigint | undefined]> =
+    //         address == null || this.oldWalletAddress != null
+    //             ? Promise.resolve([this.oldWalletAddress, this.oldWalletTokens, this.newWalletTokens])
+    //             : Promise.resolve(tonClient.openAt(lastBlock, OldTreasury.createFromAddress(oldTreasuryAddress))).then(
+    //                 async (oldTreasury) => {
+    //                     const oldWalletAddress = await retry(() => oldTreasury.getWalletAddress(address))
+    //                     const oldWallet = tonClient.openAt(lastBlock, Wallet.createFromAddress(oldWalletAddress))
+    //                     const oldWalletTokens =
+    //                         (await retry(() =>
+    //                             oldWallet
+    //                                 .getWalletState()
+    //                                 .then((walletState) => walletState.tokens)
+    //                                 .catch((e: unknown) => {
+    //                                     if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
+    //                                         return undefined // wallet does not exists
+    //                                     } else {
+    //                                         throw e
+    //                                     }
+    //                                 }),
+    //                         )) ?? 0n
+    //                     let newWalletTokens = 0n
+    //                     if (oldWalletTokens > 0n) {
+    //                         const [oldTotalCoins, oldTotalTokens] = await retry(oldTreasury.getTotalCoinsAndTokens)
+    //                         if (oldTotalTokens > 0n && treasuryState.totalCoins > 0n) {
+    //                             const coins = (oldWalletTokens * oldTotalCoins) / oldTotalTokens
+    //                             newWalletTokens = (coins * treasuryState.totalTokens) / treasuryState.totalCoins
+    //                         }
+    //                     }
+    //                     return [oldWalletAddress, oldWalletTokens, newWalletTokens]
+    //                 },
+    //             )
+    //     const [oldWalletAddress, oldWalletTokens, newWalletTokens] = await readOldWallet
 
-        runInAction(() => {
-            this.oldWalletAddress = oldWalletAddress
-            this.oldWalletTokens = oldWalletTokens
-            this.newWalletTokens = newWalletTokens
-        })
-    }
+    //     runInAction(() => {
+    //         this.oldWalletAddress = oldWalletAddress
+    //         this.oldWalletTokens = oldWalletTokens
+    //         this.newWalletTokens = newWalletTokens
+    //     })
+    // }
 
     pause = () => {
         clearTimeout(this.timeoutReadTimes)
@@ -1153,7 +1152,7 @@ export class Model {
     }
 
     resume = () => {
-        this.readTimes()
+        // this.readTimes()
         void this.readLastBlockState()
     }
 
@@ -1165,50 +1164,50 @@ export class Model {
         }
     }
 
-    upgradeOldWallet = () => {
-        if (
-            this.address != null &&
-            this.oldWalletAddress != null &&
-            this.tonConnectUI != null &&
-            this.tonBalance != null &&
-            this.oldWalletTokens != null
-        ) {
-            const queryId = generateRandomQueryId()
+    // upgradeOldWallet = () => {
+    //     if (
+    //         this.address != null &&
+    //         this.oldWalletAddress != null &&
+    //         this.tonConnectUI != null &&
+    //         this.tonBalance != null &&
+    //         this.oldWalletTokens != null
+    //     ) {
+    //         const queryId = generateRandomQueryId()
 
-            // const message = this.isSendTabActive
-            //     ? createDepositMessage(this.treasury.address, this.amountInNano, queryId)
-            //     : createUnstakeMessage(this.wallet.address, this.amountInNano, queryId)
+    //         // const message = this.isSendTabActive
+    //         //     ? createDepositMessage(this.treasury.address, this.amountInNano, queryId)
+    //         //     : createUnstakeMessage(this.wallet.address, this.amountInNano, queryId)
 
-            const tx: SendTransactionRequest = {
-                validUntil: Math.floor(Date.now() / 1000) + txValidUntil,
-                network: this.isMainnet ? CHAIN.MAINNET : CHAIN.TESTNET,
-                from: this.address.toRawString(),
-                messages: [
-                    {
-                        address: this.oldWalletAddress.toString(),
-                        amount: feeUnstake.toString(),
-                        payload: beginCell()
-                            .storeUint(opUnstakeTokens, 32)
-                            .storeUint(queryId, 64)
-                            .storeCoins(this.oldWalletTokens)
-                            .storeAddress(undefined)
-                            .storeMaybeRef(undefined)
-                            .endCell()
-                            .toBoc()
-                            .toString('base64'),
-                    },
-                ],
-            }
-            void this.tonConnectUI
-                .sendTransaction(tx)
-                .then(() => this.waitForCompletion(queryId))
-                .then(() => {
-                    this.oldWalletAddress = undefined
-                    this.oldWalletTokens = undefined
-                    this.newWalletTokens = undefined
-                })
-        }
-    }
+    //         const tx: SendTransactionRequest = {
+    //             validUntil: Math.floor(Date.now() / 1000) + txValidUntil,
+    //             network: this.isMainnet ? CHAIN.MAINNET : CHAIN.TESTNET,
+    //             from: this.address.toRawString(),
+    //             messages: [
+    //                 {
+    //                     address: this.oldWalletAddress.toString(),
+    //                     amount: feeUnstake.toString(),
+    //                     payload: beginCell()
+    //                         .storeUint(opUnstakeTokens, 32)
+    //                         .storeUint(queryId, 64)
+    //                         .storeCoins(this.oldWalletTokens)
+    //                         .storeAddress(undefined)
+    //                         .storeMaybeRef(undefined)
+    //                         .endCell()
+    //                         .toBoc()
+    //                         .toString('base64'),
+    //                 },
+    //             ],
+    //         }
+    //         void this.tonConnectUI
+    //             .sendTransaction(tx)
+    //             .then(() => this.waitForCompletion(queryId))
+    //             .then(() => {
+    //                 this.oldWalletAddress = undefined
+    //                 this.oldWalletTokens = undefined
+    //                 this.newWalletTokens = undefined
+    //             })
+    //     }
+    // }
 
     sendTxn = async () => {
         if (

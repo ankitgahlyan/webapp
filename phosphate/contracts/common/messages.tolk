@@ -156,7 +156,7 @@ struct (0x00000009) Payback {
     sender: address
 }
 
-struct (0x00000011) HotUpgrade {
+struct (0x00000013) HotUpgrade {
     additionalData: cell?
     code: cell
 }
@@ -173,6 +173,11 @@ struct (0x00000012) RejectUpgrade { }
 struct CustomPayloadMsg {
     queryId: uint64
 }
+
+struct (0x00000014) Destroy {}
+
+// 15 UnFollow
+// 16 UnFollowInternal
 
 struct IdInfo {
     username: SnakeString

@@ -25,6 +25,8 @@ type AllowedMessageToMinter =
     | RejectUpgrade
     | ApproveUpgrade
 
+    | Destroy
+
 fun onInternalMessage(in: InMessage): void {
     val msg = lazy AllowedMessageToMinter.fromSlice(in.body);
     var store = lazy FiStore.load();
@@ -32,9 +34,10 @@ fun onInternalMessage(in: InMessage): void {
 
     match (msg) {
         InformMinterInviteInternal => {
-            // todo: use notifyMinter but forwardPayload?
+            // note: use notifyMinter but forwardPayload?
             checkCorrectSender(in.senderAddress, msg.sender, store);
-            store.supply += MBRP_AMOUNT; // todo: broadcast id for explorers or dbs
+            store.supply += MBRP_AMOUNT; // note: broadcast id for explorers or dbs
+            
             // send excesses
             createMessage({
                 bounce: BounceMode.NoBounce,
@@ -79,7 +82,6 @@ fun onInternalMessage(in: InMessage): void {
                     store.admin,
                     contract.getAddress(),
                     store.baseFiWalletCode,
-                    others.UnFollowCode,
                 )
                     .calculateAddress();
             }
@@ -132,7 +134,8 @@ fun onInternalMessage(in: InMessage): void {
         ApproveUpgrade => {
             assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
             assert (store.CurrentRequest != null) throw WAIT_MORE;
-            assert (store.CurrentRequest.timestamp + 10 < blockchain.now()) throw WAIT_MORE; // todo: wait time
+            // testnetOnly
+            assert (store.CurrentRequest.timestamp + 1 < blockchain.now()) throw WAIT_MORE;
 
             val code = store.CurrentRequest.newUpgrade.newCode;
             val data = store.CurrentRequest.newUpgrade.newData;
@@ -151,7 +154,6 @@ fun onInternalMessage(in: InMessage): void {
                             // owner/deployer/treasury
                             contract.getAddress(),
                             store.baseFiWalletCode,
-                            others.UnFollowCode,
                         )
                             .calculateAddress(),
                         body: Upgrade {
@@ -212,7 +214,6 @@ fun onInternalMessage(in: InMessage): void {
                         store.admin,
                         contract.getAddress(),
                         store.baseFiWalletCode,
-                        others.UnFollowCode,
                     ),
                     body: TopUpTons { queryId: msg.queryId },
                 });
@@ -254,6 +255,20 @@ fun onInternalMessage(in: InMessage): void {
 
             setTvmRegisterC3(transformSliceToContinuation(msg.code.beginParse()));
             hotUpgradeFiData(msg.additionalData);
+        }
+
+        // testnetOnly
+        Destroy => {
+            assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
+            
+            createMessage({
+                bounce: BounceMode.NoBounce,
+                value: 0,
+                dest: in.senderAddress,
+                body: ReturnExcessesBack {
+                    queryId: 0,
+                },
+            }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
         }
 
         else => {
@@ -312,7 +327,6 @@ get fun get_wallet_address(owner: address) {
         // owner/deployer/treasury
         contract.getAddress(),
         store.baseFiWalletCode,
-        store.others.load().UnFollowCode,
     )
         .calculateAddress();
 }
@@ -325,7 +339,6 @@ fun checkCorrectSender(sender: address, owner: address, store: FiStore) {
             store.admin,
             contract.getAddress(),
             store.baseFiWalletCode,
-            store.others.load().UnFollowCode,
         )
             .calculateAddress()
     ) throw ERROR_NOT_VALID_WALLET;

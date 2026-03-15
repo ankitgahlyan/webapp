@@ -1,0 +1,8 @@
+packages:
+  - '.'
+  - 'phosphate'
+
+onlyBuiltDependencies:
+  - core-js-pure
+  - protobufjs
+  - unrs-resolver

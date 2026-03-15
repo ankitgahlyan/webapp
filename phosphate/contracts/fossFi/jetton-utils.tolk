@@ -14,7 +14,6 @@ fun calcDeployFiWallet(
     treasury: address,
     minterAddress: address,
     baseFiWalletCode: cell,
-    UnFollowCode: cell,
 ): AutoDeployAddress {
     val emptyFiWalletStore: FiWalletStore = {
         addresses: Addresses {
@@ -27,7 +26,7 @@ fun calcDeployFiWallet(
                 authorisedAccs: createEmptyMap(),
             }.toCell(),
             others: FiWalletCodes {
-                UnFollowCode,
+                a: createEmptyCell(),
                 b: createEmptyCell(),
                 c: createEmptyCell(),
                 d: createEmptyCell(),
@@ -49,19 +48,19 @@ fun calcDeployFiWallet(
     };
 }
 
-fun address.calcDeployUnFollow(self, follower: address): AutoDeployAddress {
-    val emptyUnFollowStore: UnFollowStore = {
-        admin: contract.getAddress(),
-        follow: true,
-        followee: self,
-        follower,
-    };
+// fun address.calcDeployUnFollow(self, follower: address): AutoDeployAddress {
+//     val emptyUnFollowStore: UnFollowStore = {
+//         admin: contract.getAddress(),
+//         follow: true,
+//         followee: self,
+//         follower,
+//     };
 
-    return {
-        stateInit: {code: UNFOLLOW_CODE, data: emptyUnFollowStore.toCell()},
-        toShard: {fixedPrefixLength: SHARD_DEPTH, closeTo: contract.getAddress()}
-    }
-}
+//     return {
+//         stateInit: {code: UNFOLLOW_CODE, data: emptyUnFollowStore.toCell()},
+//         toShard: {fixedPrefixLength: SHARD_DEPTH, closeTo: contract.getAddress()}
+//     }
+// }
 
 fun address.getAddrFiWallet(self) {
     // used by: wallet txn sending
@@ -72,7 +71,6 @@ fun address.getAddrFiWallet(self) {
         addrs.treasury,
         addrs.trustedJettonAddrs.load().minterAddr,
         store.baseFiWalletCode,
-        store.addresses.load().others.load().UnFollowCode,
     )
         .calculateAddress();
 }
