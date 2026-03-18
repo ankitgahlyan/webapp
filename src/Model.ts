@@ -1,26 +1,15 @@
 import { Network } from '@orbs-network/ton-access'
 import { TonConnectUI, THEME, CHAIN, SendTransactionRequest } from '@tonconnect/ui'
 import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx'
-import { Address, Dictionary, OpenedContract, TonClient4, beginCell, comment, fromNano, toNano } from '@ton/ton'
-// import {
-//     ParticipationState,
-//     Times,
-//     Treasury,
-//     Wallet,
-//     Parent,
-//     TreasuryConfig,
-//     WalletState,
-//     opUnstakeTokens,
-//     treasuryAddresses,
-//     feeUnstake,
-// } from '@hipo-finance/sdk'
-import { OldTreasury } from './OldTreasury'
+import { Address, OpenedContract, TonClient4, beginCell, comment, fromNano, toNano } from '@ton/ton'
 import { FossFi, FossFiConfig } from './wrappers/fi/FossFi'
 import { FossFiWallet, FossFiWalletConfig } from './wrappers/fi/FossFiWallet'
 
 type ActivePage = 'home' | 'history' | 'settings'
 
 type ActiveTab = 'send' | 'receive'
+
+type ActiveAction = 'send' | 'invite'
 
 type UnstakeOption = 'unstake' | 'swap'
 
@@ -97,6 +86,7 @@ export class Model {
     newWalletTokens?: bigint
     activePage: ActivePage = defaultActivePage
     activeTab: ActiveTab = defaultActiveTab
+    activeAction: ActiveAction = 'send'
     amount = ''
     receiver = ''
     comment = ''
@@ -150,6 +140,7 @@ export class Model {
             oldWalletAddress: observable,
             oldWalletTokens: observable,
             newWalletTokens: observable,
+            activeAction: observable,
             activePage: observable,
             activeTab: observable,
             amount: observable,
@@ -208,7 +199,7 @@ export class Model {
             setNetwork: action,
             setTonClient: action,
             setAddress: action,
-            // setTimes: action,
+            setActiveAction: action,
             setActivePage: action,
             setActiveTab: action,
             setUnstakeOption: action,
@@ -708,10 +699,17 @@ export class Model {
     setActiveTab = (activeTab: ActiveTab) => {
         if (this.activeTab !== activeTab) {
             this.activeTab = activeTab
+            // this.activeAction = 'send'
             this.amount = ''
             this.receiver = ''
             this.comment = ''
             this.gas = '0.55'
+        }
+    }
+
+    setActiveAction = (activeAction: ActiveAction) => {
+        if (this.activeAction !== activeAction) {
+            this.activeAction = activeAction
         }
     }
 
@@ -1238,7 +1236,7 @@ export class Model {
             const tb = beginCell()
                 .storeUint(0xf8a7ea5, 32)
                 .storeUint(generateRandomQueryId(), 64) // op, queryId
-                .storeCoins(this.amountInNano)
+                .storeCoins(this.activeAction === 'send' ? this.amountInNano : toNano(0.1))
                 .storeAddress(Address.parse(this.receiver.trim()))
                 .storeAddress(this.address)
                 .storeMaybeRef(undefined) // custom payload

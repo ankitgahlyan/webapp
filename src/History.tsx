@@ -1,14 +1,15 @@
-import { observer } from 'mobx-react-lite'
-import { Model } from './Model'
+// import { observer } from 'mobx-react-lite'
+// import { Model } from './Model'
 // import gift from './assets/hpo-hton-ton-gift.webp'
 // import ton from './assets/ton.svg'
 // import hpo from './assets/hpo.svg'
 
-interface Props {
-    model: Model
-}
+// interface Props {
+//     model: Model
+// }
 
-const Referral = observer(({ model }: Props) => {
+// const Referral = observer(({ model }: Props) => {
+const Referral = () => {
     return <div className='m-auto p-4 border-purple-500 bg-black text-white'>
         <div className='font-bold'>
             FAQ's
@@ -28,6 +29,13 @@ const Referral = observer(({ model }: Props) => {
         A. coz it's a decentralised version of a successful system (fiat).
 
         <p>send any questions via <a href="https://t.me/keeperXBot">TELEGRAM</a></p>
+
+        <div>
+            <div className='font-bold'>red-flags</div>
+            1. interest for money created out of nothing.
+            2. start of impossible promise cycle: payback in same currency (although possible to pay in gold).
+            3. 
+        </div>
     </div>
     // return (
     //     <div className='mx-auto w-full max-w-(--breakpoint-lg) p-4 pb-32 font-body text-brown dark:text-dark-50'>
@@ -185,6 +193,6 @@ const Referral = observer(({ model }: Props) => {
     //         )}
     //     </div>
     // )
-})
+}
 
 export default Referral

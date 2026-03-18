@@ -1,4 +1,9 @@
 import type { Cell } from '@ton/core'
+import { Model } from './Model'
+
+export interface Props {
+    model: Model
+}
 
 export type Page = 'home' | 'transfer'
 

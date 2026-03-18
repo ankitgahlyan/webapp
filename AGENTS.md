@@ -7,13 +7,6 @@ This is a monorepo with two workspaces:
 - **Root** (`/`) - React + Vite + TypeScript frontend application
 - **Phosphate** (`/phosphate`) - TON blockchain smart contracts
 
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
-
-
 ## MCP Servers
 
 If you are unsure how to do something, use `gh_grep` to search code examples from GitHub.

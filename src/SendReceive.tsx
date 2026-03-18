@@ -1,27 +1,15 @@
 import { observer } from 'mobx-react-lite'
-import { Model } from './Model'
 import ton from './assets/ton.svg'
 import hton from './assets/hton.svg'
-// import question from './assets/question.svg'
-// import questionDark from './assets/question-dark.svg'
-// import checkOrange from './assets/check-c6.svg'
 import { QrScanner } from './core/components/common/QrScanner'
 import { useState } from 'react'
 import { QrCode } from 'lucide-react'
 import Receive from './core/receive';
-
-interface Props {
-    model: Model
-}
+import { DropdownMenuComplex } from './components/SelectAction'
+import { Props } from './types'
 
 const SendReceive = observer(({ model }: Props) => {
     const [isScannerVisible, setIsScannerVisible] = useState(false);
-
-    // const handleScanRecipient = (data: string) => {
-    //     if (!data) return;
-    //     model.setReceiver(data.trim());
-    //     setIsScannerVisible(false);
-    // };
 
     return (
         <>
@@ -82,41 +70,19 @@ const SendReceive = observer(({ model }: Props) => {
                                 <p className='ml-auto font-medium'>{model.tonBalanceFormatted}</p>
                             </div>
 
-                            {/* {model.stakingInProgressDetails.map((value) => (
-                                <div key={(value.estimated ?? '') + value.amount} className='flex flex-row flex-wrap'>
-                                    <p className='font-light opacity-70'>
-                                        {value.estimated == null
-                                            ? 'In progress'
-                                            : 'In progress, done by ' + value.estimated}
-                                    </p>
-                                    <p className='ml-auto font-medium opacity-70'>{value.amount}</p>
-                                </div>
-                            ))} */}
-
                             <div className='my-4 h-px bg-white opacity-40'></div>
 
                             <div className='flex flex-row flex-wrap'>
                                 <p className='font-light'>MINT Amount</p>
                                 <p className='ml-auto font-medium'>{model.mintBalanceFormatted}</p>
                             </div>
-
-                            {/* <div
-                                className={
-                                    'flex flex-row flex-wrap' + (model.unstakingInProgressDetails != null ? '' : ' hidden')
-                                }
-                            >
-                                <p className='font-light opacity-70'>
-                                    {model.unstakingInProgressDetails?.estimated == null
-                                        ? 'In progress'
-                                        : 'In progress, done by ' + model.unstakingInProgressDetails.estimated}
-                                </p>
-                                <p className='ml-auto font-medium opacity-70'>{model.unstakingInProgressFormatted}</p>
-                            </div> */}
                         </div>
                     </div>
 
                     <div className='mx-4 -mt-8 rounded-2xl bg-white p-8 shadow-xs dark:bg-dark-700'>
-                        <p>{model.isSendTabActive ? 'Send Tokens' : 'Receive Tokens'}</p>
+                        <p>{model.isSendTabActive ? 'Current Action' : 'Receive Tokens'}</p>
+
+                        <DropdownMenuComplex model={model}/>
 
                         {/* receiver input section */}
                         <div
@@ -256,7 +222,8 @@ const SendReceive = observer(({ model }: Props) => {
                                 id="gas"
                                 type="number"
                                 inputMode="decimal"
-                                step={0.05}
+                                min={"0.55"}
+                                step={0.1}
                                 placeholder="gas/fees: min 0.55"
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-hidden dark:bg-dark-900 dark:text-dark-50'
@@ -267,55 +234,6 @@ const SendReceive = observer(({ model }: Props) => {
                                 }}
                             />
                         </div>
-
-                        {/* <div
-                        className={
-                            'flex flex-row gap-4 overflow-hidden transition-all motion-reduce:transition-none' +
-                            (model.isSendTabActive ? ' max-h-0 pb-0' : ' max-h-32 pb-8')
-                        }
-                    >
-                        <div
-                        className={
-                            'flex flex-1 cursor-pointer select-none flex-row flex-nowrap rounded-lg border-2 bg-milky p-4 pr-2 text-sm dark:text-brown' +
-                                (model.unstakeOption === 'unstake' ? ' border-c6' : ' border-milky')
-                                }
-                            onClick={() => {
-                                model.setUnstakeOption('unstake')
-                                }}
-                                >
-                            <p className='grow'>
-                                {model.unstakeHours ? (
-                                    <>
-                                    <span className='hidden min-[420px]:inline'>
-                                            Unstake in {model.unstakeHours}h
-                                            </span>
-                                        <span className='inline min-[420px]:hidden'>In {model.unstakeHours}h</span>
-                                    </>
-                                ) : (
-                                    'Unstake'
-                                    )}
-                            </p>
-                            <img
-                                src={checkOrange}
-                                className={'w-5' + (model.unstakeOption === 'unstake' ? '' : ' invisible')}
-                            />
-                        </div>
-                        <div
-                            className={
-                                'flex flex-1 cursor-pointer select-none flex-row flex-nowrap rounded-lg border-2 bg-milky p-4 pr-2 text-sm dark:text-brown' +
-                                (model.unstakeOption === 'swap' ? ' border-c6' : ' border-milky')
-                            }
-                            onClick={() => {
-                                model.setUnstakeOption('swap')
-                            }}
-                        >
-                            <p className='grow'>Swap now</p>
-                            <img
-                            src={checkOrange}
-                            className={'w-5' + (model.unstakeOption === 'swap' ? '' : ' invisible')}
-                            />
-                        </div>
-                    </div> */}
 
                         <button
                             id='submit'
@@ -333,31 +251,6 @@ const SendReceive = observer(({ model }: Props) => {
                         >
                             {model.buttonLabel}
                         </button>
-
-                        {/* <div className='mt-12 text-sm font-medium'>
-                        <div className='my-4 flex flex-row flex-wrap'>
-                        <p>You will receive</p>
-                            <p className='ml-auto'>{model.youWillReceive}</p>
-                            </div>
-                            <div className='my-4 flex flex-row flex-wrap'>
-                            <p>Exchange rate</p>
-                            <p className='ml-auto'>{model.exchangeRateFormatted}</p>
-                            </div>
-                        <div className='relative my-4 flex flex-row flex-wrap'>
-                            <p>Transaction cost</p>
-                            <img src={question} className='peer ml-1 w-4 dark:hidden' />
-                            <img src={questionDark} className='peer ml-1 hidden w-4 dark:block' />
-                            <p className='absolute left-1/3 top-6 z-10 hidden -translate-x-1/4 rounded-lg bg-lightblue p-4 text-xs font-normal text-blue shadow-xl peer-hover:block'>
-                            This fee is an average, but to ensure all cases are covered, we initially send extra
-                            gas, which is later refunded to your wallet.
-                            </p>
-                            <p className='ml-auto'>
-                                {model.isSendTabActive
-                                    ? model.averageStakeFeeFormatted
-                                    : model.averageUnstakeFeeFormatted}
-                            </p>
-                            </div>
-                    </div> */}
                     </div>
                 </div>
             </div>

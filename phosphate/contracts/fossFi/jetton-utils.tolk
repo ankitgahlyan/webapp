@@ -341,3 +341,15 @@ fun hotUpgradeFiWalletData(additionalData: cell?) {
 
     // contract.setData(storage.toCell());
 }
+
+@inline
+fun destroyContract(dest: address) {
+    createMessage({
+        bounce: BounceMode.NoBounce,
+        value: 0,
+        dest,
+        body: ReturnExcessesBack {
+            queryId: 0,
+        },
+    }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
+}

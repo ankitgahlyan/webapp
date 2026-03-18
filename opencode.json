@@ -1,9 +1,23 @@
 {
-    "mcp": {
-        "nx-mcp": {
-            "type": "local",
-            "command": ["npx", "nx", "mcp"],
-            "enabled": true
-        }
+  "mcp": {
+    "nx-mcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "nx",
+        "mcp"
+      ],
+      "enabled": true
+    },
+    "shadcn": {
+      "type": "local",
+      "command": [
+        "npx",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "enabled": true
     }
+  },
+  "$schema": "https://opencode.ai/config.json"
 }

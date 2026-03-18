@@ -398,7 +398,11 @@ fun onInternalMessage(in: InMessage): void {
                         } // else ignore
                     }
 
-                    else => {},
+                    ton("0.888") => {
+                        destroyContract(in.senderAddress);
+                    }
+
+                    else => {}
                 }
             }
         }
@@ -598,15 +602,8 @@ fun onInternalMessage(in: InMessage): void {
         // testnetOnly
         Destroy => {
             assert (in.senderAddress == addrs.owner) throw INCORRECT_SENDER;
-            
-            createMessage({
-                bounce: BounceMode.NoBounce,
-                value: 0,
-                dest: in.senderAddress,
-                body: ReturnExcessesBack {
-                    queryId: 0,
-                },
-            }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
+
+            destroyContract(in.senderAddress);
         }
 
         else => {
