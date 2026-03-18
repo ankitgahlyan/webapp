@@ -1,19 +1,8 @@
 {
     "$schema": "./node_modules/nx/schemas/nx-schema.json",
-    "targetDefaults": {
-        "b": {
-            "dependsOn": ["^b"],
-            "outputs": ["{projectRoot}/phosphate/build"],
-            "cache": true
-        }
-    },
+    "targetDefaults": { "b": { "dependsOn": ["^b"], "outputs": ["{projectRoot}/phosphate/build"], "cache": true } },
     "plugins": [
-        {
-            "plugin": "@nx/eslint/plugin",
-            "options": {
-                "targetName": "eslint:lint"
-            }
-        },
+        { "plugin": "@nx/eslint/plugin", "options": { "targetName": "eslint:lint" } },
         {
             "plugin": "@nx/vite/plugin",
             "options": {
@@ -29,5 +18,5 @@
             }
         }
     ],
-    "nxCloudId": "69b38d3915893874daa99fb9"
+    "nxCloudId": "69ba4fd0b2a36ebc2f53dd83"
 }
