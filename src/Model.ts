@@ -4,6 +4,7 @@ import { action, autorun, computed, makeObservable, observable, runInAction } fr
 import { Address, OpenedContract, TonClient4, beginCell, comment, fromNano, toNano } from '@ton/ton'
 import { FossFi, FossFiConfig } from './wrappers/fi/FossFi'
 import { FossFiWallet, FossFiWalletConfig } from './wrappers/fi/FossFiWallet'
+import { FI_ADDRESS } from '../phosphate/scripts/consts';
 
 type ActivePage = 'home' | 'history' | 'settings'
 
@@ -982,7 +983,8 @@ export class Model {
     readLastBlockState = async () => {
         const tonClient = this.tonClient
         const address = this.address
-        const fiAddress = Address.parse('kQBgAVsFYYWFDq4ylTETYd2F46OggTZtNp8vDQhnn1imG8O3')
+        const fiAddress = Address.parse(FI_ADDRESS)
+        // const fiAddress = Address.parse('kQBgAVsFYYWFDq4ylTETYd2F46OggTZtNp8vDQhnn1imG8O3')
         clearTimeout(this.timeoutReadLastBlock)
         if (document.hidden) {
             return
