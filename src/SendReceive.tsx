@@ -82,15 +82,15 @@ const SendReceive = observer(({ model }: Props) => {
                     <div className='mx-4 -mt-8 rounded-2xl bg-white p-8 shadow-xs dark:bg-dark-700'>
                         <p>{model.isSendTabActive ? 'Current Action' : 'Receive Tokens'}</p>
 
-                        <DropdownMenuComplex model={model}/>
+                        <DropdownMenuComplex model={model} />
 
                         {/* receiver input section */}
                         <div
                             className={
                                 'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAddressValid
-                                    ? ''
-                                    : ' border-c6 focus-within:border-c6 dark:border-c6 dark:focus-within:border-c6')
+                                    ? 'border-green-500 focus-within:border-green-500 dark:border-green-500 dark:focus-within:border-green-500'
+                                    : ' border-orange focus-within:border-orange dark:border-orange dark:focus-within:border-orange')
                             }
                         >
                             <img src={hton} className={'w-7' + (model.isSendTabActive ? '' : ' hidden')} />
@@ -104,7 +104,7 @@ const SendReceive = observer(({ model }: Props) => {
                                 placeholder="0Q... receiver address"
                                 className={
                                     'h-full w-full flex-1 px-3 text-lg focus:outline-hidden dark:bg-dark-900 dark:text-dark-50' +
-                                    (model.isAddressValid ? '' : ' text-c6 dark:text-c6')
+                                    (model.isAddressValid ? 'text-green-500 dark:text-green-500' : ' text-orange dark:text-orange')
                                 }
                                 value={model.receiver}
                                 onChange={(e) => model.setReceiver(e.target.value)}
@@ -141,8 +141,10 @@ const SendReceive = observer(({ model }: Props) => {
                             className={
                                 'mb-8 mt-4 flex flex-row flex-wrap items-center rounded-lg border border-milky p-4 focus-within:border-brown dark:border-dark-900 dark:bg-dark-900 ' +
                                 (model.isAmountValid
-                                    ? ''
-                                    : ' border-c6 focus-within:border-c6 dark:border-c6 dark:focus-within:border-c6')
+                                    ? 'border-green-500 text-green-500 focus-within:border-green-500 dark:border-green-500 dark:text-green-500 dark:focus-within:border-green-500'
+                                    : ' border-orange text-orange focus-within:border-orange dark:border-orange dark:text-orange dark:focus-within:border-orange') + (model.activeAction === 'send'
+                                        ? ''
+                                        : ' hidden')
                             }
                         >
                             <img src={ton} className={'w-7' + (model.isSendTabActive ? '' : ' hidden')} />
@@ -237,7 +239,7 @@ const SendReceive = observer(({ model }: Props) => {
 
                         <button
                             id='submit'
-                            className='h-14 w-full rounded-2xl bg-c6 text-lg font-medium text-white disabled:opacity-80 dark:text-dark-600'
+                            className='h-14 w-full rounded-2xl bg-c6 text-lg font-medium text-white disabled:opacity-50 dark:text-dark-600'
                             disabled={!model.isButtonEnabled}
                             onClick={(e) => {
                                 if (model.isWalletConnected) {

@@ -479,10 +479,10 @@ export class Model {
         const mintBalance = this.fiJettonState?.balance
         const haveBalance = tonBalance != null && mintBalance != null
         // const haveBalance = this.isSendTabActive ? tonBalance != null : mintBalance != null
-        const isSendTabActive = this.isSendTabActive
-        const unstakeOption = this.unstakeOption
+        // const isSendTabActive = this.isSendTabActive
         if (this.isWalletConnected) {
-            return (isAmountValid && isAmountPositive && haveBalance && isAddressValid) || (!isSendTabActive && unstakeOption === 'swap')
+
+            return (isAmountValid && isAmountPositive && haveBalance && isAddressValid) || (this.activeAction === 'invite' && isAddressValid)
         } else {
             return true
         }
@@ -490,15 +490,7 @@ export class Model {
 
     get buttonLabel() {
         if (this.isWalletConnected) {
-            if (this.isSendTabActive) {
-                return 'Send'
-            } else {
-                if (this.unstakeOption === 'unstake') {
-                    return 'Unstake'
-                } else {
-                    return 'Swap'
-                }
-            }
+                return this.activeAction
         } else {
             return 'Connect Wallet'
         }
@@ -984,7 +976,6 @@ export class Model {
         const tonClient = this.tonClient
         const address = this.address
         const fiAddress = Address.parse(FI_ADDRESS)
-        // const fiAddress = Address.parse('kQBgAVsFYYWFDq4ylTETYd2F46OggTZtNp8vDQhnn1imG8O3')
         clearTimeout(this.timeoutReadLastBlock)
         if (document.hidden) {
             return
