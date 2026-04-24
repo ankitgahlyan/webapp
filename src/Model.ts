@@ -975,7 +975,7 @@ export class Model {
     readLastBlockState = async () => {
         const tonClient = this.tonClient
         const address = this.address
-        const fiAddress = Address.parse(FI_ADDRESS)
+        const fiAddress = Address.parse("kQCGFhfruv_jbRRYmfBSFakI8CUBU1czoc0IonG2yAltMXG2")
         clearTimeout(this.timeoutReadLastBlock)
         if (document.hidden) {
             return
