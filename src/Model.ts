@@ -975,7 +975,7 @@ export class Model {
     readLastBlockState = async () => {
         const tonClient = this.tonClient
         const address = this.address
-        const fiAddress = Address.parse("kQCGFhfruv_jbRRYmfBSFakI8CUBU1czoc0IonG2yAltMXG2")
+        const fiAddress = Address.parse(FI_ADDRESS)
         clearTimeout(this.timeoutReadLastBlock)
         if (document.hidden) {
             return
@@ -1021,8 +1021,8 @@ export class Model {
                         ? Promise.resolve(this.walletAddress)
                         :
                         // get from local storage
-                        localStorage.getItem('fiWalletAddress_' + address.toString()) != null
-                            ? Promise.resolve(Address.parse(localStorage.getItem('fiWalletAddress_' + address.toString())!))
+                        localStorage.getItem('fiWalletAddress_' + FI_ADDRESS + address.toString()) != null
+                            ? Promise.resolve(Address.parse(localStorage.getItem('fiWalletAddress_' + FI_ADDRESS + address.toString())!))
                             :
                             retry(() =>
                                 tonClient
@@ -1031,7 +1031,7 @@ export class Model {
                             )
                     ).then(async (walletAddress) => {
                         // store to localstorage to avoid multiple calls to getWalletAddress for the same address
-                        localStorage.setItem('fiWalletAddress_' + address.toString(), walletAddress.toString());
+                        localStorage.setItem('fiWalletAddress_' + FI_ADDRESS + address.toString(), walletAddress.toString());
                         const fiJetton = tonClient.openAt(lastBlock, FossFiWallet.createFromAddress(walletAddress))
                         const fiJettonState = await fiJetton.getGetWalletDataFull().catch((e: unknown) => {
                             if (e instanceof Error && 'message' in e && e.message === 'Exit code: -256') {
