@@ -7,12 +7,122 @@ import tonspace from './assets/tonspace.jpg'
 import mtw from './assets/mytonwallet.webp'
 // import evaa from './assets/evaa.svg'
 
+// import Map, { Marker } from 'react-map-gl/maplibre';
+// import 'maplibre-gl/dist/maplibre-gl.css';
+
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useState } from "react";
+import L from "leaflet";
+
 interface Props {
     model: Model
 }
 
+type Location = {
+    id: string;
+    lat: number;
+    lon: number;
+    title: string;
+    owner: string;
+};
+
+function BlockchainLayer() {
+    const map = useMap();
+    const [locations, setLocations] = useState<Location[]>([]);
+
+    async function loadLocations() {
+        const bounds = map.getBounds();
+
+        // const bbox = [
+        //     bounds.getWest(),
+        //     bounds.getSouth(),
+        //     bounds.getEast(),
+        //     bounds.getNorth(),
+        // ].join(",");
+
+        // const data: Location[] = await fetch(
+        //     `https://api.example.com/map?bbox=${bbox}`
+        // ).then((r) => r.json());
+
+        // setLocations(data);
+        // const geoJsonLayer = L.geoJSON(data, {
+        //     pointToLayer: (_, latlng) =>
+        //         L.circleMarker(latlng, {
+        //             radius: 6,
+        //         }),
+        // });
+
+        // geoJsonLayer.addTo(map);
+    }
+
+    useEffect(() => {
+        loadLocations();
+
+        map.on("moveend", loadLocations);
+
+        return () => {
+            map.off("moveend", loadLocations);
+        };
+    }, []);
+
+    return (
+        <>
+            {locations.map((loc) => (
+                <Marker
+                    key={loc.id}
+                    position={[loc.lat, loc.lon]}
+                >
+                    <Popup>
+                        <h3>{loc.title}</h3>
+                        <p>Owner: {loc.owner}</p>
+                    </Popup>
+                </Marker>
+            ))}
+        </>
+    );
+}
+
 const Referral = observer(({ model }: Props) => {
-    return <h1 className='text-white'>coming not so soon...</h1>
+
+    return <>
+        <h1 className='text-white'>explore source code @ <a href="https://github.com/ankitgahlyan/webapp">GitHub</a></h1>
+
+        <MapContainer
+            center={[28.6139, 77.209]}
+            zoom={20}
+            style={{
+                height: "fit-content",
+                // height: "100vh",
+                width: "fit-content",
+            }}
+        >
+            <TileLayer
+                attribution="© OpenStreetMap contributors"
+                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            {/* <BlockchainLayer /> */}
+        </MapContainer>
+
+        {/* <div id="map" className='text-white'>Leaflet</div> */}
+
+        {/* <Map
+            initialViewState={{
+                latitude: 37.8,
+                longitude: -122.4,
+                zoom: 14
+            }}
+            style={{ width: 800, height: 600 }}
+            mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        >
+            <Marker longitude={-122.4} latitude={37.8} color="red" />
+        </Map> */}
+    </>
+
+    // const root = createRoot(document.body.appendChild(document.createElement('div')));
+    // root.render(<Root />);
+
+
     // return (
     //     <div className='mx-auto w-full max-w-(--breakpoint-lg) p-4 pb-32 font-body text-brown dark:text-dark-50'>
     //         <p className='px-8 pt-4 text-center text-3xl font-bold'>What Can I Do with hTON?</p>

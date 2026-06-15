@@ -458,7 +458,7 @@ fun onInternalMessage(in: InMessage): void {
             assert (in.senderAddress == msg.sender.getAddrFiWallet()) throw Errors.IncorrectSender;
 
             store.active = true;
-            store.jettonBalance = ton("1"); // for semantic txns.
+            store.jettonBalance = ton("1");
             if (time.accountInit == 0) {
                 time.accountInit = blockchain.now();
                 nomins.nominee = in.senderAddress; // must be null at init
