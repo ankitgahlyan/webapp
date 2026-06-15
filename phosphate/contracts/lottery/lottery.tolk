@@ -30,7 +30,7 @@ fun onInternalMessage(in: InMessage) {
             assert(blockchain.now() <= storage.revealDeadline) throw 201;
             
             // todo: fixme make every hour
-            if (!storage.revealDeadline) {
+            if (storage.revealDeadline == 0) {
                 storage.revealDeadline = blockchain.now() + REVEAL_DEADLINE_SECONDS;
             }
 

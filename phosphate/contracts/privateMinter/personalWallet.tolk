@@ -1,10 +1,11 @@
 import "@stdlib/gas-payments"
-import "../common/errors"
+import "../common/types"
 import "../common/fees-management"
 import "jetton-utils"
 import "../common/messages"
 import "../common/sharding"
 import "storage"
+import "@contracts/fossFi/storage"
 
 type AllowedMessageToWallet = AskToTransfer | AskToBurn | InternalTransferStep | TopUpTons
 
@@ -33,12 +34,12 @@ fun onInternalMessage(in: InMessage) {
                 assert (
                     in.senderAddress ==
                     addrPriWallet(msg.transferInitiator)
-                ) throw ERROR_NOT_VALID_WALLET;
+                ) throw Errors.NotValidWallet;
             }
 
             storage.jettonBalance += msg.jettonAmount;
 
-            if (msg.forwardTonAmount) {
+            if (msg.forwardTonAmount != 0) {
                 val notifyOwnerMsg = createMessage({
                     bounce: BounceMode.NoBounce,
                     dest: storage.owner,
@@ -75,7 +76,7 @@ fun onInternalMessage(in: InMessage) {
             msg.forwardPayload.checkIsCorrectTLBEither();
             assert (
                 msg.transferRecipient.getWorkchain() == MY_WORKCHAIN
-            ) throw ERROR_WRONG_WORKCHAIN;
+            ) throw Errors.WrongWorkchain;
             checkAmountIsEnoughToTransfer(
                 in.valueCoins,
                 msg.forwardTonAmount,
@@ -83,8 +84,8 @@ fun onInternalMessage(in: InMessage) {
             );
 
             // var storage = lazy PriWalletStore.load();
-            assert (in.senderAddress == storage.owner) throw ERROR_NOT_OWNER;
-            assert (storage.jettonBalance >= msg.jettonAmount) throw ERROR_BALANCE_ERROR;
+            assert (in.senderAddress == storage.owner) throw Errors.NotOwner;
+            assert (storage.jettonBalance >= msg.jettonAmount) throw Errors.BalanceError;
             storage.jettonBalance -= msg.jettonAmount;
             storage.save();
 
@@ -126,8 +127,8 @@ fun onInternalMessage(in: InMessage) {
 
         AskToBurn => {
             checkAmountIsEnoughToBurn(in.valueCoins);
-            assert (in.senderAddress == storage.owner) throw ERROR_NOT_OWNER;
-            assert (storage.jettonBalance >= msg.jettonAmount) throw ERROR_BALANCE_ERROR;
+            assert (in.senderAddress == storage.owner) throw Errors.NotOwner;
+            assert (storage.jettonBalance >= msg.jettonAmount) throw Errors.BalanceError;
             storage.jettonBalance -= msg.jettonAmount;
 
             val notifyMinterMsg = createMessage({
@@ -158,14 +159,7 @@ fun onInternalMessage(in: InMessage) {
     storage.save();
 }
 
-struct JettonWalletDataReply {
-    jettonBalance: coins
-    owner: address
-    minterAddress: address
-    jettonWalletCode: cell
-}
-
-get fun get_personal_wallet_state() {
+get fun get_personal_wallet_state(): PriWalletStore {
     return PriWalletStore.load();
 }
 
@@ -174,7 +168,7 @@ get fun get_wallet_data(): JettonWalletDataReply {
 
     return {
         jettonBalance: storage.jettonBalance,
-        owner: storage.owner,
+        ownerAddress: storage.owner,
         minterAddress: storage.minterAddress,
         jettonWalletCode: contract.getCode(),
     };

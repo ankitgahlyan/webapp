@@ -1,12 +1,12 @@
+import "@gen/fossFiWallet.code"
 import "@stdlib/tvm-lowlevel"
 import "jetton-utils"
 import "storage"
-import "../common/consts.tolk"
-import "../common/errors"
-import "../common/messages"
-import "../common/sharding"
-import "../lottery/storage"
-import "../lottery/messages"
+import "@contracts/common/messages"
+import "@contracts/common/sharding"
+import "@contracts/lottery/storage"
+import "@contracts/lottery/messages"
+import "@contracts/common/types"
 
 type AllowedMessageToMinter =
     | MintNewJettons
@@ -27,6 +27,14 @@ type AllowedMessageToMinter =
 
     | Destroy
 
+contract fossFi {
+    author: "zeta"
+    version: "0.1.0"
+    description: "minter contract for fossFi with personal token, voting, invite system and more"
+    storage: FiStore
+    incomingMessages: AllowedMessageToMinter
+}    
+
 fun onInternalMessage(in: InMessage): void {
     val msg = lazy AllowedMessageToMinter.fromSlice(in.body);
     var store = lazy FiStore.load();
@@ -39,21 +47,22 @@ fun onInternalMessage(in: InMessage): void {
             store.supply += MBRP_AMOUNT; // note: broadcast id for explorers or dbs
             
             // send excesses
-            createMessage({
+            val excesses = createMessage({
                 bounce: BounceMode.NoBounce,
                 value: 0,
                 dest: msg.sender,
                 body: ReturnExcessesBack {
                     queryId: msg.queryId,
                 },
-            }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_IGNORE_ERRORS);
+            });
+            excesses.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_IGNORE_ERRORS);
         }
 
         NotifyMinter => {
             checkCorrectSender(in.senderAddress, msg.burnInitiator, store);
 
             // determine whether MINT or BURN
-            msg.queryId
+            msg.queryId != 0
                 ? store.supply += msg.jettonAmount
                 : store.supply -= msg.jettonAmount;
 
@@ -71,7 +80,7 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         RequestWalletAddress => {
-            var owner: Cell<address>? = msg.includeOwnerAddress
+            val owner: Cell<address>? = msg.includeOwnerAddress
                 ? msg.owner.toCell()
                 : null;
 
@@ -81,7 +90,7 @@ fun onInternalMessage(in: InMessage): void {
                     msg.owner,
                     store.admin,
                     contract.getAddress(),
-                    store.baseFiWalletCode,
+                    fiWalletCompiledCode(),
                 )
                     .calculateAddress();
             }
@@ -101,46 +110,46 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         MintNewJettons => {
-            assert (false) throw INCORRECT_RECEIVER; // just for fun/standard
+            assert (false) throw Errors.IncorrectReceiver; // just for fun/standard
         }
 
         ChangeMinterAdmin => {
-            assert (in.senderAddress == store.admin) throw ERROR_NOT_OWNER;
+            assert (in.senderAddress == store.admin) throw Errors.NotOwner;
             store.admin = msg.newAdminAddress;
         }
 
         ChangeMinterMetadataUri => {
-            assert (in.senderAddress == store.admin) throw ERROR_NOT_OWNER;
+            assert (in.senderAddress == store.admin) throw Errors.NotOwner;
             store.metadata = msg.newMetadataUri;
         }
 
         Upgrade => {
-            assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
-            assert (store.CurrentRequest == null) throw WAIT_MORE;
+            assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
+            assert (store.currentRequest == null) throw Errors.WaitMore;
 
-            store.CurrentRequest = {
+            store.currentRequest = {
                 newUpgrade: msg,
                 timestamp: blockchain.now()
             };
         },
 
         RejectUpgrade => {
-            assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
-            assert (store.CurrentRequest != null) throw WAIT_MORE;
+            assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
+            assert (store.currentRequest != null) throw Errors.WaitMore;
 
-            store.CurrentRequest = null;
+            store.currentRequest = null;
         },
 
         ApproveUpgrade => {
-            assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
-            assert (store.CurrentRequest != null) throw WAIT_MORE;
+            assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
+            assert (store.currentRequest != null) throw Errors.WaitMore;
             // testnetOnly
-            assert (store.CurrentRequest.timestamp + 1 < blockchain.now()) throw WAIT_MORE;
+            assert (store.currentRequest.timestamp + 1 < blockchain.now()) throw Errors.WaitMore;
 
-            val code = store.CurrentRequest.newUpgrade.newCode;
-            val data = store.CurrentRequest.newUpgrade.newData;
+            val code = store.currentRequest.newUpgrade.newCode;
+            val data = store.currentRequest.newUpgrade.newData;
 
-            match (store.CurrentRequest.newUpgrade.walletUpgrade) {
+            match (store.currentRequest.newUpgrade.walletUpgrade) {
                 true => {
                     // for jettonWallet of FOSSFIAT/MINT
                     store.walletVersion += 1;
@@ -153,7 +162,7 @@ fun onInternalMessage(in: InMessage): void {
                             store.admin,
                             // owner/deployer/treasury
                             contract.getAddress(),
-                            store.baseFiWalletCode,
+                            fiWalletCompiledCode(),
                         )
                             .calculateAddress(),
                         body: Upgrade {
@@ -178,7 +187,7 @@ fun onInternalMessage(in: InMessage): void {
                 }
             }
             
-            store.CurrentRequest = null;
+            store.currentRequest = null;
         },
 
         RequestUpgradeCode => {
@@ -193,7 +202,7 @@ fun onInternalMessage(in: InMessage): void {
                     body: Upgrade {
                         walletVersion: store.walletVersion,
                         sender: store.admin,
-                        newCode: others.latestFiWalletCode!, // b for latestFiWalletCode
+                        newCode: others.latestFiWalletCode!,
                     },
                 });
                 upgradeMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
@@ -204,7 +213,7 @@ fun onInternalMessage(in: InMessage): void {
         TopUpTons => {
             // deploy + accept tons + deploy jettonWallet
             if (in.senderAddress == store.admin) {
-                store.supply += ton("1"); // needed for semantic txn minted to deployer
+                store.supply += ton("1");
                 val deployTopUpMsg = createMessage({
                     // bounce for collecting fees back
                     bounce: BounceMode.Only256BitsOfBody,
@@ -213,7 +222,7 @@ fun onInternalMessage(in: InMessage): void {
                         in.senderAddress,
                         store.admin,
                         contract.getAddress(),
-                        store.baseFiWalletCode,
+                        fiWalletCompiledCode(),
                     ),
                     body: TopUpTons { queryId: msg.queryId },
                 });
@@ -224,24 +233,25 @@ fun onInternalMessage(in: InMessage): void {
 
         EnterLottery => {
             checkCorrectSender(in.senderAddress, msg.sender, store);
-            createMessage({
+            val enterMsg = createMessage({
                 bounce: BounceMode.RichBounce, // todo handle deepBounces
                 value: 0,
                 dest: calcDeployLottery( // deploy
                     contract.getAddress(),
                     msg.amount,
-                    others.lotteryCode
+                    others.lotteryCode! // todo: fixme, should not be null for entering lottery
                 ),
                 body: msg,
-            }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+            });
+            enterMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
         }
 
         LotteryWin => {
             assert (in.senderAddress == calcDeployLottery(
                 contract.getAddress(),
                 msg.entryAmount,
-                others.lotteryCode // a for lotteryCode
-            ).calculateAddress()) throw INCORRECT_SENDER;
+                others.lotteryCode!
+            ).calculateAddress()) throw Errors.IncorrectSender;
             
             // todo:
             // send using InternalTransfer/Mint
@@ -249,26 +259,29 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         HotUpgrade => {
-            assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
+            assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
             
             contract.setCodePostponed(msg.code);
 
+            // SAFETY
             setTvmRegisterC3(transformSliceToContinuation(msg.code.beginParse()));
             hotUpgradeFiData(msg.additionalData);
         }
 
         // testnetOnly
         Destroy => {
-            assert (in.senderAddress == store.admin) throw INCORRECT_SENDER;
+            assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
             
-            createMessage({
+            val destroy = createMessage({
                 bounce: BounceMode.NoBounce,
                 value: 0,
                 dest: in.senderAddress,
                 body: ReturnExcessesBack {
                     queryId: 0,
                 },
-            }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
+            });
+            // safety: send all balance back to admin and then destroy
+            destroy.send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
         }
 
         else => {
@@ -281,20 +294,6 @@ fun onInternalMessage(in: InMessage): void {
     store.save();
 }
 
-struct JettonDataReply {
-    supply: int
-    mintable: bool
-    admin: address
-    jettonContent: cell // Cell<OnchainMetadataReply>
-    jettonWalletCode: cell
-}
-
-// struct (0x00) OnchainMetadataReply {
-//     contentDict: map<uint256, Cell<SnakeDataReply>>
-// }
-// struct (0x00) SnakeDataReply {
-//     string: SnakeString
-// }
 get fun get_jetton_data(): JettonDataReply {
     val store = lazy FiStore.load();
 
@@ -307,41 +306,41 @@ get fun get_jetton_data(): JettonDataReply {
     // metadata.contentDict.set(stringSha256("decimals"), SnakeDataReply { string: "9" }.toCell());
     // // }
     return {
-        supply: store.supply,
+        totalSupply: store.supply,
         mintable: true, // but by peers only & not minter
-        admin: store.admin,
-        jettonContent: store.metadata, // metadata.toCell(),
-        jettonWalletCode: store.baseFiWalletCode,
+        adminAddress: store.admin,
+        jettonContent: store.metadata as Cell<OnchainMetadataReply>, // metadata.toCell(),
+        jettonWalletCode: fiWalletCompiledCode(),
     };
 }
 
-get fun get_jetton_data_all() {
+get fun get_jetton_data_all(): FiStore {
     return FiStore.load(); // todo: return contract code + data also
 }
 
-get fun get_wallet_address(owner: address) {
+get fun get_wallet_address(owner: address): address {
     val store = lazy FiStore.load();
     return calcDeployFiWallet(
         owner,
         store.admin,
         // owner/deployer/treasury
         contract.getAddress(),
-        store.baseFiWalletCode,
+        fiWalletCompiledCode(),
     )
         .calculateAddress();
 }
 
-fun checkCorrectSender(sender: address, owner: address, store: FiStore) {
+fun checkCorrectSender(sender: address, owner: address, store: FiStore): void {
     assert (
         sender ==
         calcDeployFiWallet(
             owner,
             store.admin,
             contract.getAddress(),
-            store.baseFiWalletCode,
+            fiWalletCompiledCode(),
         )
             .calculateAddress()
-    ) throw ERROR_NOT_VALID_WALLET;
+    ) throw Errors.NotValidWallet;
 }
 
 // todo: implement minter deploy(efficient) not jetton(costly stateinit send)
@@ -354,7 +353,7 @@ fun calcDeployLottery(
     val emptyLotteryStore: LotteryStorage = {
         owner,
         entryAmount,
-        participants: createEmptyMap(),
+        participants: [],
     };
 
     return { stateInit: { code: lotteryCode, data: emptyLotteryStore.toCell() } };
@@ -364,7 +363,7 @@ fun calcDeployLottery(
 fun hotUpgradeFiData(additionalData: cell?) {  
     // var oldStorage = lazy FiStore.fromCell(contract.getData());
 
-    // assert (additionalData != null) throw 1112;
+    // assert (additionalData != null) throw Errors.1112;
     
     // var storage = FiStore {
     //     supply: oldStorage.totalSupply,

@@ -1,51 +1,16 @@
 "use client"
 
-import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  BellIcon,
-  CreditCardIcon,
-  DownloadIcon,
-  EyeIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileTextIcon,
-  FolderIcon,
-  FolderOpenIcon,
-  FolderSearchIcon,
-  HelpCircleIcon,
-  KeyboardIcon,
-  LanguagesIcon,
-  LayoutIcon,
-  LogOutIcon,
-  MailIcon,
-  MonitorIcon,
-  MoonIcon,
-  MoreHorizontalIcon,
-  PaletteIcon,
-  SaveIcon,
-  SettingsIcon,
-  ShieldIcon,
-  SunIcon,
-  UserIcon,
-} from "lucide-react"
+import { CreditCardIcon, UserIcon } from "lucide-react"
 import { observer } from "mobx-react-lite"
 import { Props } from "@/types"
 
@@ -60,21 +25,11 @@ export const DropdownMenuComplex = observer(({ model }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Selected: {model.activeAction}</Button>
+        <Button variant="outline">{model.activeAction}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-44">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>all actions</DropdownMenuLabel>
-          <DropdownMenuCheckboxItem
-            checked={model.activeAction === "send"}
-            onCheckedChange={() =>
-              model.setActiveAction("send")
-              // setNotifications({ ...notifications, email: checked === true })
-            }
-          >
-            <CreditCardIcon />
-            Send Tokens
-          </DropdownMenuCheckboxItem>
+          <DropdownMenuLabel>actions</DropdownMenuLabel>
           <DropdownMenuCheckboxItem
             checked={model.activeAction === "invite"}
             onCheckedChange={() =>
@@ -83,6 +38,15 @@ export const DropdownMenuComplex = observer(({ model }: Props) => {
           >
             <UserIcon />
             Invite
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={model.activeAction === "vote"}
+            onCheckedChange={() =>
+              model.setActiveAction("vote")
+            }
+          >
+            <UserIcon />
+            Vote
           </DropdownMenuCheckboxItem>
 
           {/* <DropdownMenuItem>

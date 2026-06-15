@@ -16,24 +16,16 @@ struct TrustedAddrs { // todo: map field to store variable trusted addrs by root
 struct Addresses {
     owner: address // todo: store pubKey+acceptExternalMsg for direct msg to receiver(socialRecovery?)
     treasury: address
-    id: cell // todo: implement manual change; unique ID username@localLatitudeGroupName
     nomInAddrs: Cell<NomInAddrs>
     trustedJettonAddrs: Cell<TrustedAddrs>
-    others: Cell<FiWalletCodes>
-}
-
-struct FiWalletCodes {
-    a: cell
-    b: cell
-    c: cell
-    d: cell
+    // others: Cell<FiWalletCodes>
 }
 
 struct FiCodes {
-    lotteryCode: cell
-    latestFiWalletCode: cell
-    c: cell
-    d: cell
+    lotteryCode: cell?
+    latestFiWalletCode: cell?
+    c: cell?
+    d: cell?
 }
 
 struct Maps {
@@ -67,7 +59,7 @@ struct TimeStamps {
 struct FiWalletStore { // todo: nft like store migration after activate/upgrade/ID acc also code upgrade & reverese/killSwitch for normal jettons coz of  
     jettonBalance: coins = 0
     goldCoins: uint32 = 1 // todo: implement: store of value, transferrable
-    
+    id: string = "" // for future use of offchain id like email/phone/username for social recovery & web2 integrations
     txnCount: uint8 = 0 // for fixed fees burns to counter minting
     status: uint2 = 0 // for granular control
     isAuthorityAccount: bool = false
@@ -81,37 +73,58 @@ struct FiWalletStore { // todo: nft like store migration after activate/upgrade/
     active: bool = false
     mintable: bool = true
     version: uint10 = 0
-    // storeVersion: uint10 = 0
+    storeVersion: uint10 = 0
 
     timestamps: Cell<TimeStamps>
     addresses: Cell<Addresses>
     maps: Cell<Maps>
-
-    readonly baseFiWalletCode: cell
 }
 
+// @overflow1023_policy("suppress")
 struct FiStore {
     supply: coins
     walletVersion: uint10
     admin: address // todo: implement: use dao address
-    CurrentRequest: CurrentRequest?
-    readonly baseFiWalletCode: cell // for address calculation
-    metadata: cell // Cell<SnakeString>
+    currentRequest: CurrentRequest?
+    metadata: cell
     others: Cell<FiCodes>
 }
 
-fun FiStore.load() {
+fun FiStore.load(): FiStore {
     return FiStore.fromCell(contract.getData());
 }
 
-fun FiStore.save(self) {
+fun FiStore.save(self): void {
     contract.setData(self.toCell());
 }
 
-fun FiWalletStore.load() {
+fun FiWalletStore.load(): FiWalletStore {
     return FiWalletStore.fromCell(contract.getData());
 }
 
-fun FiWalletStore.save(self) {
+fun FiWalletStore.save(self): void {
     contract.setData(self.toCell());
+}
+
+struct JettonWalletDataReply {
+    jettonBalance: coins
+    ownerAddress: address
+    minterAddress: address
+    jettonWalletCode: cell
+}
+
+struct JettonDataReply {
+    totalSupply: int
+    mintable: bool
+    adminAddress: address?
+    jettonContent: Cell<OnchainMetadataReply>
+    jettonWalletCode: cell
+}
+
+struct (0x00) OnchainMetadataReply {
+    contentDict: map<uint256, Cell<SnakeDataReply>>
+}
+
+struct (0x00) SnakeDataReply {
+    string: string
 }

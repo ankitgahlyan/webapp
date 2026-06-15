@@ -1,11 +1,51 @@
 # AGENTS.md - Development Guidelines
 
+## Agent Guidance
+
+- Use `acton` Codex skill for Acton CLI, Tolk, wrappers, tests, scripts, deployment, and `Acton.toml` tasks.
+- Treat `phosphate/contracts/fossFi/fossFi.tolk` and `contracts/src/types.tolk` as the source of truth for contract behavior and ABI shape.
+- Treat `wrappers-ts/FossFi.gen.ts` as generated output. Prefer regenerating it from the contract ABI instead of hand-editing it when the ABI changes.
+- Keep `phosphate/tests/`, `wrappers/FossFi.gen.tolk`, `phosphate/scripts/deploy.tolk`, `wrappers-ts/FossFi.gen.ts`, and the frontend code in `app/` aligned with contract changes.
+- Prefer this validation loop when feasible: `acton build`, `acton test`, `npm run typecheck`, `npm run build`.
+- Before proposing broadcast deployment changes, verify the contract flow with `acton run deploy-emulation` first.
+- When command syntax or flags are unclear, verify them with `acton --help`, `acton <command> --help`, `npm run`, or the existing project config.
+
+
 ## Project Overview
 
 This is a monorepo with two workspaces:
 
 - **Root** (`/`) - React + Vite + TypeScript frontend application
 - **Phosphate** (`/phosphate`) - TON blockchain smart contracts
+
+## Agent / Skill Files in this Repository
+
+The repository includes localized agent/skill metadata for two agent platforms:
+
+- `.github/skills/` — skill definitions and references for the GitHub agent system
+- `.github/agents/` — agent-specific helper docs, including `ci-monitor-subagent.agent.md`
+- `.github/prompts/` — prompt templates for agent activation, e.g. `monitor-ci.prompt.md`
+- `.opencode/skills/` — parallel skill definitions for the OpenCode agent system
+- `.opencode/agents/` — parallel agent definitions for OpenCode, including `ci-monitor-subagent.md`
+
+The current repo-specific agent skill is:
+
+- `monitor-ci` — a CI monitoring/orchestration skill for Nx Cloud self-healing
+
+The current helper subagent is:
+
+- `ci-monitor-subagent` — a lightweight subagent that calls one MCP tool per invocation and returns structured CI/self-healing data.
+
+Also available as agent/skill support in the repo:
+
+- `nx-workspace` — explore Nx projects, targets, and dependencies
+- `nx-generate` — generate apps/libs and scaffold workspace structure
+- `nx-import` — import existing codebases into Nx workspaces and fix integration issues
+- `nx-plugins` — manage Nx plugins and plugin-related config
+- `nx-run-tasks` — run Nx targets and task orchestration
+- `link-workspace-packages` — wire up workspace package dependencies after scaffolding or repo changes
+
+> Note: These files are documentation/configuration for agent behavior. There is no runtime AI agent code in the app frontend or Phosphate smart contract packages.
 
 ## MCP Servers
 

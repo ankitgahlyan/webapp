@@ -1,13 +1,11 @@
-import "storage"
-import "../common/consts"
-import "../common/errors"
-import "../common/fees-management"
-import "../common/messages"
-import "../common/sharding"
-import "../lottery/messages"
 import "@stdlib/gas-payments"
-import "consts"
-import "../followers/store"
+import "storage"
+import "@contracts/common/fees-management"
+import "@contracts/common/messages"
+import "@contracts/common/sharding"
+import "@contracts/lottery/messages"
+import "@contracts/common/types"
+import "@gen/fossFiWallet.code"
 
 fun calcDeployFiWallet(
     owner: address,
@@ -19,27 +17,20 @@ fun calcDeployFiWallet(
         addresses: Addresses {
             owner,
             treasury,
-            id: createEmptyCell(),
             nomInAddrs: NomInAddrs {}.toCell(),
             trustedJettonAddrs: TrustedAddrs {
                 minterAddr: minterAddress,
-                authorisedAccs: createEmptyMap(),
-            }.toCell(),
-            others: FiWalletCodes {
-                a: createEmptyCell(),
-                b: createEmptyCell(),
-                c: createEmptyCell(),
-                d: createEmptyCell(),
+                authorisedAccs: [],
             }.toCell(),
         }.toCell(),
         maps: Maps {
-            allowances: createEmptyMap(),
-            invited: createEmptyMap(),
-            votedFor: createEmptyMap(),
-            reportInfo: ReportInfo { reports: createEmptyMap() }.toCell(),
+            allowances: [],
+            invited: [],
+            votedFor: [],
+            reportInfo: ReportInfo { reports: [] }.toCell(),
         }.toCell(), // todo: learn how to set it default
         timestamps: TimeStamps {}.toCell(),
-        baseFiWalletCode,
+        // baseFiWalletCode,
     };
 
     return {
@@ -62,7 +53,7 @@ fun calcDeployFiWallet(
 //     }
 // }
 
-fun address.getAddrFiWallet(self) {
+fun address.getAddrFiWallet(self): address {
     // used by: wallet txn sending
     val store = lazy FiWalletStore.load();
     val addrs = lazy store.addresses.load();
@@ -70,31 +61,18 @@ fun address.getAddrFiWallet(self) {
         self,
         addrs.treasury,
         addrs.trustedJettonAddrs.load().minterAddr,
-        store.baseFiWalletCode,
-    )
-        .calculateAddress();
+        fiWalletCompiledCode(),
+    ).calculateAddress();
 }
-
-// fun address.connected(self, store: FiWalletStore) {
-//     // val store = lazy FiWalletStore.load();
-//     val addrs = lazy store.addresses.load();
-//     val maps = lazy store.maps.load();
-
-//     return ((self == contract.getAddress()) || (self == addrs.nomInAddrs.load().invitor!) ||
-//     (maps.followers.exists(self)) ||
-//     (maps.followings.exists(self)) ||
-//     (maps.friends.exists(self)) ||
-//     (maps.invited.exists(self)))
-//         ? true
-//         : false; // todo fixme null  
-// }
 
 fun checkCorrectSenderInternal(sender: address, owner: address) {
     val store = lazy FiWalletStore.load();
     if (sender == owner.getAddrFiWallet()) {
-        assert (store.active) throw ACCOUNT_INACTIVE;
+        assert (store.active) throw Errors.AccountInactive;
     } else {
-        assert (sender == store.addresses.load().trustedJettonAddrs.load().minterAddr) throw ERROR_NOT_VALID_WALLET;
+        assert (
+            sender == store.addresses.load().trustedJettonAddrs.load().minterAddr
+        ) throw Errors.NotValidWallet;
     }
 }
 
@@ -169,8 +147,8 @@ fun idActionChecks(store: FiWalletStore) {
     val reportInfo = lazy reports.reportInfo.load();
     assert (
         store.active
-    ) throw ACCOUNT_INACTIVE; // mint/burn actions allowed only for active/ID accounts
-    assert (reportInfo.reporterCount < 1) throw ALREADY_REPORTED; // reported IDs can't act
+    ) throw Errors.AccountInactive;                                     // mint/burn actions allowed only for active/ID accounts
+    assert (reportInfo.reporterCount < 1) throw Errors.AlreadyReported; // reported IDs can't act
 }
 
 // fun newConnectionChecks(store: FiWalletStore, targetJetton: address) {
@@ -181,15 +159,16 @@ fun idActionChecks(store: FiWalletStore) {
 // }
 
 fun address.deActivate(self, commandAmount: coins, store: FiWalletStore) {
-    assert (store.active) throw ACCOUNT_INACTIVE;
+    assert (store.active) throw Errors.AccountInactive;
     val internalDeActivate = createMessage({
         bounce: BounceMode.Only256BitsOfBody,
         dest: self.getAddrFiWallet(),
         value: 0,
         body: InternalDeActivate {}, // emptybody as jettonAddrs are stored
     });
-    internalDeActivate.send(SEND_MODE_BOUNCE_ON_ACTION_FAIL |
-    SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE);
+    internalDeActivate.send(
+        SEND_MODE_BOUNCE_ON_ACTION_FAIL | SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE,
+    );
 }
 
 // fun burnForce(sender: address, amount: int, store: FiWalletStore) {
@@ -218,18 +197,18 @@ fun address.deActivate(self, commandAmount: coins, store: FiWalletStore) {
 
 @inline
 fun requestUpgrade(from: address, sender: address, version: uint10) {
-    createMessage({
+    val outMsg = createMessage({
         dest: from,
         bounce: BounceMode.NoBounce,
         value: ton("0.1"),
         body: RequestUpgradeCode { sender, version },
-    })
-        .send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS);
+    });
+    outMsg.send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS);
 }
 
 @inline
 fun sendUpgrade(to: address, sender: address, walletVersion: uint10) {
-    createMessage({
+    val outMsg = createMessage({
         dest: to,
         value: ton("0.1"),
         bounce: false,
@@ -238,8 +217,8 @@ fun sendUpgrade(to: address, sender: address, walletVersion: uint10) {
             sender,
             newCode: contract.getCode(),
         },
-    })
-        .send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS);
+    });
+    outMsg.send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS);
 }
 
 fun cmpStringTail(mutate a: slice, mutate b: slice): bool {
@@ -252,18 +231,18 @@ fun cmpStringTail(mutate a: slice, mutate b: slice): bool {
                 return false;
             }
         }
-        
+
         // Check if both slices are fully consumed
         val aEndBits = a.isEndOfBits();
         val bEndBits = b.isEndOfBits();
         val aEndRefs = a.isEndOfRefs();
         val bEndRefs = b.isEndOfRefs();
-        
+
         // Both fully consumed - equal
         if (aEndBits && aEndRefs && bEndBits && bEndRefs) {
             return true;
         }
-        
+
         // Advance to refs if slices are empty of bits but have refs
         if (aEndBits && !aEndRefs) {
             a = a.loadRef().beginParse();
@@ -271,10 +250,9 @@ fun cmpStringTail(mutate a: slice, mutate b: slice): bool {
         if (bEndBits && !bEndRefs) {
             b = b.loadRef().beginParse();
         }
-        
+
         // Mismatch: one has more data/refs than the other
-        if (a.isEndOfBits() != b.isEndOfBits() || 
-            a.isEndOfRefs() != b.isEndOfRefs()) {
+        if (a.isEndOfBits() != b.isEndOfBits() || a.isEndOfRefs() != b.isEndOfRefs()) {
             return false;
         }
     }
@@ -283,36 +261,44 @@ fun cmpStringTail(mutate a: slice, mutate b: slice): bool {
 @inline
 fun enterLottery(sender: address, dest: address, amount: coins) {
     val enterLottery = createMessage({
-                bounce: BounceMode.Only256BitsOfBody,
-                dest, // through minter
-                value: 0,
-                body: EnterLottery {
-                    sender,
-                    amount,
-                }
-            });
-            enterLottery.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+        bounce: BounceMode.Only256BitsOfBody,
+        dest, // through minter
+        value: 0,
+        body: EnterLottery { sender, amount },
+    });
+    enterLottery.send(
+        SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+    );
 }
 
 fun sendExcesses(queryId: uint64, inValue: coins, to: address) {
-    var toLeaveOnBalance = contract.getOriginalBalance() - inValue + contract.getStorageDuePayment();
+    val toLeaveOnBalance = contract.getOriginalBalance() - inValue +
+    contract.getStorageDuePayment();
     reserveToncoinsOnBalance(
         max(toLeaveOnBalance, calculateJettonWalletMinStorageFee()),
-        RESERVE_MODE_AT_MOST
+        RESERVE_MODE_AT_MOST,
     );
 
-    createMessage({
+    val outMsg = createMessage({
         bounce: BounceMode.NoBounce,
         dest: to,
         value: 0,
         body: ReturnExcessesBack { queryId },
-    }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_IGNORE_ERRORS);
+    });
+    // safety
+    outMsg.send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_IGNORE_ERRORS);
 }
 
-fun notifyOwner(queryId: uint64, transferInitiator: address, dest: address, jettonAmount: coins, forwardPayload: slice) {
-    createMessage({
+fun notifyOwner(
+    queryId: uint64,
+    transferInitiator: address,
+    dest: address,
+    jettonAmount: coins,
+    forwardPayload: slice,
+) {
+    val outMsg = createMessage({
         bounce: BounceMode.NoBounce, // cause receiver can have uninitialized contract
-        dest, // notify current owner
+        dest,                        // notify current owner
         value: ton("0.001"),
         body: TransferNotificationForRecipient {
             queryId,
@@ -320,16 +306,14 @@ fun notifyOwner(queryId: uint64, transferInitiator: address, dest: address, jett
             transferInitiator,
             forwardPayload,
         },
-    }).send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS); // bounce back to sender
-            
+    });
+    outMsg.send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS); // bounce back to sender
 }
 
 @method_id(2222)
-fun hotUpgradeFiWalletData(additionalData: cell?) {  
+fun hotUpgradeFiWalletData(additionalData: cell?) {
     // var oldStorage = lazy FiStore.fromCell(contract.getData());
-
     // assert (additionalData != null) throw 1112;
-    
     // var storage = FiStore {
     //     supply: oldStorage.totalSupply,
     //     walletVersion: oldStorage.walletVersion,
@@ -338,18 +322,17 @@ fun hotUpgradeFiWalletData(additionalData: cell?) {
     //     metadata: oldStorage.metadata,
     //     others: oldStorage.others,
     // };
-
     // contract.setData(storage.toCell());
 }
 
 @inline
 fun destroyContract(dest: address) {
-    createMessage({
+    val outMsg = createMessage({
         bounce: BounceMode.NoBounce,
         value: 0,
         dest,
-        body: ReturnExcessesBack {
-            queryId: 0,
-        },
-    }).send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
+        body: ReturnExcessesBack { queryId: 0 },
+    });
+    // safety
+    outMsg.send(SEND_MODE_CARRY_ALL_BALANCE | SEND_MODE_DESTROY);
 }

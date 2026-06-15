@@ -1,7 +1,12 @@
-import "../common/utils.tolk"
-import "../fossFi/storage"
-
 type ForwardPayloadRemainder = RemainingBitsAndRefs
+
+struct (0b0) PayloadInline {
+    value: RemainingBitsAndRefs
+}
+
+struct (0b1) PayloadInRef {
+    value: Cell<RemainingBitsAndRefs>
+}
 
 struct (0x0f8a7ea5) AskToTransfer {
     queryId: uint64
@@ -10,6 +15,7 @@ struct (0x0f8a7ea5) AskToTransfer {
     sendExcessesTo: address?
     customPayload: cell?
     forwardTonAmount: coins
+    // @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder
 }
 
@@ -17,6 +23,7 @@ struct (0x7362d09c) TransferNotificationForRecipient {
     queryId: uint64
     jettonAmount: coins
     transferInitiator: address
+    // @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder
 }
 
@@ -28,6 +35,7 @@ struct (0x178d4519) InternalTransferStep {
     transferInitiator: address // todo: need fix?: is null when minting (not initiated by another wallet)
     sendExcessesTo: address?
     forwardTonAmount: coins
+    // @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder
 }
 
@@ -103,12 +111,13 @@ fun ForwardPayloadRemainder.checkIsCorrectTLBEither(self) {
 struct (0x00000001) InternalInvite {
     queryId: uint64 = 0
     version: uint10
-    id: IdInfo? = null
+    // id: IdInfo? = null
     sender: address
     invitor: address
     currentWalletCode: cell
     currentStorage: cell?
-    forwardPayload: ForwardPayloadRemainder
+    // @abi.clientType(PayloadInline | PayloadInRef)
+    id: string
 }
 
 struct (0x00000002) InternalDeActivate {}
@@ -126,7 +135,8 @@ struct (0x00000004) InformMinterInviteInternal {
     queryId: uint64
     sender: address
     invitor: address
-    forwardPayload: ForwardPayloadRemainder
+    // @abi.clientType(PayloadInline | PayloadInRef)
+    id: string
 }
 
 struct (0x00000005) AuthorityAction {
@@ -141,6 +151,7 @@ struct (0x00000006) SetStatus {
 struct (0x00000007) TransferByAuthority {
     amount: coins
     receiver: address
+    // @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder // todo: null?
 }
 
@@ -170,18 +181,29 @@ struct (0x00000011) ApproveUpgrade { }
 
 struct (0x00000012) RejectUpgrade { }
 
-struct CustomPayloadMsg {
+struct (0x00000017)CustomPayloadMsg {
     queryId: uint64
 }
 
 struct (0x00000014) Destroy {}
 
+struct (0x00000022) OthersActions {
+    queryId: uint64
+    jettonAmount: coins
+    transferRecipient: address
+    sendExcessesTo: address?
+    customPayload: cell?
+    forwardTonAmount: coins
+    // @abi.clientType(PayloadInline | PayloadInRef)
+    forwardPayload: string
+}
+
 // 15 UnFollow
 // 16 UnFollowInternal
 
 struct IdInfo {
-    username: SnakeString
-    lattitude: SnakeString
-    longitude: SnakeString
+    username: string
+    lattitude: string
+    longitude: string
     address: address
 }

@@ -1,11 +1,11 @@
 import "jetton-utils"
 import "storage"
-import "../common/errors"
+import "../common/types"
 import "../common/fees-management"
 import "../common/messages"
 import "../common/sharding"
 import "../fossFi/jetton-utils"
-import "../common/consts"
+import "@contracts/fossFi/storage"
 
 type AllowedMessageToMinter =
     | MintNewJettons
@@ -74,7 +74,7 @@ fun onInternalMessage(in: InMessage) {
                     contract.getAddress(),
                     storage.jettonWalletCode
                 )
-            ) throw ERROR_NOT_VALID_WALLET;
+            ) throw Errors.NotValidWallet;
             storage.totalSupply -= msg.jettonAmount;
 
             // now transfer MINTS if payback
@@ -122,11 +122,11 @@ fun onInternalMessage(in: InMessage) {
         }
 
         MintNewJettons => {
-            assert ((in.senderAddress == storage.fiJettonAddress) | (in.senderAddress == storage.adminAddress)) throw INCORRECT_SENDER;
-            assert (msg.mintRecipient.getWorkchain() == MY_WORKCHAIN) throw ERROR_WRONG_WORKCHAIN;
+            assert ((in.senderAddress == storage.fiJettonAddress) | (in.senderAddress == storage.adminAddress)) throw Errors.IncorrectSender;
+            assert (msg.mintRecipient.getWorkchain() == MY_WORKCHAIN) throw Errors.WrongWorkchain;
 
             val internalTransferMsg = lazy msg.internalTransferMsg.load({
-                throwIfOpcodeDoesNotMatch: ERROR_INVALID_OP,
+                throwIfOpcodeDoesNotMatch: Errors.InvalidMessage,
             });
             var forwardTonAmount = internalTransferMsg.forwardTonAmount;
             internalTransferMsg.forwardPayload.checkIsCorrectTLBEither();
@@ -153,17 +153,17 @@ fun onInternalMessage(in: InMessage) {
         }
 
         ChangeMinterAdmin => {
-            assert(in.senderAddress == storage.adminAddress) throw INCORRECT_SENDER;
+            assert(in.senderAddress == storage.adminAddress) throw Errors.IncorrectSender;
             storage.adminAddress = msg.newAdminAddress;
         }
 
         ChangeMinterMetadataUri => {
-            assert(in.senderAddress == storage.adminAddress) throw INCORRECT_SENDER;
+            assert(in.senderAddress == storage.adminAddress) throw Errors.IncorrectSender;
             storage.metadataUri = msg.newMetadataUri;
         }
 
         Upgrade => {
-            assert(in.senderAddress == storage.fiJettonAddress) throw INCORRECT_SENDER;
+            assert(in.senderAddress == storage.fiJettonAddress) throw Errors.IncorrectSender;
             
             if (msg.newCode != null) {
                 contract.setCodePostponed(msg.newCode);
@@ -185,14 +185,6 @@ fun onInternalMessage(in: InMessage) {
         }
     }
     storage.save();
-}
-
-struct JettonDataReply {
-    totalSupply: int
-    mintable: bool
-    adminAddress: address
-    jettonContent: cell?
-    jettonWalletCode: cell
 }
 
 struct State {
@@ -217,7 +209,7 @@ get fun get_jetton_data(): JettonDataReply {
         totalSupply: storage.totalSupply,
         mintable: true,
         adminAddress: storage.adminAddress,
-        jettonContent: storage.metadataUri,
+        jettonContent: storage.metadataUri! as Cell<OnchainMetadataReply>, // todo nullCheck
         jettonWalletCode: storage.jettonWalletCode,
     };
 }

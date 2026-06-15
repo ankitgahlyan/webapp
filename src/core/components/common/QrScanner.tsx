@@ -72,8 +72,8 @@ export const QrScanner: FC<QrScannerProps> = ({
 					// onScanError: Silently ignore QR scanning errors (continuous scanning attempts)
 				},
 			);
-		} catch (err: any) {
-			console.error('QR Scanner initialization failed:', err);
+		} catch (err: unknown) {
+			console.error('QR Scanner initialization failed:', err)
 		}
 	}
 
@@ -95,8 +95,8 @@ export const QrScanner: FC<QrScannerProps> = ({
 		try {
 			await qrScannerRef.current!.stop();
 			onClose();
-		} catch (err: any) {
-			console.error('Error stopping QR scanner:', err);
+		} catch (err: unknown) {
+			console.error('Error stopping QR scanner:', err)
 		}
 	}
 
@@ -114,8 +114,8 @@ export const QrScanner: FC<QrScannerProps> = ({
 				onScanSuccess,
 				() => { },
 			);
-		} catch (err: any) {
-			console.error('Error switching camera', err);
+		} catch (err: unknown) {
+			console.error('Error switching camera', err)
 		}
 	}
 
