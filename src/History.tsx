@@ -20,7 +20,6 @@ const Referral = () => {
         A. to create a p2p cash. <br />
         Q. why we need a p2p cash? <br />
         A. for interest-free credit. <br />
-        Q. 
         Q. why bitcoin failed? <br />
         A. coz it is just a digital version of already failed system (gold standard). <br />
         Q. why gold standard failed? <br />
@@ -28,13 +27,12 @@ const Referral = () => {
         Q. why will we succeed? <br />
         A. coz it's a decentralised version of a successful system (fiat).
 
-        <p>send any questions via <a href="https://t.me/keeperXBot">TELEGRAM</a></p>
+        {/* <p>send any questions via <a href="https://t.me/">TELEGRAM</a></p> */}
 
         <div>
-            <div className='font-bold'>red-flags</div>
-            1. interest for money created out of nothing.
-            2. start of impossible promise cycle: payback in same currency (although possible to pay in gold).
-            3. 
+            <div className='font-bold'>what's wrong with current currencies all over the world?</div>
+            1. interest for money created out of nothing. <br />
+            2. start of impossible promise cycle: payback in same currency (although possible to pay in gold & other commodity money/currency). <br />
         </div>
     </div>
     // return (
