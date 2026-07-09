@@ -1,8 +1,6 @@
 import "@acton/io"
-import "@acton/emulation/network"
 import "@acton/emulation/scripts"
 import "utils/common"
-import "../wrappers/utils"
 
 fun main() {
     val admin = promptJettonWallet("JETTON_ADMIN", "Select Current Admin ActonWallet");

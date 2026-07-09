@@ -134,17 +134,12 @@ fun FossFi.sendChangeMinterMetadataUri(
     return net.send(from, genericMsg);
 }
 
-fun FossFi.sendTopUpTons(
-    self,
-    from: address,
-    queryId: uint64,
-    config: SendParams = {},
-): SendResultList {
+fun FossFi.sendTopUpTons(self, from: address, config: SendParams = {}): SendResultList {
     val genericMsg = createMessage({
         bounce: config.bounce,
         value: config.value,
         dest: self.address,
-        body: TopUpTons { queryId },
+        body: TopUpTons {},
     });
     return net.send(from, genericMsg);
 }

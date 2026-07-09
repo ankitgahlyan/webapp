@@ -3,12 +3,12 @@ import "@acton/emulation/config"
 import "@acton/emulation/network"
 import "@acton/emulation/testing"
 import "@acton/testing/expect"
+import "@wrappers/FossFiWallet.gen"
+import "@wrappers/utils"
+import "@contracts/common/fees-management"
+import "@contracts/common/messages"
+import "@contracts/common/types"
 import "test-utils"
-import "../contracts/errors"
-import "../contracts/fees-management"
-import "../contracts/messages"
-import "../wrappers/JettonWallet.gen"
-import "../wrappers/utils"
 
 get fun `test gas: transfer minimal value edge`() {
     val (minter, deployer, _) = setupTest();
@@ -42,7 +42,7 @@ get fun `test gas: transfer minimal value edge`() {
     expect(notEnoughRes).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -97,7 +97,7 @@ get fun `test gas: transfer with forward amount requires second forward fee`() {
     expect(missingFeeRes).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 
     val enoughMsg = createMessage({
@@ -122,7 +122,7 @@ get fun `test gas: transfer with forward amount requires second forward fee`() {
     expect(edgeFailRes).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -205,7 +205,7 @@ get fun `test gas: transfer forward fees should follow config`() {
     expect(failRes).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -260,7 +260,7 @@ get fun `test gas: transfer gas fee should follow config`() {
     expect(failRes).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -316,7 +316,7 @@ get fun `test gas: transfer storage fee should follow config`() {
     expect(failRes).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -337,7 +337,7 @@ get fun `test gas: forward ton transfer should fail when fees are insufficient`(
     expect(res).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: senderWallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -366,7 +366,7 @@ get fun `test gas: burn minimal value edge`() {
     expect(fail).toHaveFailedTx<AskToBurn>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -399,7 +399,7 @@ get fun `test gas: burn custom payload should not affect minimal value`() {
     expect(fail).toHaveFailedTx<AskToBurn>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -453,7 +453,7 @@ get fun `test gas: burn forward fee should follow config`() {
     expect(failAfter).toHaveFailedTx<AskToBurn>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -508,7 +508,7 @@ get fun `test gas: burn gas fee should follow config`() {
     expect(failAfter).toHaveFailedTx<AskToBurn>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 
@@ -520,7 +520,7 @@ get fun `test gas: burn should fail when sent tons are clearly insufficient`() {
     expect(res).toHaveFailedTx<AskToBurn>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_ENOUGH_GAS,
+        exitCode: Errors.NotEnoughGas,
     });
 }
 

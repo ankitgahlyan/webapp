@@ -78,7 +78,7 @@ next-env.d.ts
 
 # Acton related files
 .acton/
-gen/
+# gen/
 build/
 lcov.info
 libraries.toml

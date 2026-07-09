@@ -1,19 +1,12 @@
-import "../common/utils"
-
-struct FiFields {
-    fiAddr: address // maybe use for onchain api addr queries
-    treasury: address // for fees collection
-    fiWalletCode: cell // for addr calc to send msg to MINT jettons
-}
-
 struct PriWalletStore {
-    jettonBalance: coins = 0 
+    jettonBalance: coins = 0
     owner: address
     deployer: address
     minterAddress: address
 }
 
-struct PriStore { // not upgradable
+struct PriStore {
+    // not upgradable
     totalSupply: coins = 0
     // creditRequired: coins = 0
     // fiFields: Cell<FiFields>
@@ -23,7 +16,7 @@ struct PriStore { // not upgradable
     metadataUri: cell? = null //Cell<SnakeString>? // to deploy directly from MINT wallet & calc minter addr onchain
 }
 
-fun PriStore.load() {
+fun PriStore.load(): PriStore {
     return PriStore.fromCell(contract.getData());
 }
 
@@ -31,7 +24,7 @@ fun PriStore.save(self) {
     contract.setData(self.toCell());
 }
 
-fun PriWalletStore.load() {
+fun PriWalletStore.load(): PriWalletStore {
     return PriWalletStore.fromCell(contract.getData());
 }
 

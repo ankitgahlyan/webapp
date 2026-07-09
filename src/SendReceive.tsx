@@ -75,7 +75,7 @@ const SendReceive = observer(({ model }: Props) => {
                             className='h-14 w-full m-2 rounded-2xl bg-c6 text-lg font-medium text-white disabled:opacity-50 dark:text-dark-600'
                             disabled={!model.isWalletConnected}
                             onClick={(e) => {
-                                model.receiver = model.address!.toString({ testOnly: true, bounceable: false })
+                                model.setReceiver(model.address!.toString({ testOnly: true, bounceable: false }))
                                 model.setAmount('0.101')
                                 model.sendTxn('claim')
                                 const target = e.target as HTMLInputElement

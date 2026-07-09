@@ -3,7 +3,7 @@
 // long strings are nested refs, like "xxxx".ref("yyyy".ref("zzzz"))
 type SnakeString = slice
 
-fun SnakeString.unpackFromSlice(mutate s: slice) {
+fun SnakeString.unpackFromSlice(mutate s: slice): slice {
     // obviously, SnakeString can be only the last: it's just "the remainder";
     // for correctness, it's better to validate it has no more refs:
     // assert (s.remainingRefsCount() <= 1) throw 5;

@@ -1,5 +1,5 @@
+import "@contracts/common/sharding"
 import "storage"
-import "../common/sharding"
 
 fun calcDeployPriWallet(
     owner: address,
@@ -21,7 +21,12 @@ fun calcDeployPriWallet(
 }
 
 @inline
-fun calcDeployPriMinter(fiJettonAddress: address, adminAddress: address, jettonWalletCode: cell, jettonMinterCode: cell): AutoDeployAddress {
+fun calcDeployPriMinter(
+    fiJettonAddress: address,
+    adminAddress: address,
+    jettonWalletCode: cell,
+    jettonMinterCode: cell,
+): AutoDeployAddress {
     val emptyPriMinterStore: PriStore = {
         fiJettonAddress,
         adminAddress,
@@ -30,19 +35,24 @@ fun calcDeployPriMinter(fiJettonAddress: address, adminAddress: address, jettonW
 
     return {
         workchain: BASECHAIN,
-        stateInit: { code: jettonMinterCode, data: emptyPriMinterStore.toCell() }, // todo fixme need jettonMinterCode
-        toShard: { fixedPrefixLength: SHARD_DEPTH, closeTo: adminAddress }, // noNeed to be in same shard for minter
+        stateInit: {
+            code: jettonMinterCode,
+            data: emptyPriMinterStore.toCell(),
+        },                                                                         // todo fixme need jettonMinterCode
+        toShard: {
+            fixedPrefixLength: SHARD_DEPTH,
+            closeTo: adminAddress,
+        },                                                                         // noNeed to be in same shard for minter
     };
 }
 
-
-fun autoAddrPriWallet(owner: address) {
+fun autoAddrPriWallet(owner: address): AutoDeployAddress {
     // wallet calls this when deploy and checking on incoming
     val st = lazy PriWalletStore.load();
     return calcDeployPriWallet(owner, st.deployer, st.minterAddress, contract.getCode());
 }
 
-fun addrPriWallet(owner: address) {
+fun addrPriWallet(owner: address): address {
     return autoAddrPriWallet(owner).calculateAddress();
 }
 
@@ -51,7 +61,6 @@ fun calcAddrPriWallet(
     deployer: address,
     minterAddress: address,
     jettonWalletCode: cell,
-) {
-    return calcDeployPriWallet(owner, deployer, minterAddress, jettonWalletCode)
-        .calculateAddress();
+): address {
+    return calcDeployPriWallet(owner, deployer, minterAddress, jettonWalletCode).calculateAddress();
 }

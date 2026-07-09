@@ -1,4 +1,3 @@
-import "@acton/emulation/network"
 import "@acton/emulation/scripts"
 import "utils/common"
 import "../wrappers/utils"

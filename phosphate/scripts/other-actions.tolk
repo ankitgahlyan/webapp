@@ -2,12 +2,11 @@ import "@acton/emulation/network"
 import "@acton/emulation/scripts"
 import "@wrappers/FossFi.gen"
 import "@wrappers/FossFiWallet.gen"
-import "@wrappers/utils"
 import "utils/common"
-import "../tests/test-utils"
 
 fun main() {
-    val sender = promptJettonWallet("JETTON_SENDER", "Select Jetton Sender ActonWallet");
+    val sender = promptJettonWallet("JETTON_SENDER", "Select Jetton Sender ActonWallet").address;
+    // val sender = address(JETTON_DEFAULT_DEPLOYER);
     val minter = promptJettonMinter("Enter Jetton Minter address");
     val recipient = promptJettonAddressRequired(
         "JETTON_TRANSFER_RECIPIENT",
@@ -19,21 +18,22 @@ fun main() {
         JETTON_DEFAULT_TRANSFER_AMOUNT,
     );
 
-    val senderWallet = FossFiWallet { address: minter.getWalletAddress(sender.address) };
-    val res = senderWallet.sendTransferPayloadInline(
-        // val res = senderWallet.sendAskToTransfer(
-        sender.address,
-        DEFAULT_TRANSFER_MSG_VALUE,
+    val senderWallet = FossFiWallet { address: minter.getWalletAddress(sender) };
+    // val res = senderWallet.sendTransferPayloadInline(
+    val res = senderWallet.sendOthersActions(
+        sender,
+        111,
         transferAmount,
         recipient,
-        sender.address,
+        sender,
         null,
         1,
-        createEmptySlice(),
+        "from_script",
+        { value: ton("0.55") },
     );
     res.waitForFirstTransaction();
 
     printJettonMinterInfo(minter, "JETTON");
-    printJettonWalletInfo(minter, sender.address, "JETTON_SENDER");
+    printJettonWalletInfo(minter, sender, "JETTON_SENDER");
     printJettonWalletInfo(minter, recipient, "JETTON_RECIPIENT");
 }

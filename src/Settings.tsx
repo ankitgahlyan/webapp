@@ -1,11 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { Model } from './Model'
-import dedust from './assets/dedust.png'
-import ston from './assets/ston.png'
-import tonco from './assets/tonco.svg'
-import tonspace from './assets/tonspace.jpg'
-import mtw from './assets/mytonwallet.webp'
-// import evaa from './assets/evaa.svg'
 
 // import Map, { Marker } from 'react-map-gl/maplibre';
 // import 'maplibre-gl/dist/maplibre-gl.css';
@@ -87,7 +81,7 @@ const Referral = observer(({ model }: Props) => {
     return <>
         <h1 className='text-white'>explore source code @ <a href="https://github.com/ankitgahlyan/webapp">GitHub</a></h1>
 
-        <MapContainer
+        {/* <MapContainer
             center={[28.6139, 77.209]}
             zoom={20}
             style={{
@@ -100,9 +94,7 @@ const Referral = observer(({ model }: Props) => {
                 attribution="© OpenStreetMap contributors"
                 url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-
-            {/* <BlockchainLayer /> */}
-        </MapContainer>
+        </MapContainer> */}
 
         {/* <div id="map" className='text-white'>Leaflet</div> */}
 

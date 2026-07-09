@@ -1,3 +1,4 @@
+import "@acton/build"
 import "@acton/env"
 import "@acton/fmt"
 import "@acton/io"
@@ -8,12 +9,14 @@ import "@wrappers/FossFi.gen"
 import "@wrappers/FossFiWallet.gen"
 import "@wrappers/utils"
 import "@contracts/fossFi/storage"
-import "@acton/build"
 
 const JETTON_DEFAULT_NAME = "BroTherHOOD"
 const JETTON_DEFAULT_SYMBOL = "HD"
 const JETTON_DEFAULT_DESCRIPTION = "token with social minting + debt-free credit claims capabilities & supply is controlled by scarcity of humans & value is backed by paybacks by connections + lifetime emi & unique humans are ensured by peer reporting & genuine reports will be rewarded & lookout for your circle and rings to find potential valid reports"
-const JETTON_DEFAULT_IMAGE = "https://ton.org/download/ton_symbol.png"
+const JETTON_DEFAULT_IMAGE = "https://github.com/Cryptofonts/cryptoicons/blob/master/SVG/ton.svg"
+// JETTON_IMAGE='https://ankitgahlyan.github.io/fossfiat/vite.svg'
+const JETTON_IMAGE = "https://raw.githubusercontent.com/ankitgahlyan/fossfiat/refs/heads/main/public/tiger.svg"
+
 const JETTON_DEFAULT_DECIMALS = "9"
 const JETTON_DEFAULT_UPDATED_DESCRIPTION = "Sample jetton (metadata updated from acton-contracts scripts)"
 
@@ -50,7 +53,7 @@ fun promptJettonAddressRequired(envName: string, message: string): address {
     if (fromEnv != null) {
         return fromEnv;
     }
-    return parseAddress(prompt(message, "EQ... / kQ...", ""));
+    return parseAddress(prompt(message, "EQ... / kQ..."));
 }
 
 fun promptJettonCoins(envName: string, message: string, default: string): coins {
@@ -118,7 +121,7 @@ fun promptJettonMinterStorage(admin: address): FiStore {
         admin,
         metadata: buildJettonMetadataCell(promptJettonMetadata(JETTON_DEFAULT_DESCRIPTION)),
         others: FiCodes {
-            lotteryCode: build("lottery"),
+            lotteryCode: null,
             latestFiWalletCode: null,
             c: null,
             d: null,
@@ -128,8 +131,10 @@ fun promptJettonMinterStorage(admin: address): FiStore {
 
 fun deployJettonMinter(deployer: ActonWallet, storage: FiStore): FossFi {
     val minter = FossFi.fromStorage(storage);
-    val res = minter.sendDeploy(deployer.address, { value: ton("0.5") });
+    val res = minter.deploy(deployer.address, { value: ton("0.55") });
     res.waitForFirstTransaction();
+    val result = minter.sendTopUpTons(deployer.address, { value: ton("0.55") });
+    result.waitForFirstTransaction();
     return minter;
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useState, type PropsWithChildren } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { TonConnectUIProvider, THEME } from '@tonconnect/ui-react';
 
-import { queryClient } from '../lib/ton';
+import { queryClient } from '@/lib/ton';
 
 const manifestUrl =
   'https://ton-blockchain.github.io/acton/tonconnect-manifest.json';

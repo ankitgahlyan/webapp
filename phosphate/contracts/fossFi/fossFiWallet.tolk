@@ -1,6 +1,5 @@
 import "@stdlib/gas-payments"
 import "@stdlib/tvm-lowlevel"
-import "@gen/fossFiWallet.code"
 import "@contracts/common/fees-management"
 import "@contracts/common/messages"
 import "@contracts/common/sharding"
@@ -163,7 +162,7 @@ fun onInternalMessage(in: InMessage): void {
                             msg.transferRecipient,
                             addrs.treasury,
                             trustedAddrs.minterAddr,
-                            fiWalletCompiledCode(),
+                            addrs.baseFiWalletCode,
                         ),                                    // deploy in invite + standalone for idLess accounts
                         value: 0,
                         body: InternalInvite {
@@ -361,7 +360,7 @@ fun onInternalMessage(in: InMessage): void {
             // require(sender() == self.owner || isFromMaster, "Incorrect sender");
             assert (in.senderAddress == addrs.owner) throw Errors.NotOwner;
             // assert (false, 0); // todo what it does?
-            msg.forwardPayload.checkIsCorrectTLBEither();
+            msg.forwardPayload.checkIsCorrectTlbEither();
             assert (
                 msg.transferRecipient.getWorkchain() == MY_WORKCHAIN
             ) throw Errors.WrongWorkchain;
@@ -484,7 +483,7 @@ fun onInternalMessage(in: InMessage): void {
             val notifyMinterMsg = createMessage({
                 bounce: BounceMode.NoBounce,
                 dest: trustedAddrs.minterAddr,
-                value: ton("0.001"),
+                value: 0,
                 body: InformMinterInviteInternal {
                     queryId: msg.queryId,
                     sender: addrs.owner, // different for mint for addr calc
@@ -576,8 +575,7 @@ fun onInternalMessage(in: InMessage): void {
             // deploy + just accept tons
             if (time.accountInit == 0 && (in.senderAddress == trustedAddrs.minterAddr)) {
                 store.active = true;
-                store.jettonBalance += ton("1"); // need for semantic txns.
-                // store.receivedVotes += AUTHORITY_THRESHOLD; // check4TreasuryNotNeededButGivesMintingPower conflictOFInterest
+                store.jettonBalance += ton("1");
                 store.isAuthorityAccount = true;
                 time.accountInit = blockchain.now();
                 nomins.invitor = contract.getAddress();
@@ -662,7 +660,7 @@ get fun get_wallet_data(): JettonWalletDataReply {
         jettonBalance: store.jettonBalance,
         ownerAddress: addrs.owner,
         minterAddress: addrs.trustedJettonAddrs.load().minterAddr,
-        jettonWalletCode: fiWalletCompiledCode(), // embeded init code
+        jettonWalletCode: addrs.baseFiWalletCode, // embeded init code
     };
 }
 

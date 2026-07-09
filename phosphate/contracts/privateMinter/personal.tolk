@@ -1,11 +1,10 @@
+import "@contracts/common/fees-management"
+import "@contracts/common/messages"
+import "@contracts/common/sharding"
+import "@contracts/common/types"
+import "@contracts/fossFi/storage"
 import "jetton-utils"
 import "storage"
-import "../common/types"
-import "../common/fees-management"
-import "../common/messages"
-import "../common/sharding"
-import "../fossFi/jetton-utils"
-import "@contracts/fossFi/storage"
 
 type AllowedMessageToMinter =
     | MintNewJettons
@@ -28,10 +27,10 @@ fun onBouncedMessage(in: InMessageBounced) {
             var storage = lazy PriStore.load();
             storage.totalSupply -= msg.jettonAmount;
             storage.save();
-        },
+        }
 
         Payback => {
-            var store = lazy PriStore.load(); 
+            var store = lazy PriStore.load();
             store.totalSupply += msg.amount;
             store.save();
 
@@ -42,7 +41,7 @@ fun onBouncedMessage(in: InMessageBounced) {
                     msg.sender,
                     store.adminAddress,
                     contract.getAddress(),
-                    store.jettonWalletCode
+                    store.jettonWalletCode,
                 ),
                 body: InternalTransferStep {
                     queryId: msg.queryId,
@@ -54,9 +53,8 @@ fun onBouncedMessage(in: InMessageBounced) {
                     forwardTonAmount: 0,
                     forwardPayload: createEmptySlice(),
                 },
-                
             }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_IGNORE_ERRORS);
-        },
+        }
     }
 }
 
@@ -72,7 +70,7 @@ fun onInternalMessage(in: InMessage) {
                     msg.burnInitiator,
                     storage.adminAddress,
                     contract.getAddress(),
-                    storage.jettonWalletCode
+                    storage.jettonWalletCode,
                 )
             ) throw Errors.NotValidWallet;
             storage.totalSupply -= msg.jettonAmount;
@@ -88,14 +86,14 @@ fun onInternalMessage(in: InMessage) {
                         amount: msg.jettonAmount,
                         sender: msg.burnInitiator,
                     },
-                }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                }).send(
+                    SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+                );
             }
         }
 
         RequestWalletAddress => {
-            val owner: Cell<address>? = msg.includeOwnerAddress
-                ? msg.owner.toCell()
-                : null;
+            val owner: Cell<address>? = msg.includeOwnerAddress ? msg.owner.toCell() : null;
 
             var jettonWalletAddress: address? = null;
             if (msg.owner.getWorkchain() == MY_WORKCHAIN) {
@@ -103,7 +101,7 @@ fun onInternalMessage(in: InMessage) {
                     msg.owner,
                     storage.adminAddress,
                     contract.getAddress(),
-                    storage.jettonWalletCode
+                    storage.jettonWalletCode,
                 );
             }
 
@@ -117,26 +115,35 @@ fun onInternalMessage(in: InMessage) {
                     owner,
                 },
             });
-            respondMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
-            SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+            respondMsg.send(
+                SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+            );
         }
 
         MintNewJettons => {
-            assert ((in.senderAddress == storage.fiJettonAddress) | (in.senderAddress == storage.adminAddress)) throw Errors.IncorrectSender;
+            assert (
+                (in.senderAddress == storage.fiJettonAddress) |
+                (in.senderAddress == storage.adminAddress)
+            ) throw Errors.IncorrectSender;
             assert (msg.mintRecipient.getWorkchain() == MY_WORKCHAIN) throw Errors.WrongWorkchain;
 
-            val internalTransferMsg = lazy msg.internalTransferMsg.load({
-                throwIfOpcodeDoesNotMatch: Errors.InvalidMessage,
-            });
-            var forwardTonAmount = internalTransferMsg.forwardTonAmount;
-            internalTransferMsg.forwardPayload.checkIsCorrectTLBEither();
+            val internalTransferMsg = lazy msg
+                .internalTransferMsg
+                .load({
+                    throwIfOpcodeDoesNotMatch: Errors.InvalidMessage,
+                });
+            val forwardTonAmount = internalTransferMsg.forwardTonAmount;
+            internalTransferMsg.forwardPayload.checkIsCorrectTlbEither();
 
             // a little more than needed, it’s ok since it’s sent by the admin and excesses will return back
             checkAmountIsEnoughToTransfer(msg.tonAmount, forwardTonAmount, in.originalForwardFee);
 
             storage.totalSupply += internalTransferMsg.jettonAmount;
 
-            reserveToncoinsOnBalance(ton("0.01"), RESERVE_MODE_EXACT_AMOUNT); // reserve for storage fees
+            reserveToncoinsOnBalance(
+                ton("0.01"),
+                RESERVE_MODE_EXACT_AMOUNT,
+            ); // reserve for storage fees
 
             val deployMsg = createMessage({
                 bounce: BounceMode.Only256BitsOfBody,
@@ -144,27 +151,29 @@ fun onInternalMessage(in: InMessage) {
                     msg.mintRecipient,
                     storage.adminAddress,
                     contract.getAddress(),
-                    storage.jettonWalletCode
+                    storage.jettonWalletCode,
                 ),
                 value: msg.tonAmount,
                 body: msg.internalTransferMsg,
             });
-            deployMsg.send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_BOUNCE_ON_ACTION_FAIL); // todo: bounce?
+            deployMsg.send(
+                SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+            ); // todo: bounce?
         }
 
         ChangeMinterAdmin => {
-            assert(in.senderAddress == storage.adminAddress) throw Errors.IncorrectSender;
+            assert (in.senderAddress == storage.adminAddress) throw Errors.IncorrectSender;
             storage.adminAddress = msg.newAdminAddress;
         }
 
         ChangeMinterMetadataUri => {
-            assert(in.senderAddress == storage.adminAddress) throw Errors.IncorrectSender;
+            assert (in.senderAddress == storage.adminAddress) throw Errors.IncorrectSender;
             storage.metadataUri = msg.newMetadataUri;
         }
 
         Upgrade => {
-            assert(in.senderAddress == storage.fiJettonAddress) throw Errors.IncorrectSender;
-            
+            assert (in.senderAddress == storage.fiJettonAddress) throw Errors.IncorrectSender;
+
             if (msg.newCode != null) {
                 contract.setCodePostponed(msg.newCode);
             }
@@ -194,12 +203,12 @@ struct State {
 }
 
 get fun get_state(): State {
-    val store =  lazy PriStore.load();
+    val store = lazy PriStore.load();
     return {
         supply: store.totalSupply,
         admin: store.adminAddress,
         fiJetton: store.fiJettonAddress,
-    }
+    };
 }
 
 get fun get_jetton_data(): JettonDataReply {
@@ -221,7 +230,6 @@ get fun get_wallet_address(owner: address): address {
         owner,
         storage.adminAddress,
         contract.getAddress(),
-        storage.jettonWalletCode
+        storage.jettonWalletCode,
     );
 }
-

@@ -1,7 +1,7 @@
 import { Network } from '@orbs-network/ton-access'
 import { TonConnectUI, THEME, CHAIN, SendTransactionRequest } from '@tonconnect/ui'
 import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx'
-import { Address, OpenedContract, TonClient4, toNano } from '@ton/ton'
+import { Address, Cell, OpenedContract, TonClient, TonClient4, toNano } from '@ton/ton'
 import { FI_ADDRESS } from '../phosphate/scripts/consts';
 import { FiWalletStore, fossFiWallet } from '../wrappers-ts/FossFiWallet.gen';
 import { FiStore, fossFi } from '../wrappers-ts/FossFi.gen';
@@ -15,31 +15,6 @@ type ActiveAction = 'invite' | 'vote'
 type UnstakeOption = 'unstake' | 'swap'
 
 type WaitForTransaction = 'no' | 'signed' | 'sent' | 'timeout' | 'done'
-
-type WalletRewardsFetchState = 'init' | 'loading' | 'error' | 'done'
-
-interface WalletRewards {
-    clubLevel: number
-    rewardCoefficients: number[]
-    htonHpoRewardRate: number
-    hpoSumRewards: number
-    htonSumRewards: number
-    earnedRewards: EarnedReward[]
-}
-
-interface EarnedReward {
-    roundSince: Date
-    time: Date
-    tonReward: number
-    hpoReward: number
-}
-
-interface EarnedRewardApiResponse {
-    round_since: number
-    time: number
-    ton_reward: string
-    hpo_reward: string
-}
 
 interface FragmentState {
     network?: Network
@@ -67,6 +42,7 @@ const cookieBannerClosed = 'banner.closed'
 export class Model {
     // observed state
     network: Network = defaultNetwork
+    otonClient?: TonClient
     tonClient?: TonClient4
     address?: Address
     tonBalance?: bigint
@@ -292,6 +268,7 @@ export class Model {
         if (this.network !== network) {
             this.network = network
             this.tonClient = undefined
+            this.otonClient = undefined
             this.setAddress(undefined)
             this.tonBalance = undefined
             this.walletAddress = undefined
@@ -312,6 +289,10 @@ export class Model {
 
     setTonClient = (endpoint: string) => {
         this.tonClient = new TonClient4({ endpoint, timeout: 5 * 1_000 })
+    }
+
+    setoTonClient = (endpoint: string) => {
+        this.otonClient = new TonClient({ endpoint, timeout: 5 * 1_000 })
     }
 
     setAddress = (address?: Address) => {
@@ -405,9 +386,11 @@ export class Model {
 
         // Switch to fixed endpoint
         // if (network === 'mainnet') {
-        this.setTonClient('https://' + this.network + '-v4.tonhubapi.com')
+        // this.setTonClient('https://testnet.toncenter.com')
+        // this.setTonClient('https://' + this.network + '-v4.tonhubapi.com')
+        this.setoTonClient('https://' + this.network + '-v4.tonhubapi.com')
         // } else {
-        //     this.setTonClient('https://testnet-v4.tonhubapi.com')
+        this.setTonClient('https://testnet-v4.tonhubapi.com')
         // }
     }
 
@@ -521,17 +504,32 @@ export class Model {
         }
     }
 
+    makeTransaction(body: Cell): SendTransactionRequest {
+        return {
+            validUntil: Math.floor(Date.now() / 1000) + txValidUntil,
+            network: CHAIN.TESTNET,
+            from: this.address!.toRawString(), // todo: nullCheck
+            messages: [
+                {
+                    address: this.fiJetton!.address.toString(), // todo:
+                    amount: toNano(this.gas).toString(),
+                    payload: body.toBoc().toString('base64'),
+                },
+            ],
+        }
+    }
+
     sendTxn = async (action: string | undefined = undefined) => {
         if (
             (this.address != null &&
-            this.isAmountValid &&
-            this.isAddressValid &&
-            this.isAmountPositive &&
-            this.amountInNano != null &&
-            this.fiJetton != null &&
-            this.tonConnectUI != null &&
-            this.tonBalance != null
-            // && this.mintBalance != null
+                this.isAmountValid &&
+                this.isAddressValid &&
+                this.isAmountPositive &&
+                this.amountInNano != null &&
+                this.fiJetton != null &&
+                this.tonConnectUI != null &&
+                this.tonBalance != null
+                // && this.mintBalance != null
             )
             // || (action === 'claim')
         ) {
@@ -539,14 +537,15 @@ export class Model {
                 this.activeAction === 'invite' ? toNano(0.1)
                     : this.activeAction === 'vote' ? toNano(0.11)
                         // : this.activeAction === 'claim' ? toNano(0.101)
-                            : this.amountInNano
+                        : this.amountInNano
                 ;
 
             if (action === 'claim') {
                 amount = toNano(0.101)
             }
 
-            const tb = fossFiWallet.createCellOfOthersActions({
+
+            const tx = this.makeTransaction(fossFiWallet.createCellOfOthersActions({
                 queryId: generateRandomQueryId(),
                 jettonAmount: amount,
                 transferRecipient: Address.parse(this.receiver.trim()),
@@ -554,20 +553,9 @@ export class Model {
                 customPayload: null,
                 forwardTonAmount: 1n,
                 forwardPayload: this.comment,
-            });
+            }));
 
-            const tx: SendTransactionRequest = {
-                validUntil: Math.floor(Date.now() / 1000) + txValidUntil,
-                network: CHAIN.TESTNET,
-                from: this.address.toRawString(),
-                messages: [
-                    {
-                        address: this.fiJetton.address.toString(),
-                        amount: toNano(this.gas).toString(),
-                        payload: tb.toBoc().toString('base64'),
-                    },
-                ],
-            }
+            // const tx = this.makeTransaction(tb);
             void this.tonConnectUI
                 .sendTransaction(tx)
                 // .then(() => this.waitForCompletion(queryId))

@@ -1,11 +1,10 @@
 import "@stdlib/gas-payments"
-import "storage"
 import "@contracts/common/fees-management"
 import "@contracts/common/messages"
 import "@contracts/common/sharding"
-import "@contracts/lottery/messages"
 import "@contracts/common/types"
-import "@gen/fossFiWallet.code"
+import "@contracts/lottery/messages"
+import "storage"
 
 fun calcDeployFiWallet(
     owner: address,
@@ -17,6 +16,7 @@ fun calcDeployFiWallet(
         addresses: Addresses {
             owner,
             treasury,
+            baseFiWalletCode,
             nomInAddrs: NomInAddrs {}.toCell(),
             trustedJettonAddrs: TrustedAddrs {
                 minterAddr: minterAddress,
@@ -30,28 +30,13 @@ fun calcDeployFiWallet(
             reportInfo: ReportInfo { reports: [] }.toCell(),
         }.toCell(), // todo: learn how to set it default
         timestamps: TimeStamps {}.toCell(),
-        // baseFiWalletCode,
     };
 
     return {
         stateInit: { code: baseFiWalletCode, data: emptyFiWalletStore.toCell() },
         toShard: { fixedPrefixLength: SHARD_DEPTH, closeTo: owner },
-    };
+    };                                                                                                                                                // todo: remove code dep just deploy empty wallet and then upgrade it to the latest code
 }
-
-// fun address.calcDeployUnFollow(self, follower: address): AutoDeployAddress {
-//     val emptyUnFollowStore: UnFollowStore = {
-//         admin: contract.getAddress(),
-//         follow: true,
-//         followee: self,
-//         follower,
-//     };
-
-//     return {
-//         stateInit: {code: UNFOLLOW_CODE, data: emptyUnFollowStore.toCell()},
-//         toShard: {fixedPrefixLength: SHARD_DEPTH, closeTo: contract.getAddress()}
-//     }
-// }
 
 fun address.getAddrFiWallet(self): address {
     // used by: wallet txn sending
@@ -61,7 +46,7 @@ fun address.getAddrFiWallet(self): address {
         self,
         addrs.treasury,
         addrs.trustedJettonAddrs.load().minterAddr,
-        fiWalletCompiledCode(),
+        addrs.baseFiWalletCode,
     ).calculateAddress();
 }
 
@@ -76,72 +61,6 @@ fun checkCorrectSenderInternal(sender: address, owner: address) {
     }
 }
 
-// fun mintInternal(amount: coins, store: FiWalletStore) {
-//     amount = deductDebts(amount, store);
-//     if (amount > 0) {
-//         // var store = lazy FiWalletStore.load();
-//         store.jettonBalance += amount;
-//     }
-// }
-
-// fun deductDebts(amount: coins, store: FiWalletStore) {
-//     // var store = lazy FiWalletStore.load();
-//     var debtsMap = store.maps.load().debts; // todo simple bool store toggle to prevent expensive loads
-
-//     var remaining = amount;
-//     var debt = store.debt;
-//     val noDebts = debtsMap.isEmpty();
-//     // nothing to do
-//     if (remaining <= 0 || (debt == 0 && noDebts)) {
-//         return remaining;
-//     }
-//     if (debt > 0) {
-//         // TODO: pay a portion and shift to transfer side also
-//         if (remaining >= debt) {
-//             remaining -= debt; // continue deducting others
-//             store.debt = 0;
-//         } else {
-//             store.debt = debt - remaining;
-//             remaining = 0;
-//             return remaining;
-//         }
-//     }
-
-//     if (!noDebts) {
-//         // Pay debts in map order until remaining is exhausted
-//         var debt = debtsMap.findFirst();
-//         while (debt.isFound) {
-//             // ... use r.getKey() and r.loadValue()
-//             if (remaining <= 0) {
-//                 // ==0
-//                 return remaining; // 0
-//             }
-
-//             val from = debt.getKey();
-//             var foundDebt = debt.loadValue();
-
-//             var pay = 0;
-//             if (remaining >= foundDebt) {
-//                 pay = foundDebt;
-//             } else {
-//                 pay = remaining;
-//             }
-//             foundDebt -= pay;
-//             remaining -= pay;
-
-//             if (foundDebt == 0) {
-//                 var _ = debtsMap.delete(from);
-//             } else {
-//                 debtsMap.set(from, foundDebt);
-//             }
-//             // emitEvent(2, self.owner, from, pay);
-//             debt = debtsMap.iterateNext(debt);
-//         }
-//     }
-//     // optional: emit an event for debt payment
-//     return remaining;
-// }
-
 fun idActionChecks(store: FiWalletStore) {
     val reports = lazy store.maps.load();
     val reportInfo = lazy reports.reportInfo.load();
@@ -151,14 +70,7 @@ fun idActionChecks(store: FiWalletStore) {
     assert (reportInfo.reporterCount < 1) throw Errors.AlreadyReported; // reported IDs can't act
 }
 
-// fun newConnectionChecks(store: FiWalletStore, targetJetton: address) {
-//     assert (store.connections < MAX_CONNECTIONS) throw MAX_CONNECTIONS;
-//     assert (
-//         !targetJetton.connected(store)
-//     ) throw CONNECTION_EXISTS; // todo maybe use advanced map methods instead?
-// }
-
-fun address.deActivate(self, commandAmount: coins, store: FiWalletStore) {
+fun address.deActivate(self, _commandAmount: coins, store: FiWalletStore) {
     assert (store.active) throw Errors.AccountInactive;
     val internalDeActivate = createMessage({
         bounce: BounceMode.Only256BitsOfBody,
@@ -170,30 +82,6 @@ fun address.deActivate(self, commandAmount: coins, store: FiWalletStore) {
         SEND_MODE_BOUNCE_ON_ACTION_FAIL | SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE,
     );
 }
-
-// fun burnForce(sender: address, amount: int, store: FiWalletStore) {
-//     // todo: refactor
-//     if (amount <= 0) {
-//         return;
-//     }
-
-//     if (store.jettonBalance >= amount) {
-//         store.jettonBalance -= amount;
-//         return;
-//     }
-
-//     // Not enough balance — consume what is left and record remaining as debt to sender
-//     val shortfall = amount - store.jettonBalance;
-//     store.jettonBalance = 0;
-
-//     var prevDebt = 0; // TODO: need this? 
-//     var maps = lazy store.maps.load();
-//     if (maps.debts.exists(sender)) {
-//         prevDebt = maps.debts.mustGet(sender);
-//     }
-//     // TODO FEES?
-//     maps.debts.set(sender, prevDebt + shortfall); // turnover += amount; // eventually debt gets paid
-// }
 
 @inline
 fun requestUpgrade(from: address, sender: address, version: uint10) {
@@ -219,43 +107,6 @@ fun sendUpgrade(to: address, sender: address, walletVersion: uint10) {
         },
     });
     outMsg.send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS);
-}
-
-fun cmpStringTail(mutate a: slice, mutate b: slice): bool {
-    while (true) {
-        val minBits = min(a.remainingBitsCount(), b.remainingBitsCount());
-        if (minBits > 0) {
-            val aBits = a.loadBits(minBits);
-            val bBits = b.loadBits(minBits);
-            if (!aBits.bitsEqual(bBits)) {
-                return false;
-            }
-        }
-
-        // Check if both slices are fully consumed
-        val aEndBits = a.isEndOfBits();
-        val bEndBits = b.isEndOfBits();
-        val aEndRefs = a.isEndOfRefs();
-        val bEndRefs = b.isEndOfRefs();
-
-        // Both fully consumed - equal
-        if (aEndBits && aEndRefs && bEndBits && bEndRefs) {
-            return true;
-        }
-
-        // Advance to refs if slices are empty of bits but have refs
-        if (aEndBits && !aEndRefs) {
-            a = a.loadRef().beginParse();
-        }
-        if (bEndBits && !bEndRefs) {
-            b = b.loadRef().beginParse();
-        }
-
-        // Mismatch: one has more data/refs than the other
-        if (a.isEndOfBits() != b.isEndOfBits() || a.isEndOfRefs() != b.isEndOfRefs()) {
-            return false;
-        }
-    }
 }
 
 @inline
@@ -311,7 +162,7 @@ fun notifyOwner(
 }
 
 @method_id(2222)
-fun hotUpgradeFiWalletData(additionalData: cell?) {
+fun hotUpgradeFiWalletData(_additionalData: cell?) {
     // var oldStorage = lazy FiStore.fromCell(contract.getData());
     // assert (additionalData != null) throw 1112;
     // var storage = FiStore {

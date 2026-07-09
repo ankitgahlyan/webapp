@@ -2,17 +2,40 @@ import "@acton/emulation/network"
 import "@acton/emulation/testing"
 import "@acton/testing/expect"
 import "@acton/types/transaction"
+import "@wrappers/FossFiWallet.gen"
+import "@wrappers/utils"
+import "@contracts/common/messages"
+import "@contracts/common/types"
 import "test-utils"
-import "../contracts/errors"
-import "../contracts/messages"
-import "../wrappers/JettonWallet.gen"
-import "../wrappers/utils"
 
 get fun `test wallet: owner can send jettons`() {
     val (minter, deployer, notDeployer) = setupTest();
-    val transferAmount = ton("5");
-    val senderWallet = mintTo(minter, deployer, deployer.address, ton("20"));
+    val transferAmount = ton("100"); // invite
+    // val senderWallet = mintTo(minter, deployer, deployer.address, ton("20"));
+    val senderWallet = userWallet(minter, deployer.address);
     val receiverWallet = userWallet(minter, notDeployer.address);
+
+    expect(senderWallet.getJettonBalance()).toEqual(ton("1"));
+
+    val invite = senderWallet.sendOthersActions(
+        deployer.address,
+        0,
+        ton("0.1"),                            // invite
+        notDeployer.address,
+        deployer.address,
+        null,
+        DEFAULT_FORWARD_TON_AMOUNT,
+        "deploy",
+        { value: DEFAULT_TRANSFER_MSG_VALUE }, // todo: bounce?
+    );
+
+    expect(invite).toHaveSuccessfulDeploy<InternalInvite>({
+        from: senderWallet.address,
+        to: receiverWallet.address,
+    });
+
+    expect(senderWallet.getJettonBalance()).toEqual(ton("1000"));
+    expect(receiverWallet.getJettonBalance()).toEqual(ton("1"));
 
     val res = senderWallet.sendTransferPayloadInline(
         deployer.address,
@@ -24,13 +47,14 @@ get fun `test wallet: owner can send jettons`() {
         DEFAULT_FORWARD_TON_AMOUNT,
         createEmptySlice(),
     );
+
     expect(res).toHaveSuccessfulTx<AskToTransfer>({
         from: deployer.address,
         to: senderWallet.address,
     });
 
-    expect(senderWallet.getJettonBalance()).toEqual(ton("15"));
-    expect(receiverWallet.getJettonBalance()).toEqual(transferAmount);
+    expect(senderWallet.getJettonBalance()).toEqual(ton("900"));
+    expect(receiverWallet.getJettonBalance()).toEqual(transferAmount + ton("1"));
 }
 
 get fun `test wallet: non-owner cannot send jettons`() {
@@ -51,7 +75,7 @@ get fun `test wallet: non-owner cannot send jettons`() {
     expect(res).toHaveFailedTx<AskToTransfer>({
         from: notDeployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_OWNER,
+        exitCode: Errors.NotOwner,
     });
 
     expect(wallet.getJettonBalance()).toEqual(balanceBefore);
@@ -75,7 +99,7 @@ get fun `test wallet: cannot send more jettons than balance`() {
     expect(res).toHaveFailedTx<AskToTransfer>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_BALANCE_ERROR,
+        exitCode: Errors.BalanceError,
     });
 
     expect(wallet.getJettonBalance()).toEqual(balanceBefore);
@@ -217,7 +241,7 @@ get fun `test wallet: non-owner cannot burn jettons`() {
     expect(res).toHaveFailedTx<AskToBurn>({
         from: notDeployer.address,
         to: wallet.address,
-        exitCode: ERROR_NOT_OWNER,
+        exitCode: Errors.NotOwner,
     });
 
     expect(wallet.getJettonBalance()).toEqual(balanceBefore);
@@ -240,7 +264,7 @@ get fun `test wallet: cannot burn more jettons than balance`() {
     expect(res).toHaveFailedTx<AskToBurn>({
         from: deployer.address,
         to: wallet.address,
-        exitCode: ERROR_BALANCE_ERROR,
+        exitCode: Errors.BalanceError,
     });
 
     expect(wallet.getJettonBalance()).toEqual(balanceBefore);

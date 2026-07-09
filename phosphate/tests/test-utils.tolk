@@ -1,5 +1,4 @@
 import "@stdlib/gas-payments"
-import "@acton/build"
 import "@acton/emulation/config"
 import "@acton/emulation/network"
 import "@acton/emulation/testing"
@@ -9,12 +8,13 @@ import "@acton/types/big_array"
 import "@acton/types/message"
 import "@acton/types/out_actions"
 import "@acton/types/transaction"
-import "@contracts/fossFi/jetton-utils"
-import "@contracts/common/messages"
-import "@contracts/fossFi/storage"
+import "@gen/fossFiWallet.code"
 import "@wrappers/FossFi.gen"
 import "@wrappers/FossFiWallet.gen"
 import "@wrappers/utils"
+import "@contracts/common/messages"
+import "@contracts/fossFi/jetton-utils"
+import "@contracts/fossFi/storage"
 
 fun buildTestMetadata(uri: string): cell {
     var metadata: OnchainMetadataReply = { contentDict: [] };
@@ -25,7 +25,7 @@ fun buildTestMetadata(uri: string): cell {
 // Common values used across tests (nanotons for TON amounts)
 const TEST_JETTON_UNIT = 1
 const DEFAULT_MINTED_JETTONS = ton("5") // 5 TON in jetton units
-const DEFAULT_TRANSFER_MSG_VALUE = 300000000 // 0.3 TON
+const DEFAULT_TRANSFER_MSG_VALUE = 550000000 // 0.55 TON
 const LOW_TRANSFER_MSG_VALUE = 200000000 // 0.2 TON
 const DEFAULT_BURN_MSG_VALUE = 200000000 // 0.2 TON
 const DEFAULT_FORWARD_TON_AMOUNT = 50000000 // 0.05 TON
@@ -100,28 +100,30 @@ fun sendRawTransferPayload(
     return net.send(from, outMessage);
 }
 
-fun userWallet(minter: JettonMinter, userAddress: address): JettonWallet {
+fun userWallet(minter: FossFi, userAddress: address): FossFiWallet {
     val address = minter.getWalletAddress(userAddress);
-    return JettonWallet { address };
+    return FossFiWallet { address };
 }
 
-fun walletStateInit(storage: WalletStorage): ContractState {
+fun walletStateInit(storage: FiWalletStore): ContractState {
     return ContractState {
-        code: build("JettonWallet"),
+        // code: build("FossFiWallet"),
+        code: fossFiWalletCompiledCode(),
         data: storage.toCell(),
     };
 }
 
 fun deployWalletFromStorage(
-    storage: WalletStorage,
+    storage: FiWalletStore,
     from: address,
     value: coins = ton("10"),
-): JettonWallet {
+): FossFiWallet {
     val init = storage.jettonBalance == 0
-        ? calcDeployedJettonWallet(
-            storage.ownerAddress,
-            storage.minterAddress,
-            build("JettonWallet"),
+        ? calcDeployFiWallet(
+            storage.addresses.load().owner,
+            storage.addresses.load().treasury,
+            storage.addresses.load().trustedJettonAddrs.load().minterAddr,
+            fossFiWalletCompiledCode(),
         )
         : AutoDeployAddress { stateInit: walletStateInit(storage) };
     val address = init.calculateAddress();
@@ -137,18 +139,32 @@ fun deployWalletFromStorage(
     );
     expect(deployResult).toHaveSuccessfulDeploy({ to: address });
 
-    return JettonWallet { address };
+    return FossFiWallet { address };
 }
 
-fun setupDirectWallet(initialBalance: coins = 0): (JettonWallet, Treasury, Treasury, Treasury) {
+fun setupDirectWallet(initialBalance: coins = 0): (FossFiWallet, Treasury, Treasury, Treasury) {
     val owner = testing.treasury("direct-wallet-owner");
     val minter = testing.treasury("direct-wallet-minter");
     val outsider = testing.treasury("direct-wallet-outsider");
     val wallet = deployWalletFromStorage(
-        WalletStorage {
-            jettonBalance: 0,
-            ownerAddress: owner.address,
-            minterAddress: minter.address,
+        FiWalletStore {
+            addresses: Addresses {
+                owner: owner.address,
+                treasury: owner.address,
+                baseFiWalletCode: fossFiWalletCompiledCode(),
+                nomInAddrs: NomInAddrs {}.toCell(),
+                trustedJettonAddrs: TrustedAddrs {
+                    minterAddr: minter.address,
+                    authorisedAccs: [],
+                }.toCell(),
+            }.toCell(),
+            maps: Maps {
+                allowances: [],
+                invited: [],
+                votedFor: [],
+                reportInfo: ReportInfo { reports: [] }.toCell(),
+            }.toCell(), // todo: learn how to set it default
+            timestamps: TimeStamps {}.toCell(),
         },
         owner.address,
     );
@@ -163,7 +179,8 @@ fun setupDirectWallet(initialBalance: coins = 0): (JettonWallet, Treasury, Treas
                 body: InternalTransferStep {
                     queryId: 0,
                     jettonAmount: initialBalance,
-                    transferInitiator: null,
+                    version: 0,
+                    transferInitiator: wallet.address,
                     sendExcessesTo: null,
                     forwardTonAmount: 0,
                     forwardPayload: makeTinyForwardPayload(),
@@ -210,24 +227,33 @@ fun hasSetCodeAction(res: SendResultList, account: address): bool {
     return false;
 }
 
-fun setupTest(initialSupply: int = 0): (JettonMinter, Treasury, Treasury) {
+fun setupTest(): (FossFi, Treasury, Treasury) {
     val deployer = testing.treasury("deployer");
     val notDeployer = testing.treasury("not-deployer");
 
-    val minter = JettonMinter.fromStorage(MinterStorage {
-        totalSupply: initialSupply,
-        adminAddress: deployer.address,
+    val minter = FossFi.fromStorage(FiStore {
+        // supply: initialSupply,
+        // walletVersion: 0,
+        admin: deployer.address,
+        // currentRequest: null,
         metadata: buildTestMetadata("link"),
-        nextAdminAddress: null,
+        others: FiCodes {
+            lotteryCode: null,
+            latestFiWalletCode: null,
+            c: null,
+            d: null,
+        }.toCell(),
     });
 
-    val transactions = minter.sendDeploy(deployer.address, { value: ton("10") });
-    expect(transactions).toHaveSuccessfulDeploy({ to: minter.address });
+    val deployMinter = minter.deploy(deployer.address, { value: ton("1") });
+
+    expect(deployMinter).toHaveSuccessfulDeploy({ to: minter.address });
+    val _result = minter.sendTopUpTons(deployer.address, { value: ton("10") });
 
     return (minter, deployer, notDeployer);
 }
 
-fun mintTo(minter: JettonMinter, admin: Treasury, recipient: address, amount: coins): JettonWallet {
+fun mintTo(minter: FossFi, admin: Treasury, recipient: address, amount: coins): FossFiWallet {
     val supplyBefore = minter.getTotalSupply();
     val wallet = userWallet(minter, recipient);
 

@@ -5,7 +5,7 @@ struct UnFollowStore {
     followee: address
 }
 
-fun UnFollowStore.load() {
+fun UnFollowStore.load(): UnFollowStore {
     return UnFollowStore.fromCell(contract.getData());
 }
 

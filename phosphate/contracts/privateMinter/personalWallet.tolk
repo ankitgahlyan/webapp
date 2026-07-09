@@ -1,11 +1,11 @@
 import "@stdlib/gas-payments"
-import "../common/types"
-import "../common/fees-management"
-import "jetton-utils"
-import "../common/messages"
-import "../common/sharding"
-import "storage"
+import "@contracts/common/fees-management"
+import "@contracts/common/messages"
+import "@contracts/common/sharding"
+import "@contracts/common/types"
 import "@contracts/fossFi/storage"
+import "jetton-utils"
+import "storage"
 
 type AllowedMessageToWallet = AskToTransfer | AskToBurn | InternalTransferStep | TopUpTons
 
@@ -17,7 +17,7 @@ fun onBouncedMessage(in: InMessageBounced) {
     val msg = lazy BounceOpToHandle.fromSlice(in.bouncedBody);
     val restoreAmount = match (msg) {
         InternalTransferStep => msg.jettonAmount, // safe to fetch jettonAmount, because
-        NotifyMinter => msg.jettonAmount, // it's in the beginning of a message
+        NotifyMinter => msg.jettonAmount,         // it's in the beginning of a message
     };
 
     var storage = lazy PriWalletStore.load();
@@ -30,10 +30,10 @@ fun onInternalMessage(in: InMessage) {
     var storage = lazy PriWalletStore.load();
     match (msg) {
         InternalTransferStep => {
-            if (in.senderAddress != storage.minterAddress) { // TODO: or treasury
+            if (in.senderAddress != storage.minterAddress) {
+                // TODO: or treasury
                 assert (
-                    in.senderAddress ==
-                    addrPriWallet(msg.transferInitiator)
+                    in.senderAddress == addrPriWallet(msg.transferInitiator)
                 ) throw Errors.NotValidWallet;
             }
 
@@ -51,15 +51,17 @@ fun onInternalMessage(in: InMessage) {
                         forwardPayload: msg.forwardPayload,
                     },
                 });
-                notifyOwnerMsg.send(SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                notifyOwnerMsg.send(
+                    SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+                );
             }
 
             if (msg.sendExcessesTo != null) {
-                var toLeaveOnBalance = contract.getOriginalBalance() - in.valueCoins +
+                val toLeaveOnBalance = contract.getOriginalBalance() - in.valueCoins +
                 contract.getStorageDuePayment();
                 reserveToncoinsOnBalance(
                     max(toLeaveOnBalance, calculateJettonWalletMinStorageFee()),
-                    RESERVE_MODE_AT_MOST
+                    RESERVE_MODE_AT_MOST,
                 );
 
                 val excessesMsg = createMessage({
@@ -73,14 +75,14 @@ fun onInternalMessage(in: InMessage) {
         }
 
         AskToTransfer => {
-            msg.forwardPayload.checkIsCorrectTLBEither();
+            msg.forwardPayload.checkIsCorrectTlbEither();
             assert (
                 msg.transferRecipient.getWorkchain() == MY_WORKCHAIN
             ) throw Errors.WrongWorkchain;
             checkAmountIsEnoughToTransfer(
                 in.valueCoins,
                 msg.forwardTonAmount,
-                in.originalForwardFee
+                in.originalForwardFee,
             );
 
             // var storage = lazy PriWalletStore.load();
@@ -90,7 +92,10 @@ fun onInternalMessage(in: InMessage) {
             storage.save();
 
             // self-transfer means payback
-            if ((in.senderAddress == msg.transferRecipient) | (msg.transferRecipient == storage.minterAddress)) {
+            if (
+                (in.senderAddress == msg.transferRecipient) |
+                (msg.transferRecipient == storage.minterAddress)
+            ) {
                 // burn for payback
                 createMessage({
                     bounce: BounceMode.Only256BitsOfBody,
@@ -100,10 +105,13 @@ fun onInternalMessage(in: InMessage) {
                         queryId: msg.queryId,
                         jettonAmount: msg.jettonAmount,
                         burnInitiator: in.senderAddress,
-                        sendExcessesTo: in.senderAddress == msg.transferRecipient ? msg.sendExcessesTo : null,
+                        sendExcessesTo: in.senderAddress == msg.transferRecipient
+                            ? msg.sendExcessesTo
+                            : null,
                     },
-                }).send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
-                SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+                }).send(
+                    SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+                );
 
                 return; // no further execution required
             }
@@ -121,8 +129,9 @@ fun onInternalMessage(in: InMessage) {
                     forwardPayload: msg.forwardPayload,
                 },
             });
-            deployMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
-            SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+            deployMsg.send(
+                SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+            );
         }
 
         AskToBurn => {
@@ -142,8 +151,9 @@ fun onInternalMessage(in: InMessage) {
                     sendExcessesTo: msg.sendExcessesTo,
                 },
             });
-            notifyMinterMsg.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE |
-            SEND_MODE_BOUNCE_ON_ACTION_FAIL);
+            notifyMinterMsg.send(
+                SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_BOUNCE_ON_ACTION_FAIL,
+            );
         }
 
         TopUpTons => {
@@ -153,7 +163,7 @@ fun onInternalMessage(in: InMessage) {
         else => {
             // invalid input; a typical reaction is:
             // ignore empty messages, "wrong opcode" if not
-            assert (in.body.isEmpty()) throw 0xFFFF
+            assert (in.body.isEmpty()) throw 0xFFFF;
         }
     }
     storage.save();

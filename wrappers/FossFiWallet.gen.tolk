@@ -57,22 +57,24 @@ fun FossFiWallet.sendAskToTransfer(
     sendExcessesTo: address?,
     customPayload: cell?,
     forwardTonAmount: coins,
-    forwardPayload: ForwardPayloadRemainder,
+    forwardPayload: PayloadInline | PayloadInRef,
     config: SendParams = {},
 ): SendResultList {
+    // build body cell manually, because some fields have @abi.clientType
+    val bodyB = beginCell()
+        .storeUint(0x0f8a7ea5, 32)
+        .storeAny(queryId)
+        .storeAny(jettonAmount)
+        .storeAny(transferRecipient)
+        .storeAny(sendExcessesTo)
+        .storeAny(customPayload)
+        .storeAny(forwardTonAmount)
+        .storeAny(forwardPayload);
     val genericMsg = createMessage({
         bounce: config.bounce,
         value: config.value,
         dest: self.address,
-        body: AskToTransfer {
-            queryId,
-            jettonAmount,
-            transferRecipient,
-            sendExcessesTo,
-            customPayload,
-            forwardTonAmount,
-            forwardPayload,
-        },
+        body: AskToTransfer.fromSlice(bodyB.toSlice()),
     });
     return net.send(from, genericMsg);
 }
@@ -120,23 +122,25 @@ fun FossFiWallet.sendInternalTransferStep(
     transferInitiator: address,
     sendExcessesTo: address?,
     forwardTonAmount: coins,
-    forwardPayload: ForwardPayloadRemainder,
+    forwardPayload: PayloadInline | PayloadInRef,
     config: SendParams = {},
 ): SendResultList {
+    // build body cell manually, because some fields have @abi.clientType
+    val bodyB = beginCell()
+        .storeUint(0x178d4519, 32)
+        .storeAny(queryId)
+        .storeAny(jettonAmount)
+        .storeAny(version)
+        .storeAny(transferredAsCredit)
+        .storeAny(transferInitiator)
+        .storeAny(sendExcessesTo)
+        .storeAny(forwardTonAmount)
+        .storeAny(forwardPayload);
     val genericMsg = createMessage({
         bounce: config.bounce,
         value: config.value,
         dest: self.address,
-        body: InternalTransferStep {
-            queryId,
-            jettonAmount,
-            version,
-            transferredAsCredit,
-            transferInitiator,
-            sendExcessesTo,
-            forwardTonAmount,
-            forwardPayload,
-        },
+        body: InternalTransferStep.fromSlice(bodyB.toSlice()),
     });
     return net.send(from, genericMsg);
 }
@@ -262,17 +266,12 @@ fun FossFiWallet.sendSetStatus(
     return net.send(from, genericMsg);
 }
 
-fun FossFiWallet.sendTopUpTons(
-    self,
-    from: address,
-    queryId: uint64,
-    config: SendParams = {},
-): SendResultList {
+fun FossFiWallet.sendTopUpTons(self, from: address, config: SendParams = {}): SendResultList {
     val genericMsg = createMessage({
         bounce: config.bounce,
         value: config.value,
         dest: self.address,
-        body: TopUpTons { queryId },
+        body: TopUpTons {},
     });
     return net.send(from, genericMsg);
 }
@@ -283,19 +282,21 @@ fun FossFiWallet.sendTransferNotificationForRecipient(
     queryId: uint64,
     jettonAmount: coins,
     transferInitiator: address,
-    forwardPayload: ForwardPayloadRemainder,
+    forwardPayload: PayloadInline | PayloadInRef,
     config: SendParams = {},
 ): SendResultList {
+    // build body cell manually, because some fields have @abi.clientType
+    val bodyB = beginCell()
+        .storeUint(0x7362d09c, 32)
+        .storeAny(queryId)
+        .storeAny(jettonAmount)
+        .storeAny(transferInitiator)
+        .storeAny(forwardPayload);
     val genericMsg = createMessage({
         bounce: config.bounce,
         value: config.value,
         dest: self.address,
-        body: TransferNotificationForRecipient {
-            queryId,
-            jettonAmount,
-            transferInitiator,
-            forwardPayload,
-        },
+        body: TransferNotificationForRecipient.fromSlice(bodyB.toSlice()),
     });
     return net.send(from, genericMsg);
 }

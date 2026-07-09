@@ -5,51 +5,21 @@ version = "0.1.0"
 license = "MIT"
 
 [toolchain]
-acton = "trunk"
+acton = "1.1.0"
 
 [contracts.dao]
-display-name = "Dao"
+display-name = "DAO"
 src = "phosphate/contracts/dao/dao.tolk"
-depends = []
-
-[contracts.followers]
-display-name = "Followers"
-src = "phosphate/contracts/followers/followers.tolk"
-depends = []
+depends = ["fossFi"]
 
 [contracts.fossFi]
 display-name = "FossFi"
 src = "phosphate/contracts/fossFi/fossFi.tolk"
-
-[[contracts.fossFi.depends]]
-name = "fossFiWallet"
-kind = "embed_code"
-function = "fiWalletCompiledCode"
+depends = ["fossFiWallet"]
 
 [contracts.fossFiWallet]
 display-name = "FossFiWallet"
 src = "phosphate/contracts/fossFi/fossFiWallet.tolk"
-depends = []
-
-[contracts.lottery]
-display-name = "Lottery"
-src = "phosphate/contracts/lottery/lottery.tolk"
-depends = []
-
-[contracts.personal]
-display-name = "Personal"
-src = "phosphate/contracts/privateMinter/personal.tolk"
-depends = []
-
-[contracts.personalWallet]
-display-name = "PersonalWallet"
-src = "phosphate/contracts/privateMinter/personalWallet.tolk"
-depends = []
-
-[contracts.somebodyHelpMePlsBruhhh]
-display-name = "SomebodyHelpMePlsBruhhh"
-src = "phosphate/contracts/recovery/somebodyHelpMePlsBruhhh.tolk"
-depends = []
 
 [fmt]
 width = 100

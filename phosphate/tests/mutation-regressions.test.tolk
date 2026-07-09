@@ -6,14 +6,13 @@ import "@acton/testing/expect"
 import "@acton/types/message"
 import "@acton/types/out_actions"
 import "@acton/types/transaction"
+import "@wrappers/FossFi.gen"
+import "@wrappers/FossFiWallet.gen"
+import "@wrappers/utils"
+import "@contracts/common/fees-management"
+import "@contracts/common/messages"
+import "@contracts/fossFi/storage"
 import "test-utils"
-import "../contracts/errors"
-import "../contracts/fees-management"
-import "../contracts/messages"
-import "../contracts/storage"
-import "../wrappers/JettonMinter.gen"
-import "../wrappers/JettonWallet.gen"
-import "../wrappers/utils"
 
 fun expectSendActionMode(
     res: SendResultList,
@@ -60,6 +59,7 @@ fun estimateMinimalMintTonAmount(
             internalTransferMsg: InternalTransferStep {
                 queryId: 0,
                 jettonAmount,
+                version: 0,
                 transferInitiator: null,
                 sendExcessesTo: minterAddress,
                 forwardTonAmount,
@@ -93,6 +93,7 @@ fun mintAmountMeetsExpectedThreshold(
         internalTransferMsg: InternalTransferStep {
             queryId: 0,
             jettonAmount,
+            version: 0,
             transferInitiator: null,
             sendExcessesTo: minterAddress,
             forwardTonAmount,
@@ -158,6 +159,7 @@ get fun `test mutation: direct wallet internal transfer should persist balance a
             body: InternalTransferStep {
                 queryId: 0,
                 jettonAmount: ton("1"),
+                version: 0,
                 transferInitiator: null,
                 sendExcessesTo: owner.address,
                 forwardTonAmount: DEFAULT_FORWARD_TON_AMOUNT,
@@ -207,7 +209,7 @@ get fun `test mutation: direct wallet should accept sibling transfers and reject
     val outsider = testing.treasury("direct-wallet-pair-outsider");
 
     val senderWallet = deployWalletFromStorage(
-        WalletStorage {
+        FiWalletStore {
             jettonBalance: 0,
             ownerAddress: senderOwner.address,
             minterAddress: minter.address,
@@ -215,7 +217,7 @@ get fun `test mutation: direct wallet should accept sibling transfers and reject
         senderOwner.address,
     );
     val receiverWallet = deployWalletFromStorage(
-        WalletStorage {
+        FiWalletStore {
             jettonBalance: 0,
             ownerAddress: receiverOwner.address,
             minterAddress: minter.address,

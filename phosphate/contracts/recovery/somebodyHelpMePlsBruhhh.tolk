@@ -98,7 +98,7 @@ struct RecoveryStorage {
     // lastCheckIn: int as uint32;
 }
 
-fun RecoveryStorage.load() {
+fun RecoveryStorage.load(): RecoveryStorage {
     return RecoveryStorage.fromCell(contract.getData());
 }
 
@@ -116,7 +116,7 @@ type AllowedMessageToRecovery = SetTrusty | Vouch | Veto | Recover
 
 // Handle bounced messages (e.g., if V5 wallet rejects extension action)
 // This prevents loss of funds - bounced TON returns to contract balance
-fun onBouncedMessage(in: InMessageBounced) {
+fun onBouncedMessage(_in: InMessageBounced) {
     // in.bouncedBody.skipBouncedPrefix();
     // Accept bounced messages silently
     // Funds are automatically credited back to contract balance
@@ -177,7 +177,6 @@ fun onInternalMessage(in: InMessage) {
             // assert (store.vouchedCount > store.minVouchThreshold) throw WAIT_MORE;
             // send txn to v5 wallet
         }
-
         // else => {
         //     // Reject unknown blockchain messages
         //     assert (in.body.isEmpty()) throw 0xFFFF;
@@ -202,7 +201,7 @@ fun onInternalMessage(in: InMessage) {
 fun buildChangeKeyAction() {
     // ===== STEP 1: Build the actual TON transfer message =====
     // This is a standard internal message that will be sent FROM the V5 wallet TO beneficiary
-    var innerMessage: cell = beginCell()
+    var _innerMessage: cell = beginCell()
         // int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool = 0b011000
         .storeUint(MSG_INTERNAL_FLAGS, MSG_HEADER_BITS)
         // dest:MsgAddressInt - recipient address
@@ -221,7 +220,7 @@ fun buildChangeKeyAction() {
 /// Builds V5 extension action to transfer Jetton from wallet to beneficiary
 fun buildJettonTransferAction(jettonWallet: address, amount: int) {
     // ===== STEP 1: Build Jetton transfer payload (TEP-74 standard) =====
-    var jettonBody: cell = beginCell()
+    val jettonBody: cell = beginCell()
         // op:uint32 - Jetton transfer opcode
         .storeUint(OP_JETTON_TRANSFER, BITS_OPCODE)
         // query_id:uint64 - unique identifier for tracking
@@ -241,7 +240,7 @@ fun buildJettonTransferAction(jettonWallet: address, amount: int) {
         .endCell();
 
     // ===== STEP 2: Build internal message to Jetton Wallet contract =====
-    var innerMessage: cell = beginCell()
+    var _innerMessage: cell = beginCell()
         // int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool = 0b011000
         .storeUint(MSG_INTERNAL_FLAGS, MSG_HEADER_BITS)
         // Destination: the Jetton Wallet contract (not the beneficiary!)
@@ -269,18 +268,18 @@ fun buildJettonTransferAction(jettonWallet: address, amount: int) {
 fun wrapAsExtensionAction(message: cell, mode: int): cell {
     // ===== Build action_send_msg using Tact message =====
     // TL-B: action_send_msg#0ec3c86d mode:uint8 out_msg:^cell = OutAction;
-    var sendAction: cell = ActionSendMsg {
+    val sendAction: cell = ActionSendMsg {
         mode,
         outMsg: message,
     }.toCell();
 
     // ===== Build OutList (list of actions to execute) =====
     // TL-B: out_list$_ {n:#} prev:^(OutList n) action:OutAction = OutList (n+1);
-    var outList: cell = beginCell().storeRef(sendAction).endCell();
+    val outList: cell = beginCell().storeRef(sendAction).endCell();
 
     // ===== Build InnerRequest (V5 action request body) =====
     // TL-B: actions$_ out_actions:(Maybe OutList) has_other_actions:Bool ... = InnerRequest;
-    var innerRequest: cell = beginCell()
+    var _innerRequest: cell = beginCell()
         // .storeBit(true) // has_out_actions
         .storeRef(outList) // out_actions:^OutList
         // .storeBit(false) // has_other_actions
@@ -297,7 +296,7 @@ fun wrapAsExtensionAction(message: cell, mode: int): cell {
 
 // ============ GETTERS ============
 
-get fun state() {
+get fun state(): RecoveryStorage {
     return RecoveryStorage.load();
 }
 // get fun owner() {

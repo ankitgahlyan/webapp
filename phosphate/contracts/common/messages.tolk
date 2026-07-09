@@ -15,7 +15,7 @@ struct (0x0f8a7ea5) AskToTransfer {
     sendExcessesTo: address?
     customPayload: cell?
     forwardTonAmount: coins
-    // @abi.clientType(PayloadInline | PayloadInRef)
+    @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder
 }
 
@@ -23,7 +23,7 @@ struct (0x7362d09c) TransferNotificationForRecipient {
     queryId: uint64
     jettonAmount: coins
     transferInitiator: address
-    // @abi.clientType(PayloadInline | PayloadInRef)
+    @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder
 }
 
@@ -35,7 +35,7 @@ struct (0x178d4519) InternalTransferStep {
     transferInitiator: address // todo: need fix?: is null when minting (not initiated by another wallet)
     sendExcessesTo: address?
     forwardTonAmount: coins
-    // @abi.clientType(PayloadInline | PayloadInRef)
+    @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder
 }
 
@@ -94,13 +94,11 @@ struct (0xcb862902) ChangeMinterMetadataUri {
     newMetadataUri: cell // SnakeString
 }
 
-struct (0xd372158c) TopUpTons {
-    queryId: uint64
-}
+struct (0xd372158c) TopUpTons
 
 // "forward payload" is TL/B `(Either Cell ^Cell)`;
 // we want to test, that if ^Cell, no other data exists in a slice
-fun ForwardPayloadRemainder.checkIsCorrectTLBEither(self) {
+fun ForwardPayloadRemainder.checkIsCorrectTlbEither(self) {
     var mutableCopy = self;
     if (mutableCopy.loadMaybeRef() != null) {
         // throw "cell underflow" if there is data besides a ref
@@ -151,7 +149,7 @@ struct (0x00000006) SetStatus {
 struct (0x00000007) TransferByAuthority {
     amount: coins
     receiver: address
-    // @abi.clientType(PayloadInline | PayloadInRef)
+    @abi.clientType(PayloadInline | PayloadInRef)
     forwardPayload: ForwardPayloadRemainder // todo: null?
 }
 
@@ -177,11 +175,11 @@ struct CurrentRequest {
     timestamp: uint32
 }
 
-struct (0x00000011) ApproveUpgrade { }
+struct (0x00000011) ApproveUpgrade {}
 
-struct (0x00000012) RejectUpgrade { }
+struct (0x00000012) RejectUpgrade {}
 
-struct (0x00000017)CustomPayloadMsg {
+struct (0x00000017) CustomPayloadMsg {
     queryId: uint64
 }
 

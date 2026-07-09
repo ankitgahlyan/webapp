@@ -15,5 +15,10 @@
     },
     "enabledPlugins": {
         "nx@nx-claude-plugins": true
+    },
+    "sandbox": {
+        "network": {
+            "allowedDomains": ["www.google-analytics.com"]
+        }
     }
 }

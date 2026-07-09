@@ -5,23 +5,18 @@ struct Proposal {
     votesAgainst: uint64
     executed: bool
 }
+
 struct Vote {
     proposalId: uint64
     support: bool
 }
 
-type DaoMsg = 
+type DaoMsg =
     | Proposal
     | Vote
 
-fun onBouncedMessage(in: InMessageBounced) {
+fun onBouncedMessage(_in: InMessageBounced) {}
 
-}
+fun onInternalMessage(_in: InMessage) {}
 
-fun onInternalMessage(in: InMessage) {
-
-}
-
-get fun get_dao_data() {
-
-}
+get fun get_dao_data() {}

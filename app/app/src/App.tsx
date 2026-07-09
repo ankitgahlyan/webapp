@@ -102,7 +102,7 @@ export default function App() {
             <IconTonDiamond size={32} />
           </div>
           <h1 className="text-[22px] font-semibold tracking-tight">
-            TON dApp Template
+            Welcome to openFi
           </h1>
           <p className="text-muted-foreground text-[15px] max-w-md">
             Connect your wallet and start building.
