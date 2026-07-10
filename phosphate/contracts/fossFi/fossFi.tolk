@@ -125,15 +125,16 @@ fun onInternalMessage(in: InMessage): void {
 
         RejectUpgrade => {
             assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
-            assert (store.currentRequest != null) throw Errors.WaitMore;
+            assert (store.currentRequest != null) throw Errors.WaitMore; // todo: better error code
 
             store.currentRequest = null;
         }
 
         ApproveUpgrade => {
             assert (in.senderAddress == store.admin) throw Errors.IncorrectSender;
+            // todo: redundant check (why would admin do this?)
             assert (store.currentRequest != null) throw Errors.WaitMore;
-            // testnetOnly
+            // testnetOnly, wait period is over
             assert (store.currentRequest.timestamp + 1 < blockchain.now()) throw Errors.WaitMore;
 
             val code = store.currentRequest.newUpgrade.newCode;
@@ -144,19 +145,21 @@ fun onInternalMessage(in: InMessage): void {
                     // for jettonWallet of FOSSFIAT/MINT
                     store.walletVersion += 1;
                     others.latestFiWalletCode = code!; // shouldn't be null for other than minterUpgrade
+                    // todo: remove on mainnet to keep contracts deployer agnostic
                     val upgradeMsg = createMessage({
                         bounce: BounceMode.NoBounce,
                         value: 0,
                         dest: calcDeployFiWallet(
                             in.senderAddress,
                             store.admin,
-                            // owner/deployer/treasury
+                            // owner/deployer/treasury all same here
                             contract.getAddress(),
                             fossFiWalletCompiledCode(),
                         ).calculateAddress(),
                         body: Upgrade {
                             walletVersion: store.walletVersion,
-                            sender: store.admin,
+                            sender: store.admin, // or use contract.getAddress()
+                            newData: data,
                             newCode: code,
                         },
                     });

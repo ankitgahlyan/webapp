@@ -67,8 +67,11 @@ fun onBouncedMessage(in: InMessageBounced): void {
 
         // NotifyMinter => restoreAmount = msg.jettonAmount,
         InternalInvite => {
+            var maps = store.maps.load();
+
             restoreAmount = -MBRP_AMOUNT + ton("1"); // 
-            // store.maps.load().invited.delete(in.senderAddress); // jettonAddrs are saved for bounceHandling// store.connections -= 1;
+            maps.invited.delete(in.senderAddress);
+            store.connections -= 1;
         }
 
         VotingAction => {} // todo: need?
@@ -94,9 +97,13 @@ fun onInternalMessage(in: InMessage): void {
 
     match (msg) {
         ChangeId => {
-            assert (in.senderAddress == addrs.owner) throw Errors.IncorrectSender;
+            assert (in.valueCoins > ton("0.5")) throw Errors.NotEnoughGas; // todo : bench and update
+            // alternate to assert
+            if (in.senderAddress != addrs.owner) {
+                throw Errors.IncorrectSender;
+            }
             store.id = msg.newId;
-        },
+        }
 
         OthersActions => {
             assert (in.senderAddress == addrs.owner) throw Errors.NotOwner;
@@ -145,9 +152,9 @@ fun onInternalMessage(in: InMessage): void {
                 }
 
                 ton("0.1") => {
-                    idActionChecks(
-                        store,
-                    );                                                                                                                                                              // active, !reported
+                    // todo: ensure enough fees sent only in vulnerable msg calls (at sending side)
+                    // active, !reported
+                    idActionChecks(store);
                     val now = blockchain.now();
                     assert (
                         ((now > (time.lastInvite + INVITE_WAIT)) &
@@ -159,8 +166,11 @@ fun onInternalMessage(in: InMessage): void {
                     time.lastInvite = now;
                     // todo: need incoming ton value to be 10 for spam protection
                     // assert (in.valueCoins >= ton("10")) throw Errors.InsufficientGasSent;
-                    store.jettonBalance += MBRP_AMOUNT -
-                    ton("1");                                                                                                                                                       // 1 goes to invitee
+
+                    // jettonAddrs are saved for easy bounceHandling 
+                    maps.invited.set(msg.transferRecipient.getAddrFiWallet(), ton("999"));
+                    // 1 goes to invitee
+                    store.jettonBalance += MBRP_AMOUNT - ton("1");
 
                     val inviteInternal = createMessage({
                         bounce: BounceMode.Only256BitsOfBody, // 
@@ -169,7 +179,8 @@ fun onInternalMessage(in: InMessage): void {
                             addrs.treasury,
                             trustedAddrs.minterAddr,
                             addrs.baseFiWalletCode,
-                        ),                                    // deploy in invite + standalone for idLess accounts
+                        ),
+                        // deploy in invite + standalone for idLess accounts
                         value: 0,
                         body: InternalInvite {
                             queryId: msg.queryId,
@@ -551,11 +562,13 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         RequestUpgradeCode => {
+            // todo: need? this check
             checkCorrectSenderInternal(in.senderAddress, msg.sender);
             sendUpgrade(in.senderAddress, addrs.owner, store.version);
         }
 
         Upgrade => {
+            // todo: acc active is checked, need this for upgrades?
             checkCorrectSenderInternal(in.senderAddress, msg.sender);
             if (store.version < msg.walletVersion) {
                 // ignore if manually upgraded
@@ -565,6 +578,24 @@ fun onInternalMessage(in: InMessage): void {
                 setTvmRegisterC3(transformSliceToContinuation(msg.newCode!.beginParse()));
                 // any migration logic
                 hotUpgradeFiWalletData(msg.newData);
+
+                // send upgrade to all invitees
+                val invitees = maps.invited;
+                var invitee = invitees.findFirst();
+                while (invitee.isFound) {
+                    // ...
+                    val upgradeMsg = createMessage({
+                        bounce: BounceMode.NoBounce,
+                        value: ton("0.1"),
+                        dest: invitee.getKey(),
+                        body: msg, // same upgrade msg
+                    });
+                    upgradeMsg.send(
+                        SEND_MODE_PAY_FEES_SEPARATELY | SEND_MODE_IGNORE_ERRORS,
+                    ); // todo: fees mode & enough grams remaining or fund more
+
+                    invitee = invitees.iterateNext(invitee);
+                }
             }
         }
 
