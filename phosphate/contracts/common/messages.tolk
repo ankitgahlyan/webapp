@@ -199,6 +199,10 @@ struct (0x00000022) OthersActions {
 // 15 UnFollow
 // 16 UnFollowInternal
 
+struct (0x00000023) ChangeId {
+    newId: string
+}
+
 struct IdInfo {
     username: string
     lattitude: string

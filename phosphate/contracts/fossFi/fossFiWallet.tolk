@@ -13,6 +13,7 @@ type AllowedMessageToWallet =
     | AskToTransfer
     | AskToBurn
     | AuthorityAction
+    | ChangeId
     | InternalTransferStep
     | InternalInvite
     | InternalDeActivate
@@ -92,6 +93,11 @@ fun onInternalMessage(in: InMessage): void {
     var nomins = lazy addrs.nomInAddrs.load();
 
     match (msg) {
+        ChangeId => {
+            assert (in.senderAddress == addrs.owner) throw Errors.IncorrectSender;
+            store.id = msg.newId;
+        },
+
         OthersActions => {
             assert (in.senderAddress == addrs.owner) throw Errors.NotOwner;
             // assert (false, 0); // todo what it does?
@@ -115,7 +121,7 @@ fun onInternalMessage(in: InMessage): void {
                         (now > ACTIVATION_WAIT + time.lastClaim)
                     ) throw Errors.WaitMore;
 
-                    // votingPower based mint
+                    // todo: votingPower based mint continue after 2 years
                     val claimAmount = ton("11111") + (ton("1") * store.receivedVotes);
 
                     store.jettonBalance += claimAmount;
@@ -246,7 +252,7 @@ fun onInternalMessage(in: InMessage): void {
                 }
 
                 ton("0.999") => {
-                    // todo: fixme
+                    // todo: fixme redundant
                     requestUpgrade(
                         trustedAddrs.minterAddr,
                         addrs.owner,
@@ -272,6 +278,7 @@ fun onInternalMessage(in: InMessage): void {
                     );
                 }
 
+                // todo: implement
                 ton("0.99") => {
                     store.jettonBalance -= LOTTERY_ENTRY_AMT; // todo: fixme check all deductions
                     enterLottery(
@@ -281,6 +288,7 @@ fun onInternalMessage(in: InMessage): void {
                     );                                        // todo: fixme: use lottery addr
                 }
 
+                // todo: implement
                 ton("0.777") => {
                     if (trustedAddrs.personalJettonMinter == null) {
                         trustedAddrs.personalJettonMinter = msg.transferRecipient;
@@ -288,6 +296,7 @@ fun onInternalMessage(in: InMessage): void {
                 }
 
                 ton("0.888") => {
+                    // fixme: assert balance is as much as claimed
                     destroyContract(in.senderAddress);
                 }
 
