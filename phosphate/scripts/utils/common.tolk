@@ -1,4 +1,4 @@
-import "@acton/build"
+import "@stdlib/strings"
 import "@acton/env"
 import "@acton/fmt"
 import "@acton/io"
@@ -13,8 +13,10 @@ import "@contracts/fossFi/storage"
 const JETTON_DEFAULT_NAME = "BroTherHOOD"
 const JETTON_DEFAULT_SYMBOL = "HD"
 const JETTON_DEFAULT_DESCRIPTION = "token with social minting + debt-free credit claims capabilities & supply is controlled by scarcity of humans & value is backed by paybacks by connections + lifetime emi & unique humans are ensured by peer reporting & genuine reports will be rewarded & lookout for your circle and rings to find potential valid reports"
-const JETTON_DEFAULT_IMAGE = "https://github.com/Cryptofonts/cryptoicons/blob/master/SVG/ton.svg"
-// JETTON_IMAGE='https://ankitgahlyan.github.io/fossfiat/vite.svg'
+// const JETTON_DEFAULT_IMAGE = "https://github.com/Cryptofonts/cryptoicons/blob/master/SVG/ton.svg"
+// const JETTON_DEFAULT_IMAGE = "https://ankitgahlyan.github.io/fossfiat/icon1.png"
+const JETTON_DEFAULT_IMAGE = "https://raw.githubusercontent.com/ankitgahlyan/fossfiat/refs/heads/main/public/icon1.png"
+
 const JETTON_IMAGE = "https://raw.githubusercontent.com/ankitgahlyan/fossfiat/refs/heads/main/public/tiger.svg"
 
 const JETTON_DEFAULT_DECIMALS = "9"
@@ -30,6 +32,11 @@ struct JettonMetadata {
     description: string
     image: string
     decimals: string
+}
+
+fun promptWalletUpgrade(message: string): bool {
+    val walletUpgrade = prompt(message, "wallet upgrade?", "y");
+    return walletUpgrade.equalTo("y");
 }
 
 fun promptJettonString(envName: string, message: string, default: string): string {

@@ -97,7 +97,9 @@ fun onInternalMessage(in: InMessage): void {
 
     match (msg) {
         ChangeId => {
-            assert (in.valueCoins > ton("0.5")) throw Errors.NotEnoughGas; // todo : bench and update
+            assert (
+                in.valueCoins > ton("0.5")
+            ) throw Errors.NotEnoughGas;                                   // todo : bench and update
             // alternate to assert
             if (in.senderAddress != addrs.owner) {
                 throw Errors.IncorrectSender;
