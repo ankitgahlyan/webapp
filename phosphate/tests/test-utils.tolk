@@ -227,7 +227,7 @@ fun hasSetCodeAction(res: SendResultList, account: address): bool {
     return false;
 }
 
-fun setupTest(): (FossFi, Treasury, Treasury) {
+fun setupTest(): (FossFi, FossFiWallet, Treasury, Treasury) {
     val deployer = testing.treasury("deployer");
     val notDeployer = testing.treasury("not-deployer");
 
@@ -250,7 +250,10 @@ fun setupTest(): (FossFi, Treasury, Treasury) {
     expect(deployMinter).toHaveSuccessfulDeploy({ to: minter.address });
     val _result = minter.sendTopUpTons(deployer.address, { value: ton("10") });
 
-    return (minter, deployer, notDeployer);
+    val wallet = userWallet(minter, deployer.address);
+    expect(wallet.getJettonBalance()).toEqual(ton("1"));
+
+    return (minter, wallet, deployer, notDeployer);
 }
 
 fun mintTo(minter: FossFi, admin: Treasury, recipient: address, amount: coins): FossFiWallet {

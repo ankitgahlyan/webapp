@@ -7,12 +7,13 @@ import "@wrappers/utils"
 import "@contracts/common/messages"
 import "@contracts/common/types"
 import "test-utils"
+import "@wrappers/FossFi.gen"
+import "@acton/build"
+import "@contracts/fossFi/storage"
 
 get fun `test wallet: owner can send jettons`() {
-    val (minter, deployer, notDeployer) = setupTest();
-    val transferAmount = ton("100"); // invite
-    // val senderWallet = mintTo(minter, deployer, deployer.address, ton("20"));
-    val senderWallet = userWallet(minter, deployer.address);
+    val (minter, senderWallet, deployer, notDeployer) = setupTest();
+    val transferAmount = ton("100");
     val receiverWallet = userWallet(minter, notDeployer.address);
 
     expect(senderWallet.getJettonBalance()).toEqual(ton("1"));
@@ -25,7 +26,7 @@ get fun `test wallet: owner can send jettons`() {
         deployer.address,
         null,
         DEFAULT_FORWARD_TON_AMOUNT,
-        "deploy",
+        "username@lat,long",
         { value: DEFAULT_TRANSFER_MSG_VALUE }, // todo: bounce?
     );
 
@@ -55,11 +56,25 @@ get fun `test wallet: owner can send jettons`() {
 
     expect(senderWallet.getJettonBalance()).toEqual(ton("900"));
     expect(receiverWallet.getJettonBalance()).toEqual(transferAmount + ton("1"));
+
+    // upgrades test
+    val newCode = build("fossFiWallet");
+    val upg= minter.sendUpgrade(
+        deployer.address,
+        true,
+        0,
+        deployer.address,
+        null,
+        newCode
+    );
+
+    val minterDataAll = minter.getJettonDataAll();
+    expect(minterDataAll.currentRequest!.newUpgrade.walletUpgrade).toBeTrue();
 }
 
 get fun `test wallet: non-owner cannot send jettons`() {
-    val (minter, deployer, notDeployer) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, ton("7"));
+    val (minter, wallet, deployer, notDeployer) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("7"));
     val balanceBefore = wallet.getJettonBalance();
 
     val res = wallet.sendTransferPayloadInline(
@@ -82,8 +97,8 @@ get fun `test wallet: non-owner cannot send jettons`() {
 }
 
 get fun `test wallet: cannot send more jettons than balance`() {
-    val (minter, deployer, notDeployer) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, ton("2"));
+    val (minter, wallet, deployer, notDeployer) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("2"));
     val balanceBefore = wallet.getJettonBalance();
 
     val res = wallet.sendTransferPayloadInline(
@@ -106,8 +121,8 @@ get fun `test wallet: cannot send more jettons than balance`() {
 }
 
 get fun `test wallet: zero forward ton means no transfer notification`() {
-    val (minter, deployer, notDeployer) = setupTest();
-    val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
+    val (minter, senderWallet, deployer, notDeployer) = setupTest();
+    // val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
     val receiverWallet = userWallet(minter, notDeployer.address);
 
     val res = senderWallet.sendTransferPayloadInline(
@@ -131,8 +146,8 @@ get fun `test wallet: zero forward ton means no transfer notification`() {
 }
 
 get fun `test wallet: transfer notification should preserve forward payload`() {
-    val (minter, deployer, notDeployer) = setupTest();
-    val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
+    val (minter, senderWallet, deployer, notDeployer) = setupTest();
+    // val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
     val receiverWallet = userWallet(minter, notDeployer.address);
     val sentAmount = ton("0.5");
     val forwardPayload = beginCell().storeUint(0x1234567890abcdef, 128).endCell();
@@ -181,8 +196,8 @@ get fun `test wallet: transfer notification should preserve forward payload`() {
 }
 
 get fun `test wallet: transfer to undeployed recipient wallet should still work`() {
-    val (minter, deployer, _) = setupTest();
-    val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
+    val (minter, senderWallet, deployer, _) = setupTest();
+    // val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
     val recipientOwner = randomAddress();
     val recipientWallet = userWallet(minter, recipientOwner);
     val sentAmount = ton("0.5");
@@ -207,9 +222,9 @@ get fun `test wallet: transfer to undeployed recipient wallet should still work`
 }
 
 get fun `test wallet: owner can burn jettons`() {
-    val (minter, deployer, _) = setupTest();
+    val (minter, wallet, deployer, _) = setupTest();
     val burnAmount = ton("3");
-    val wallet = mintTo(minter, deployer, deployer.address, ton("10"));
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("10"));
     val supplyBefore = minter.getTotalSupply();
 
     val res = wallet.sendBurn(
@@ -226,8 +241,8 @@ get fun `test wallet: owner can burn jettons`() {
 }
 
 get fun `test wallet: non-owner cannot burn jettons`() {
-    val (minter, deployer, notDeployer) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, ton("6"));
+    val (minter, wallet, deployer, notDeployer) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("6"));
     val balanceBefore = wallet.getJettonBalance();
     val supplyBefore = minter.getTotalSupply();
 
@@ -249,8 +264,8 @@ get fun `test wallet: non-owner cannot burn jettons`() {
 }
 
 get fun `test wallet: cannot burn more jettons than balance`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, ton("1"));
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("1"));
     val balanceBefore = wallet.getJettonBalance();
     val supplyBefore = minter.getTotalSupply();
 

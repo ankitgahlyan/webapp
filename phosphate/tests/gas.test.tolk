@@ -11,8 +11,8 @@ import "@contracts/common/types"
 import "test-utils"
 
 get fun `test gas: transfer minimal value edge`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (_, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val dest = randomAddress();
     val body = buildTransferBody(TEST_JETTON_UNIT, 0, dest, dest, makeTinyForwardPayload());
@@ -67,8 +67,8 @@ get fun `test gas: transfer minimal value is message-size aware`() {
 }
 
 get fun `test gas: transfer with forward amount requires second forward fee`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (_, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val dest = randomAddress();
     val body = buildTransferBody(
@@ -127,8 +127,8 @@ get fun `test gas: transfer with forward amount requires second forward fee`() {
 }
 
 get fun `test gas: transfer forward fees should follow config`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val dest = randomAddress();
     val body = buildTransferBody(
@@ -210,8 +210,8 @@ get fun `test gas: transfer forward fees should follow config`() {
 }
 
 get fun `test gas: transfer gas fee should follow config`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val dest = randomAddress();
     val body = buildTransferBody(
@@ -265,8 +265,8 @@ get fun `test gas: transfer gas fee should follow config`() {
 }
 
 get fun `test gas: transfer storage fee should follow config`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val dest = randomAddress();
     val body = buildTransferBody(
@@ -321,7 +321,7 @@ get fun `test gas: transfer storage fee should follow config`() {
 }
 
 get fun `test gas: forward ton transfer should fail when fees are insufficient`() {
-    val (minter, deployer, notDeployer) = setupTest();
+    val (minter, wallet, deployer, notDeployer) = setupTest();
     val senderWallet = mintTo(minter, deployer, deployer.address, ton("2"));
 
     val res = senderWallet.sendTransferPayloadInline(
@@ -342,8 +342,8 @@ get fun `test gas: forward ton transfer should fail when fees are insufficient`(
 }
 
 get fun `test gas: burn minimal value edge`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val minimalTonValue = calcMinimalBurnAmount() + MIN_EDGE_DELTA;
 
@@ -371,8 +371,8 @@ get fun `test gas: burn minimal value edge`() {
 }
 
 get fun `test gas: burn custom payload should not affect minimal value`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val customPayload = beginCell()
         .storeMaybeRef(beginCell().storeUint(0x123456789abcdef, 128).endCell())
@@ -404,8 +404,8 @@ get fun `test gas: burn custom payload should not affect minimal value`() {
 }
 
 get fun `test gas: burn forward fee should follow config`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val minimalBefore = calcMinimalBurnAmount() + MIN_EDGE_DELTA;
 
@@ -458,8 +458,8 @@ get fun `test gas: burn forward fee should follow config`() {
 }
 
 get fun `test gas: burn gas fee should follow config`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, DEFAULT_MINTED_JETTONS);
 
     val minimalBefore = calcMinimalBurnAmount() + MIN_EDGE_DELTA;
 
@@ -513,8 +513,8 @@ get fun `test gas: burn gas fee should follow config`() {
 }
 
 get fun `test gas: burn should fail when sent tons are clearly insufficient`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, ton("1"));
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("1"));
 
     val res = wallet.sendBurn(deployer.address, ton("0.0001"), ton("1"), deployer.address, null);
     expect(res).toHaveFailedTx<AskToBurn>({
@@ -525,8 +525,8 @@ get fun `test gas: burn should fail when sent tons are clearly insufficient`() {
 }
 
 get fun `test gas: wallet storage fee should be measurable`() {
-    val (minter, deployer, _) = setupTest();
-    val wallet = mintTo(minter, deployer, deployer.address, ton("1"));
+    val (minter, wallet, deployer, _) = setupTest();
+    // val wallet = mintTo(minter, deployer, deployer.address, ton("1"));
 
     val state = testing.getAccountState(wallet.address);
     expect(state).toBeNotNull();
