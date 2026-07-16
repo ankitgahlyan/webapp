@@ -10,6 +10,7 @@ import "@wrappers/FossFiWallet.gen"
 import "@wrappers/utils"
 import "@contracts/fossFi/storage"
 
+const FI_ADDRESS = "kQDhDjKMKWe_RZ__AUVgx5MHFyX5DISVsh8HALMo9K7UfG5p"
 const JETTON_DEFAULT_NAME = "BroTherHOOD"
 const JETTON_DEFAULT_SYMBOL = "HD"
 const JETTON_DEFAULT_DESCRIPTION = "token with social minting + debt-free credit claims capabilities & supply is controlled by scarcity of humans & value is backed by paybacks by connections + lifetime emi & unique humans are ensured by peer reporting & genuine reports will be rewarded & lookout for your circle and rings to find potential valid reports"
@@ -60,7 +61,7 @@ fun promptJettonAddressRequired(envName: string, message: string): address {
     if (fromEnv != null) {
         return fromEnv;
     }
-    return parseAddress(prompt(message, "EQ... / kQ..."));
+    return parseAddress(prompt(message, "EQ... / kQ...", FI_ADDRESS));
 }
 
 fun promptJettonCoins(envName: string, message: string, default: string): coins {

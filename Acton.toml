@@ -32,3 +32,15 @@ gen = "gen"
 tests = "tests"
 wrappers = "wrappers"
 wrappers-ts = "wrappers-ts"
+
+[test]
+ui = true
+ui-port = 12345
+
+[wrappers.tolk]
+# output-dir = "tests/generated-wrappers"
+# generate-test = true
+test-output-dir = "tests/generated-tests"
+
+[wrappers.typescript]
+output-dir = "./wrappers-ts"

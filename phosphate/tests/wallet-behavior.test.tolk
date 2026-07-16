@@ -1,15 +1,17 @@
+import "@acton/build"
+import "@acton/io"
 import "@acton/emulation/network"
 import "@acton/emulation/testing"
 import "@acton/testing/expect"
 import "@acton/types/transaction"
+import "@gen/fossFiWallet.code"
+import "@wrappers/FossFi.gen"
 import "@wrappers/FossFiWallet.gen"
 import "@wrappers/utils"
 import "@contracts/common/messages"
 import "@contracts/common/types"
-import "test-utils"
-import "@wrappers/FossFi.gen"
-import "@acton/build"
 import "@contracts/fossFi/storage"
+import "test-utils"
 
 get fun `test wallet: owner can send jettons`() {
     val (minter, senderWallet, deployer, notDeployer) = setupTest();
@@ -29,11 +31,13 @@ get fun `test wallet: owner can send jettons`() {
         "username@lat,long",
         { value: DEFAULT_TRANSFER_MSG_VALUE }, // todo: bounce?
     );
+    invite.giveName("inviteMsg");
 
     expect(invite).toHaveSuccessfulDeploy<InternalInvite>({
         from: senderWallet.address,
         to: receiverWallet.address,
     });
+    expect(invite).toHaveAllSuccessfulTxs();
 
     expect(senderWallet.getJettonBalance()).toEqual(ton("1000"));
     expect(receiverWallet.getJettonBalance()).toEqual(ton("1"));
@@ -59,17 +63,58 @@ get fun `test wallet: owner can send jettons`() {
 
     // upgrades test
     val newCode = build("fossFiWallet");
-    val upg= minter.sendUpgrade(
+    val upg = minter.sendUpgrade(
         deployer.address,
         true,
         0,
         deployer.address,
         null,
-        newCode
+        newCode,
     );
 
+    // upg.waitForTrace();
     val minterDataAll = minter.getJettonDataAll();
     expect(minterDataAll.currentRequest!.newUpgrade.walletUpgrade).toBeTrue();
+
+    testing.setNow(testing.getNow() + 1000); // 1000 seconds from now
+
+    val approveReq = minter.sendApproveUpgrade(deployer.address);
+    println(approveReq);
+    // expect(approveReq).toHaveSuccessfulTx<ApproveUpgrade>({
+    //     from: deployer.address,
+    //     to: minter.address,
+    // });
+    // expect(minter.getJettonDataAll().currentRequest).toBeNull();
+    // expect(senderWallet.getWalletDataAll().version).toEqual(1);
+}
+
+get fun `test : addrs r same`() {
+    val (minter, wallet, deployer, notDeployer) = setupTest();
+    val storage: FiWalletStore = FiWalletStore {
+        addresses: Addresses {
+            owner: deployer.address,
+            treasury: deployer.address,
+            baseFiWalletCode: fossFiWalletCompiledCode(),
+            nomInAddrs: NomInAddrs {}.toCell(),
+            trustedJettonAddrs: TrustedAddrs {
+                minterAddr: minter.address,
+                authorisedAccs: [],
+            }.toCell(),
+        }.toCell(),
+        maps: Maps {
+            allowances: [],
+            invited: [],
+            votedFor: [],
+            reportInfo: ReportInfo { reports: [] }.toCell(),
+        }.toCell(), // todo: learn how to set it default
+        timestamps: TimeStamps {}.toCell(),
+    };
+    val calcAddr = AutoDeployAddress {
+        stateInit: walletStateInit(storage),
+        toShard: { fixedPrefixLength: 8, closeTo: deployer.address },
+    }.calculateAddress();
+
+    expect(wallet.address).toEqual(calcAddr);
 }
 
 get fun `test wallet: non-owner cannot send jettons`() {

@@ -43,10 +43,6 @@
 		// 		"next-devtools-mcp@latest"
 		// 	]
 		// },
-		"ton": {
-			"type": "remote",
-			"url": "https://docs.ton.org/mcp"
-		},
 		"context7": {
 			"type": "local",
 			"command": [

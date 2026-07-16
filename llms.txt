@@ -1,0 +1,575 @@
+# Docs
+
+- [Start here](https://docs.ton.org/llms/start-here/content.md): Condensed overview of documentation and TON blockchain
+- [Get support](https://docs.ton.org/llms/get-support/content.md)
+- [Coming from Ethereum](https://docs.ton.org/llms/from-ethereum/content.md)
+- [100,000 Transactions Per Second (TPS)](https://docs.ton.org/llms/tps/content.md): TON Blockchain set the world record on its first performance test on Oct 31st, 2023
+- [How to adopt sub-second finality](https://docs.ton.org/llms/subsecond/content.md)
+
+- **Onboarding**
+- AI in TON
+  - [Overview of AI in TON](https://docs.ton.org/llms/onboarding/ai/overview/content.md)
+  - [Quick start with agentic wallets](https://docs.ton.org/llms/onboarding/ai/quick-start/content.md)
+  - [AgentKit: `@ton/mcp`](https://docs.ton.org/llms/onboarding/ai/mcp/content.md)
+  - [Agentic wallet contracts](https://docs.ton.org/llms/onboarding/ai/wallets/content.md)
+- Wallet apps
+  - [wallet.ton.org](https://docs.ton.org/llms/onboarding/wallet-apps/web/content.md)
+  - [How to get coins on testnet](https://docs.ton.org/llms/onboarding/wallet-apps/get-coins/content.md)
+  - [Deep links](https://docs.ton.org/llms/onboarding/wallet-apps/deep-links/content.md)
+  - [Addresses workflow](https://docs.ton.org/llms/onboarding/wallet-apps/addresses-workflow/content.md)
+- Explorers
+  - [Explorers overview](https://docs.ton.org/llms/onboarding/explorers/overview/content.md)
+- [Analytics and data providers](https://docs.ton.org/llms/onboarding/analytics/content.md)
+- Oracles
+  - [Oracles overview](https://docs.ton.org/llms/onboarding/oracles/overview/content.md)
+  - [RedStone oracle](https://docs.ton.org/llms/onboarding/oracles/redstone/content.md)
+  - [Pyth oracle](https://docs.ton.org/llms/onboarding/oracles/pyth/content.md)
+- [Bridges](https://docs.ton.org/llms/onboarding/bridges/content.md)
+
+- **Nodes**
+- [Blockchain nodes overview](https://docs.ton.org/llms/nodes/overview/content.md): Pick the right TON node setup and understand the operational work it requires
+- [Network status](https://docs.ton.org/llms/nodes/status/content.md)
+- C++ node
+  - [Run a node with MyTonCtrl](https://docs.ton.org/llms/nodes/cpp/setup-mytonctrl/content.md): Provision hardware, install MyTonCtrl, and follow runbooks for validator, liteserver, or archive roles.
+  - [Run a validator](https://docs.ton.org/llms/nodes/cpp/run-validator/content.md): Run a validator node with MyTonCtrl
+  - [Run an archive liteserver](https://docs.ton.org/llms/nodes/cpp/run-archive-liteserver/content.md): Run an archive liteserver node with MyTonCtrl
+  - [Integrate MyTonCtrl with Prometheus](https://docs.ton.org/llms/nodes/cpp/integrating-with-prometheus/content.md)
+  - [Setting up a local blockchain using MyLocalTon](https://docs.ton.org/llms/nodes/cpp/setup-mylocalton/content.md): Install MyLocalTon to spin up a self-contained TON network for development and testing.
+  - MyTonCtrl reference
+    - [MyTonCtrl overview](https://docs.ton.org/llms/nodes/cpp/mytonctrl/overview/content.md)
+    - [Core](https://docs.ton.org/llms/nodes/cpp/mytonctrl/core/content.md): Inspecting node health, managing modes and settings, maintaining the software stack, and running diagnostics.
+    - [Installer](https://docs.ton.org/llms/nodes/cpp/mytonctrl/installer/content.md): MyTonInstaller complements MyTonCtrl by bootstrapping and maintaining TON node components.
+    - [Wallet](https://docs.ton.org/llms/nodes/cpp/mytonctrl/wallet/content.md): Wallet mode provides convenience utilities for generating, activating, importing, exporting, and moving funds between TON wallets managed by MyTonCtrl.
+    - [Validator](https://docs.ton.org/llms/nodes/cpp/mytonctrl/validator/content.md): Validator mode automates governance voting, election participation, efficiency tracking, and the local collator registry.
+    - [Collator](https://docs.ton.org/llms/nodes/cpp/mytonctrl/collator/content.md): Collator mode lets a node produce blocks for selected shardchains without running the full validator stack. The commands below help you configure local collators, adjust the validator allowlist, and manage collator-specific configuration JSON.
+    - [Nominator pools](https://docs.ton.org/llms/nodes/cpp/mytonctrl/pools/content.md): Pool-focused commands help you manage validator-run nominator pools and Orbs single-nominator pools. The console exposes utilities that create local pool descriptors, deploy the contracts on-chain, and move stake in or out.
+    - [Liquid staking](https://docs.ton.org/llms/nodes/cpp/mytonctrl/liquid-staking/content.md): Liquid staking mode orchestrates controller deployment and maintenance for jetton-based staking pools. The commands below cover controller lifecycle management, funding flows, validator-set updates, and diagnostic helpers.
+    - [Custom overlays](https://docs.ton.org/llms/nodes/cpp/mytonctrl/custom-overlays/content.md): Sets up a custom overlay to speed up synchronization for a group of nodes.
+    - [Utilities](https://docs.ton.org/llms/nodes/cpp/mytonctrl/utilities/content.md): Utility commands provide quick inspection and helper tools for accounts, bookmarks, governance artifacts, and validator data.
+    - [Telegram alerting](https://docs.ton.org/llms/nodes/cpp/mytonctrl/alerting/content.md)
+    - [Backup](https://docs.ton.org/llms/nodes/cpp/mytonctrl/backups/content.md): MyTonCtrl bundles helper scripts for creating and restoring node backups.
+    - [BTC Teleport](https://docs.ton.org/llms/nodes/cpp/mytonctrl/btc-teleport/content.md): The BTC Teleport module manages the optional Bitcoin bridge (Teleport) client shipped with MyTonCtrl. Use these commands to inspect proposals, vote on them, or remove the Teleport installation when no longer needed.
+- Staking
+  - [Staking overview](https://docs.ton.org/llms/nodes/staking/overview/content.md)
+  - [Stake calculation](https://docs.ton.org/llms/nodes/staking/stake-calculation/content.md)
+  - [Liquid staking contracts](https://docs.ton.org/llms/nodes/staking/liquid-staking/content.md)
+  - [Single nominator pool contracts](https://docs.ton.org/llms/nodes/staking/single-nominator/content.md)
+  - [Nominator pool contracts](https://docs.ton.org/llms/nodes/staking/nominator-pools/content.md)
+
+- **Applications**
+- [Applications overview](https://docs.ton.org/llms/applications/overview/content.md): Technologies for building applications, tools, and wallet services on TON
+- [SDKs](https://docs.ton.org/llms/applications/sdks/content.md)
+- AppKit
+  - [AppKit overview](https://docs.ton.org/llms/applications/appkit/overview/content.md)
+  - Get started
+    - [Get started guides with AppKit](https://docs.ton.org/llms/applications/appkit/get-started/get-started/content.md)
+    - [Quick start with AppKit](https://docs.ton.org/llms/applications/appkit/get-started/quick-start/content.md)
+    - Install AppKit
+      - [Prepare the AppKit project](https://docs.ton.org/llms/applications/appkit/get-started/installation/installation/content.md)
+      - [Install AppKit in a React app](https://docs.ton.org/llms/applications/appkit/get-started/installation/react-app/content.md)
+      - [Install AppKit in a vanilla JS app](https://docs.ton.org/llms/applications/appkit/get-started/installation/vanilla-js/content.md)
+    - [Add wallet connectors in AppKit](https://docs.ton.org/llms/applications/appkit/get-started/connectors/content.md)
+    - [Add networks in AppKit](https://docs.ton.org/llms/applications/appkit/get-started/networks/content.md)
+    - [Use basic getter hooks in AppKit](https://docs.ton.org/llms/applications/appkit/get-started/basic-getter-hooks/content.md)
+    - [Send transactions with AppKit](https://docs.ton.org/llms/applications/appkit/get-started/sending-transactions/content.md)
+    - [Stream live updates in AppKit](https://docs.ton.org/llms/applications/appkit/get-started/streaming/content.md)
+    - [Add DeFi providers in AppKit](https://docs.ton.org/llms/applications/appkit/get-started/providers/content.md)
+    - [Use UI widgets in AppKit](https://docs.ton.org/llms/applications/appkit/get-started/using-ui-widgets/content.md)
+  - How to
+    - [AppKit how-to guides](https://docs.ton.org/llms/applications/appkit/howto/overview/content.md)
+    - [How to set up AppKit](https://docs.ton.org/llms/applications/appkit/howto/appkit/content.md)
+    - [How to connect to a wallet in AppKit](https://docs.ton.org/llms/applications/appkit/howto/connect-to-a-wallet/content.md)
+    - [How to use providers in AppKit](https://docs.ton.org/llms/applications/appkit/howto/providers/content.md)
+    - [How to configure networks in AppKit](https://docs.ton.org/llms/applications/appkit/howto/networks/content.md)
+    - [How to read balances with AppKit](https://docs.ton.org/llms/applications/appkit/howto/read-balances/content.md)
+    - [How to send Gram with AppKit](https://docs.ton.org/llms/applications/appkit/howto/send-gram/content.md)
+    - [How to send jettons with AppKit](https://docs.ton.org/llms/applications/appkit/howto/send-jettons/content.md)
+    - [How to manage NFTs with AppKit](https://docs.ton.org/llms/applications/appkit/howto/nfts/content.md)
+    - [How to sign data with AppKit](https://docs.ton.org/llms/applications/appkit/howto/sign-data/content.md)
+    - [How to use streaming in AppKit](https://docs.ton.org/llms/applications/appkit/howto/streaming/content.md)
+    - [How to perform swaps with AppKit](https://docs.ton.org/llms/applications/appkit/howto/swaps/content.md)
+    - [How to stake and unstake with AppKit](https://docs.ton.org/llms/applications/appkit/howto/staking/content.md)
+    - [How to use on-ramps with AppKit](https://docs.ton.org/llms/applications/appkit/howto/onramp/content.md)
+    - [How to send gasless transactions with AppKit](https://docs.ton.org/llms/applications/appkit/howto/gasless/content.md)
+    - [How to use UI widgets in AppKit](https://docs.ton.org/llms/applications/appkit/howto/use-ui-widgets/content.md)
+  - Reference
+    - [AppKit reference](https://docs.ton.org/llms/applications/appkit/reference/reference/content.md)
+    - [`@ton/appkit` reference](https://docs.ton.org/llms/applications/appkit/reference/appkit/content.md)
+    - [`@ton/appkit-react` reference](https://docs.ton.org/llms/applications/appkit/reference/appkit-react/content.md)
+  - [AppKit: FAQ and troubleshooting](https://docs.ton.org/llms/applications/appkit/faq-troubleshooting/content.md)
+  - [AppKit changelog](https://docs.ton.org/llms/applications/appkit/changelog/content.md)
+- TON Pay
+  - [TON Pay SDK overview](https://docs.ton.org/llms/applications/ton-pay/overview/content.md)
+  - [Quick start with TON Pay](https://docs.ton.org/llms/applications/ton-pay/quick-start/content.md)
+  - [How to set up invoice Gram and USDT payments with TON Pay](https://docs.ton.org/llms/applications/ton-pay/invoices/content.md)
+  - [On-ramp in TON Pay SDK](https://docs.ton.org/llms/applications/ton-pay/on-ramp/content.md)
+  - Payment integration
+    - [How to build a transfer in TON Pay](https://docs.ton.org/llms/applications/ton-pay/payment-integration/transfer/content.md)
+    - [How to send payments using TON Pay React hook](https://docs.ton.org/llms/applications/ton-pay/payment-integration/payments-react/content.md)
+    - [How to send payments using TON Connect with TON Pay](https://docs.ton.org/llms/applications/ton-pay/payment-integration/payments-tonconnect/content.md)
+    - [How to check status and retrieve info with TON Pay](https://docs.ton.org/llms/applications/ton-pay/payment-integration/status-info/content.md)
+  - UI integration
+    - [How to add a TON Pay button using React](https://docs.ton.org/llms/applications/ton-pay/ui-integration/button-react/content.md)
+    - [How to add a TON Pay button using JS](https://docs.ton.org/llms/applications/ton-pay/ui-integration/button-js/content.md)
+  - [TON Pay webhooks](https://docs.ton.org/llms/applications/ton-pay/webhooks/content.md)
+  - [TON Pay API reference](https://docs.ton.org/llms/applications/ton-pay/api-reference/content.md)
+- WalletKit
+  - [WalletKit overview](https://docs.ton.org/llms/applications/walletkit/overview/content.md)
+  - Web
+    - [Get started with WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/init/content.md)
+    - [Configure WalletKit parameters on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/configure/content.md)
+    - [Initialize a TON wallet with WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/init-wallet/content.md)
+    - [Manage TON wallets with WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/wallets/content.md)
+    - [How to handle connections with WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/connections/content.md)
+    - [How to handle other events with WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/events/content.md)
+    - [How to work with Gram using WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/gram/content.md)
+    - [How to work with Jettons using WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/jettons/content.md)
+    - [How to work with NFTs using WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/nfts/content.md)
+    - [Stake and unstake with WalletKit on the Web platform](https://docs.ton.org/llms/applications/walletkit/web/staking/content.md)
+  - iOS
+    - [How to install WalletKit on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/installation/content.md)
+    - [How to initialize WalletKit on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/init/content.md)
+    - [How to manage TON wallets using WalletKit on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/wallets/content.md)
+    - [How to retrieve wallet information, jettons, and NFTs with WalletKit on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/data/content.md)
+    - [How to transfer Gram, Jettons, and NFTs using WalletKit on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/transactions/content.md)
+    - [How to connect to dApp and handle wallet events with WalletKit on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/events/content.md)
+    - [How to inject WalletKit into WebView on the iOS platform](https://docs.ton.org/llms/applications/walletkit/ios/webview/content.md)
+  - Android
+    - [How to install WalletKit on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/installation/content.md)
+    - [How to initialize WalletKit on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/init/content.md)
+    - [How to manage TON wallets using WalletKit on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/wallets/content.md)
+    - [How to retrieve wallet information, jettons, and NFTs with WalletKit on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/data/content.md)
+    - [How to connect to dApp and handle wallet events with WalletKit on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/events/content.md)
+    - [How to transfer Gram, Jettons, and NFTs using WalletKit on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/transactions/content.md)
+    - [How to inject WalletKit into WebView on the Android platform](https://docs.ton.org/llms/applications/walletkit/android/webview/content.md)
+  - Deep dive
+    - [Manual TON Connect integration guides](https://docs.ton.org/llms/applications/walletkit/deep/overview/content.md)
+    - [Integrate TON Connect, test, and apply for listing](https://docs.ton.org/llms/applications/walletkit/deep/qa-guide/content.md)
+    - [Integrate TON Connect into native and web wallets](https://docs.ton.org/llms/applications/walletkit/deep/native-web/content.md)
+    - [Integrate TON Connect into in-wallet browsers and browser extensions](https://docs.ton.org/llms/applications/walletkit/deep/browser-extension/content.md)
+- TON Connect
+  - [TON Connect overview](https://docs.ton.org/llms/applications/ton-connect/overview/content.md)
+  - [Get started with TON Connect](https://docs.ton.org/llms/applications/ton-connect/get-started/content.md)
+  - How to
+    - [How to connect a wallet with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/connect/content.md)
+    - [How to disconnect a session with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/disconnect/content.md)
+    - [How to send a transaction with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/send-transaction/content.md)
+    - [How to perform message lookup after sending a transaction with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/message-lookup/content.md)
+    - [How to sign data with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/sign-data/content.md)
+    - [How to sign and relay a gasless message with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/sign-message-gasless/content.md)
+    - [How to connect-and-act in one tap with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/embedded-request/content.md)
+    - [How to filter wallets by required features with TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/filter-wallets/content.md)
+    - [How to enable WalletConnect support in TON Connect](https://docs.ton.org/llms/applications/ton-connect/how-to/walletconnect-support/content.md)
+  - [Core concepts of TON Connect](https://docs.ton.org/llms/applications/ton-connect/core-concepts/content.md)
+  - API reference
+    - [`@tonconnect/ui-react` reference](https://docs.ton.org/llms/applications/ton-connect/api-reference/ui-react/content.md)
+    - [`@tonconnect/ui` reference](https://docs.ton.org/llms/applications/ton-connect/api-reference/ui/content.md)
+    - [`@tonconnect/sdk` reference](https://docs.ton.org/llms/applications/ton-connect/api-reference/sdk/content.md)
+    - [`@tonconnect/protocol` reference](https://docs.ton.org/llms/applications/ton-connect/api-reference/protocol/content.md)
+  - [TON Connect troubleshooting](https://docs.ton.org/llms/applications/ton-connect/troubleshooting/content.md)
+  - [TON Connect FAQ](https://docs.ton.org/llms/applications/ton-connect/faq/content.md)
+- Payment processing
+  - [Payment processing overview](https://docs.ton.org/llms/applications/payments/overview/content.md)
+  - [Gram payments processing](https://docs.ton.org/llms/applications/payments/gram/content.md)
+  - [Jettons payments processing](https://docs.ton.org/llms/applications/payments/jettons/content.md)
+  - [How to set up a self-hosted payment processor using Bicycle](https://docs.ton.org/llms/applications/payments/setup/content.md)
+
+- **APIs**
+- [APIs](https://docs.ton.org/llms/api/overview/content.md): Options for reading TON data and interacting with it from the off-chain world
+- [Jetton prices API](https://docs.ton.org/llms/api/price/content.md): Different ways to retrieve Jetton's historical prices on Decentralized Exchanges, DEXes
+- [Rate limits](https://docs.ton.org/llms/api/rate-limit/content.md)
+- [Get your TON Center API key](https://docs.ton.org/llms/api/get-api-key/content.md)
+- API v2
+  - [TON Center API v2 overview](https://docs.ton.org/llms/api/v2/overview/content.md)
+  - [API v2 authentication](https://docs.ton.org/llms/api/v2/authentication/content.md)
+  - [API v2 error codes](https://docs.ton.org/llms/api/v2/errors/content.md)
+  - [API v2 TonLib type identifiers](https://docs.ton.org/llms/api/v2/tonlib-types/content.md)
+  - Accounts
+    - [Get address balance](https://docs.ton.org/llms/api/v2/accounts/get-address-balance/content.md)
+    - [Get address information](https://docs.ton.org/llms/api/v2/accounts/get-address-information/content.md)
+    - [Get address state](https://docs.ton.org/llms/api/v2/accounts/get-address-state/content.md)
+    - [Get extended address information](https://docs.ton.org/llms/api/v2/accounts/get-extended-address-information/content.md)
+    - [Get token data](https://docs.ton.org/llms/api/v2/accounts/get-token-data/content.md)
+    - [Get wallet information](https://docs.ton.org/llms/api/v2/accounts/get-wallet-information/content.md)
+  - Blocks
+    - [Get block header](https://docs.ton.org/llms/api/v2/blocks/get-block-header/content.md)
+    - [Get consensus block](https://docs.ton.org/llms/api/v2/blocks/get-consensus-block/content.md)
+    - [Get masterchain block signatures](https://docs.ton.org/llms/api/v2/blocks/get-masterchain-block-signatures/content.md)
+    - [Get masterchain info](https://docs.ton.org/llms/api/v2/blocks/get-masterchain-info/content.md)
+    - [Get outbound message queue size](https://docs.ton.org/llms/api/v2/blocks/get-outbound-message-queue-size/content.md)
+    - [Get shard block proof](https://docs.ton.org/llms/api/v2/blocks/get-shard-block-proof/content.md)
+    - [Get shards](https://docs.ton.org/llms/api/v2/blocks/get-shards/content.md)
+    - [Lookup block](https://docs.ton.org/llms/api/v2/blocks/lookup-block/content.md)
+  - Configuration
+    - [Get all config parameters](https://docs.ton.org/llms/api/v2/configuration/get-all-config-parameters/content.md)
+    - [Get config parameter](https://docs.ton.org/llms/api/v2/configuration/get-config-parameter/content.md)
+    - [Get libraries](https://docs.ton.org/llms/api/v2/configuration/get-libraries/content.md)
+  - RPC
+    - [JSON-RPC endpoint](https://docs.ton.org/llms/api/v2/rpc/json-rpc-endpoint/content.md)
+  - Run method
+    - [Run get method (standard)](https://docs.ton.org/llms/api/v2/run-method/run-get-method-standard/content.md)
+    - [Run get method](https://docs.ton.org/llms/api/v2/run-method/run-get-method/content.md)
+  - Send
+    - [Estimate fee](https://docs.ton.org/llms/api/v2/send/estimate-fee/content.md)
+    - [Send BoC (return hash)](https://docs.ton.org/llms/api/v2/send/send-boc-return-hash/content.md)
+    - [Send BoC](https://docs.ton.org/llms/api/v2/send/send-boc/content.md)
+  - Transactions
+    - [Get block transactions (extended)](https://docs.ton.org/llms/api/v2/transactions/get-block-transactions-extended/content.md)
+    - [Get block transactions](https://docs.ton.org/llms/api/v2/transactions/get-block-transactions/content.md)
+    - [Get transactions (standard)](https://docs.ton.org/llms/api/v2/transactions/get-transactions-standard/content.md)
+    - [Get transactions](https://docs.ton.org/llms/api/v2/transactions/get-transactions/content.md)
+    - [Try locate result transaction](https://docs.ton.org/llms/api/v2/transactions/try-locate-result-transaction/content.md)
+    - [Try locate source transaction](https://docs.ton.org/llms/api/v2/transactions/try-locate-source-transaction/content.md)
+    - [Try locate transaction](https://docs.ton.org/llms/api/v2/transactions/try-locate-transaction/content.md)
+  - Utils
+    - [Detect address](https://docs.ton.org/llms/api/v2/utils/detect-address/content.md)
+    - [Detect hash](https://docs.ton.org/llms/api/v2/utils/detect-hash/content.md)
+    - [Pack address](https://docs.ton.org/llms/api/v2/utils/pack-address/content.md)
+    - [Unpack address](https://docs.ton.org/llms/api/v2/utils/unpack-address/content.md)
+- API v3
+  - [TON Center API v3 overview](https://docs.ton.org/llms/api/v3/overview/content.md)
+  - [API authentication](https://docs.ton.org/llms/api/v3/authentication/content.md)
+  - [API error codes](https://docs.ton.org/llms/api/v3/errors/content.md)
+  - [Pagination](https://docs.ton.org/llms/api/v3/pagination/content.md)
+  - Accounts
+    - [Address Book](https://docs.ton.org/llms/api/v3/accounts/address-book/content.md)
+    - [Get Account States](https://docs.ton.org/llms/api/v3/accounts/get-account-states/content.md)
+    - [Get Wallet States](https://docs.ton.org/llms/api/v3/accounts/get-wallet-states/content.md)
+    - [Metadata](https://docs.ton.org/llms/api/v3/accounts/metadata/content.md)
+  - Actions and traces
+    - [Get Actions](https://docs.ton.org/llms/api/v3/actions-and-traces/get-actions/content.md)
+    - [Get Pending Actions](https://docs.ton.org/llms/api/v3/actions-and-traces/get-pending-actions/content.md)
+    - [Get Pending Traces](https://docs.ton.org/llms/api/v3/actions-and-traces/get-pending-traces/content.md)
+    - [Get Traces](https://docs.ton.org/llms/api/v3/actions-and-traces/get-traces/content.md)
+  - Blockchain data
+    - [Get Adjacent Transactions](https://docs.ton.org/llms/api/v3/blockchain-data/get-adjacent-transactions/content.md)
+    - [Get blocks](https://docs.ton.org/llms/api/v3/blockchain-data/get-blocks/content.md)
+    - [Get masterchain block shard state](https://docs.ton.org/llms/api/v3/blockchain-data/get-masterchain-block-shard-state/content.md)
+    - [Get masterchain block shards](https://docs.ton.org/llms/api/v3/blockchain-data/get-masterchain-block-shards/content.md)
+    - [Get Masterchain Info](https://docs.ton.org/llms/api/v3/blockchain-data/get-masterchain-info/content.md)
+    - [Get messages](https://docs.ton.org/llms/api/v3/blockchain-data/get-messages/content.md)
+    - [Get pending transactions](https://docs.ton.org/llms/api/v3/blockchain-data/get-pending-transactions/content.md)
+    - [Get transactions by Masterchain block](https://docs.ton.org/llms/api/v3/blockchain-data/get-transactions-by-masterchain-block/content.md)
+    - [Get transactions by message](https://docs.ton.org/llms/api/v3/blockchain-data/get-transactions-by-message/content.md)
+    - [Get transactions](https://docs.ton.org/llms/api/v3/blockchain-data/get-transactions/content.md)
+  - DNS
+    - [Get DNS Records](https://docs.ton.org/llms/api/v3/dns/get-dns-records/content.md)
+  - Jettons
+    - [Get Jetton Burns](https://docs.ton.org/llms/api/v3/jettons/get-jetton-burns/content.md)
+    - [Get Jetton Masters](https://docs.ton.org/llms/api/v3/jettons/get-jetton-masters/content.md)
+    - [Get Jetton Transfers](https://docs.ton.org/llms/api/v3/jettons/get-jetton-transfers/content.md)
+    - [Get Jetton Wallets](https://docs.ton.org/llms/api/v3/jettons/get-jetton-wallets/content.md)
+  - Multisig
+    - [Get Multisig Orders](https://docs.ton.org/llms/api/v3/multisig/get-multisig-orders/content.md)
+    - [Get Multisig Wallets](https://docs.ton.org/llms/api/v3/multisig/get-multisig-wallets/content.md)
+  - NFTs
+    - [Get NFT collections](https://docs.ton.org/llms/api/v3/nfts/get-nft-collections/content.md)
+    - [Get NFT items](https://docs.ton.org/llms/api/v3/nfts/get-nft-items/content.md)
+    - [Get NFT Transfers](https://docs.ton.org/llms/api/v3/nfts/get-nft-transfers/content.md)
+  - Stats
+    - [Get Top Accounts By Balance](https://docs.ton.org/llms/api/v3/stats/get-top-accounts-by-balance/content.md)
+  - Utils
+    - [Decode Opcodes and Bodies (GET)](https://docs.ton.org/llms/api/v3/utils/decode-opcodes-and-bodies-get/content.md)
+    - [Decode Opcodes and Bodies (POST)](https://docs.ton.org/llms/api/v3/utils/decode-opcodes-and-bodies-post/content.md)
+  - Vesting
+    - [Get Vesting Contracts](https://docs.ton.org/llms/api/v3/vesting/get-vesting-contracts/content.md)
+  - Legacy (v2)
+    - [Estimate Fee](https://docs.ton.org/llms/api/v3/api-v2/estimate-fee/content.md)
+    - [Get Address Information](https://docs.ton.org/llms/api/v3/api-v2/get-address-information/content.md)
+    - [Get Wallet Information](https://docs.ton.org/llms/api/v3/api-v2/get-wallet-information/content.md)
+    - [Run Get-Method](https://docs.ton.org/llms/api/v3/api-v2/run-get-method/content.md)
+    - [Send Message](https://docs.ton.org/llms/api/v3/api-v2/send-message/content.md)
+- Streaming API
+  - [Streaming API overview](https://docs.ton.org/llms/api/streaming/overview/content.md)
+  - [Streaming API: Server-Sent Events](https://docs.ton.org/llms/api/streaming/sse/content.md)
+  - [Streaming API: WebSocket](https://docs.ton.org/llms/api/streaming/wss/content.md)
+  - [Streaming API notification reference](https://docs.ton.org/llms/api/streaming/reference/content.md)
+- Nominator Pools API
+  - [Get Nominator Bookings Method](https://docs.ton.org/llms/api/smc-index/get-nominator-bookings-method/content.md)
+  - [Get Nominator Earnings Method](https://docs.ton.org/llms/api/smc-index/get-nominator-earnings-method/content.md)
+  - [Get Nominator Method](https://docs.ton.org/llms/api/smc-index/get-nominator-method/content.md)
+  - [Get Pool Bookings Method](https://docs.ton.org/llms/api/smc-index/get-pool-bookings-method/content.md)
+  - [Get Pool Method](https://docs.ton.org/llms/api/smc-index/get-pool-method/content.md)
+  - [Lifecheck Method](https://docs.ton.org/llms/api/smc-index/lifecheck-method/content.md)
+
+- **Smart contracts**
+- [Smart contracts](https://docs.ton.org/llms/contracts/overview/content.md): How to build, test, deploy, debug, and otherwise interact with TON smart contracts
+- [TON plugin for IDEs from JetBrains](https://docs.ton.org/llms/contracts/ide/jetbrains/content.md)
+- [TON extension for Visual Studio Code (VS Code) and VSCode-based editors](https://docs.ton.org/llms/contracts/ide/vscode/content.md)
+- [Acton toolchain](https://ton-blockchain.github.io/acton/docs/welcome)
+- Standard contracts
+  - [Standard contracts](https://docs.ton.org/llms/contracts/standard/overview/content.md)
+  - Wallets
+    - [How TON wallets work](https://docs.ton.org/llms/contracts/standard/wallets/how-it-works/content.md)
+    - [TON wallet mnemonics](https://docs.ton.org/llms/contracts/standard/wallets/mnemonics/content.md)
+    - [Comparison](https://docs.ton.org/llms/contracts/standard/wallets/comparison/content.md)
+    - [How to interact with wallets](https://docs.ton.org/llms/contracts/standard/wallets/interact/content.md)
+    - [Gasless transactions](https://docs.ton.org/llms/contracts/standard/wallets/gasless/content.md)
+    - [Wallet V5](https://docs.ton.org/llms/contracts/standard/wallets/v5/content.md)
+    - [Wallet V5 interface: messages and get methods](https://docs.ton.org/llms/contracts/standard/wallets/v5-api/content.md)
+    - [Wallet V4](https://docs.ton.org/llms/contracts/standard/wallets/v4/content.md)
+    - Highload wallets
+      - [Highload wallets](https://docs.ton.org/llms/contracts/standard/wallets/highload/overview/content.md)
+      - V3
+        - [How to create a highload wallet v3](https://docs.ton.org/llms/contracts/standard/wallets/highload/v3/create/content.md)
+        - [How to send a batch of transfers](https://docs.ton.org/llms/contracts/standard/wallets/highload/v3/send-batch-transfers/content.md)
+        - [How to send a single transfer](https://docs.ton.org/llms/contracts/standard/wallets/highload/v3/send-single-transfer/content.md)
+        - [Highload Wallet v3 — specification](https://docs.ton.org/llms/contracts/standard/wallets/highload/v3/specification/content.md)
+        - [How to verify that a message is processed](https://docs.ton.org/llms/contracts/standard/wallets/highload/v3/verify-is-processed/content.md)
+      - V2
+        - [Highload wallet v2: Specification](https://docs.ton.org/llms/contracts/standard/wallets/highload/v2/specification/content.md)
+    - [Lockup wallet](https://docs.ton.org/llms/contracts/standard/wallets/lockup/content.md)
+    - Preprocessed wallet v2
+      - [How to interact with preprocessed wallet v2](https://docs.ton.org/llms/contracts/standard/wallets/preprocessed-v2/interact/content.md)
+      - [Preprocessed wallet v2: Specification](https://docs.ton.org/llms/contracts/standard/wallets/preprocessed-v2/specification/content.md)
+    - [Restricted wallet](https://docs.ton.org/llms/contracts/standard/wallets/restricted/content.md)
+    - [Wallets performance benchmark](https://docs.ton.org/llms/contracts/standard/wallets/performance/content.md)
+    - [Wallet sources](https://docs.ton.org/llms/contracts/standard/wallets/sources/content.md)
+    - [Wallets history](https://docs.ton.org/llms/contracts/standard/wallets/history/content.md)
+  - Tokens
+    - [Token overview](https://docs.ton.org/llms/contracts/standard/tokens/overview/content.md)
+    - [Token metadata](https://docs.ton.org/llms/contracts/standard/tokens/metadata/content.md)
+    - [Token airdrop](https://docs.ton.org/llms/contracts/standard/tokens/airdrop/content.md)
+    - Jettons
+      - [Jetton standard](https://docs.ton.org/llms/contracts/standard/tokens/jettons/overview/content.md)
+      - [Jetton: how it works](https://docs.ton.org/llms/contracts/standard/tokens/jettons/how-it-works/content.md)
+      - [Jetton implementations comparison](https://docs.ton.org/llms/contracts/standard/tokens/jettons/comparison/content.md)
+      - [How to create a jetton with Acton](https://docs.ton.org/llms/contracts/standard/tokens/jettons/create/content.md)
+      - [How to mint new jettons](https://docs.ton.org/llms/contracts/standard/tokens/jettons/mint/content.md)
+      - [How to transfer jettons](https://docs.ton.org/llms/contracts/standard/tokens/jettons/transfer/content.md)
+      - [How to burn jettons](https://docs.ton.org/llms/contracts/standard/tokens/jettons/burn/content.md)
+      - [How to find jetton wallet](https://docs.ton.org/llms/contracts/standard/tokens/jettons/find/content.md)
+      - [How to get jetton wallet data](https://docs.ton.org/llms/contracts/standard/tokens/jettons/wallet-data/content.md)
+      - [How to get jetton supply data](https://docs.ton.org/llms/contracts/standard/tokens/jettons/supply-data/content.md)
+      - [Mintless jetton](https://docs.ton.org/llms/contracts/standard/tokens/jettons/mintless/overview/content.md)
+      - [How to deploy mintless jetton](https://docs.ton.org/llms/contracts/standard/tokens/jettons/mintless/deploy/content.md)
+      - [Jetton interface: messages and get methods](https://docs.ton.org/llms/contracts/standard/tokens/jettons/api/content.md)
+    - NFT
+      - [NFT: Non-fungible token](https://docs.ton.org/llms/contracts/standard/tokens/nft/overview/content.md)
+      - [NFT: how it works](https://docs.ton.org/llms/contracts/standard/tokens/nft/how-it-works/content.md)
+      - [SBT: How it works](https://docs.ton.org/llms/contracts/standard/tokens/nft/sbt/content.md)
+      - [NFT implementations comparison](https://docs.ton.org/llms/contracts/standard/tokens/nft/comparison/content.md)
+      - [How to deploy an NFT item](https://docs.ton.org/llms/contracts/standard/tokens/nft/deploy/content.md)
+      - [How to transfer an NFT item](https://docs.ton.org/llms/contracts/standard/tokens/nft/transfer/content.md)
+      - [How to get NFT item metadata](https://docs.ton.org/llms/contracts/standard/tokens/nft/metadata/content.md)
+      - [How to verify an NFT item](https://docs.ton.org/llms/contracts/standard/tokens/nft/verify/content.md)
+      - [NFT interface: messages and get methods](https://docs.ton.org/llms/contracts/standard/tokens/nft/api/content.md)
+      - [NFT: reference implementation](https://docs.ton.org/llms/contracts/standard/tokens/nft/nft-reference/content.md)
+  - [Vesting contracts](https://docs.ton.org/llms/contracts/standard/vesting/content.md)
+- Techniques
+  - [How to sign messages](https://docs.ton.org/llms/contracts/techniques/signing/content.md)
+  - [Contract sharding](https://docs.ton.org/llms/contracts/techniques/contract-sharding/content.md)
+  - [Security best practices](https://docs.ton.org/llms/contracts/techniques/security/content.md)
+  - [How to estimate gas usage in TON contracts](https://docs.ton.org/llms/contracts/techniques/gas/content.md)
+  - [On-chain jetton processing](https://docs.ton.org/llms/contracts/techniques/on-chain-jetton-processing/content.md)
+  - [How to use on-chain libraries](https://docs.ton.org/llms/contracts/techniques/using-on-chain-libraries/content.md)
+  - [Random number generation](https://docs.ton.org/llms/contracts/techniques/random/content.md)
+  - [Upgrading contracts](https://docs.ton.org/llms/contracts/techniques/upgrades/content.md)
+  - [How to use a vanity contract](https://docs.ton.org/llms/contracts/techniques/vanity/content.md)
+  - [Zero-knowledge proofs on TON](https://docs.ton.org/llms/contracts/techniques/zero-knowledge/content.md)
+  - [How to verify Groth16 examples on TON](https://docs.ton.org/llms/contracts/techniques/groth16-examples/content.md)
+- Blueprint
+  - [Blueprint overview](https://docs.ton.org/llms/contracts/blueprint/overview/content.md)
+  - [Write your first smart contract with Blueprint](https://docs.ton.org/llms/contracts/blueprint/first-smart-contract/content.md)
+  - [Smart contract development with Blueprint](https://docs.ton.org/llms/contracts/blueprint/develop/content.md)
+  - Testing
+    - [Testing smart contracts with Blueprint](https://docs.ton.org/llms/contracts/blueprint/testing/overview/content.md)
+    - [Testing style guide for Blueprint projects](https://docs.ton.org/llms/contracts/blueprint/testing/style-guide/content.md)
+    - [Reference for testing with Blueprint](https://docs.ton.org/llms/contracts/blueprint/testing/reference/content.md)
+  - [Debugging smart contracts with Blueprint](https://docs.ton.org/llms/contracts/blueprint/debug/content.md)
+  - [Deployment and interaction with Blueprint](https://docs.ton.org/llms/contracts/blueprint/deploy/content.md)
+  - [Collecting test coverage with Blueprint](https://docs.ton.org/llms/contracts/blueprint/coverage/content.md)
+  - [Benchmarking performance with Blueprint](https://docs.ton.org/llms/contracts/blueprint/benchmarks/content.md)
+  - [Configuring Blueprint](https://docs.ton.org/llms/contracts/blueprint/config/content.md)
+  - [Blueprint CLI reference](https://docs.ton.org/llms/contracts/blueprint/cli/content.md)
+  - [Blueprint TypeScript API](https://docs.ton.org/llms/contracts/blueprint/api/content.md)
+
+- **Tolk language**
+- [Tolk language](https://docs.ton.org/llms/tolk/overview/content.md): Official TON smart contracts programming language
+- [Basic syntax](https://docs.ton.org/llms/tolk/basic-syntax/content.md)
+- [Idioms and conventions](https://docs.ton.org/llms/tolk/idioms-conventions/content.md)
+- [Tolk contract examples](https://docs.ton.org/llms/tolk/examples/content.md)
+- Type system
+  - [Type system overview](https://docs.ton.org/llms/tolk/types/list-of-types/content.md)
+  - [Numbers](https://docs.ton.org/llms/tolk/types/numbers/content.md)
+  - [Booleans](https://docs.ton.org/llms/tolk/types/booleans/content.md)
+  - [Address](https://docs.ton.org/llms/tolk/types/address/content.md)
+  - [Cells, slices, builders](https://docs.ton.org/llms/tolk/types/cells/content.md)
+  - [Strings](https://docs.ton.org/llms/tolk/types/strings/content.md)
+  - [Structures](https://docs.ton.org/llms/tolk/types/structures/content.md)
+  - [Type aliases](https://docs.ton.org/llms/tolk/types/aliases/content.md)
+  - [Generic structs and aliases](https://docs.ton.org/llms/tolk/types/generics/content.md)
+  - [Enums](https://docs.ton.org/llms/tolk/types/enums/content.md)
+  - [Nullable types and null safety](https://docs.ton.org/llms/tolk/types/nullable/content.md)
+  - [Union types](https://docs.ton.org/llms/tolk/types/unions/content.md)
+  - [Tensors](https://docs.ton.org/llms/tolk/types/tensors/content.md)
+  - [Arrays and tuples](https://docs.ton.org/llms/tolk/types/tuples/content.md)
+  - [Maps](https://docs.ton.org/llms/tolk/types/maps/content.md)
+  - [Callables](https://docs.ton.org/llms/tolk/types/callables/content.md)
+  - [The unknown type](https://docs.ton.org/llms/tolk/types/unknown/content.md)
+  - [Void and never types](https://docs.ton.org/llms/tolk/types/void-never/content.md)
+  - [Type checks and casts](https://docs.ton.org/llms/tolk/types/type-checks-and-casts/content.md)
+  - [TVM stack representation](https://docs.ton.org/llms/tolk/types/overall-tvm-stack/content.md)
+  - [Serialization](https://docs.ton.org/llms/tolk/types/overall-serialization/content.md)
+- Syntax details
+  - [Variables](https://docs.ton.org/llms/tolk/syntax/variables/content.md)
+  - [Conditions and loops](https://docs.ton.org/llms/tolk/syntax/conditions-loops/content.md)
+  - [Exceptions in Tolk](https://docs.ton.org/llms/tolk/syntax/exceptions/content.md)
+  - [Functions and methods](https://docs.ton.org/llms/tolk/syntax/functions-methods/content.md)
+  - [Structures and fields](https://docs.ton.org/llms/tolk/syntax/structures-fields/content.md)
+  - [Pattern matching](https://docs.ton.org/llms/tolk/syntax/pattern-matching/content.md)
+  - [Mutability](https://docs.ton.org/llms/tolk/syntax/mutability/content.md)
+  - [Operators](https://docs.ton.org/llms/tolk/syntax/operators/content.md)
+  - [Imports and name resolution](https://docs.ton.org/llms/tolk/syntax/imports/content.md)
+- Language features
+  - [Handling messages](https://docs.ton.org/llms/tolk/features/message-handling/content.md)
+  - [Contract storage](https://docs.ton.org/llms/tolk/features/contract-storage/content.md)
+  - [Contract getters](https://docs.ton.org/llms/tolk/features/contract-getters/content.md)
+  - [Contract declaration and ABI](https://docs.ton.org/llms/tolk/features/contract-abi/content.md)
+  - [Sending messages](https://docs.ton.org/llms/tolk/features/message-sending/content.md)
+  - [Automatic serialization](https://docs.ton.org/llms/tolk/features/auto-serialization/content.md)
+  - [Lazy loading](https://docs.ton.org/llms/tolk/features/lazy-loading/content.md)
+  - [Forward payload in jettons](https://docs.ton.org/llms/tolk/features/jetton-payload/content.md)
+  - [Standard library](https://docs.ton.org/llms/tolk/features/standard-library/content.md)
+  - [Assembler functions](https://docs.ton.org/llms/tolk/features/asm-functions/content.md)
+  - [Compiler optimizations](https://docs.ton.org/llms/tolk/features/compiler-optimizations/content.md)
+- Migrating from FunC
+  - [Tolk vs FunC](https://docs.ton.org/llms/tolk/from-func/tolk-vs-func/content.md)
+  - [Tolk vs TL-B](https://docs.ton.org/llms/tolk/from-func/tolk-vs-tlb/content.md)
+  - [Standard libraries comparison](https://docs.ton.org/llms/tolk/from-func/stdlib-comparison/content.md)
+  - [FunC-to-Tolk converter](https://docs.ton.org/llms/tolk/from-func/converter/content.md)
+- [Changelog](https://docs.ton.org/llms/tolk/changelog/content.md)
+- [Standard library](https://ton-blockchain.github.io/acton/docs/tolk_standard_library/overview)
+
+- **TVM: TON Virtual Machine**
+- [TVM overview](https://docs.ton.org/llms/tvm/overview/content.md): Detailed reference of the TON smart-contract runtime
+- Tools
+  - [TxTracer](https://docs.ton.org/llms/tvm/tools/txtracer/content.md)
+  - [Retracer](https://docs.ton.org/llms/tvm/tools/retracer/content.md)
+  - [TVM Explorer](https://docs.ton.org/llms/tvm/tools/tvm-explorer/content.md)
+  - [TON Assembly (TASM)](https://docs.ton.org/llms/tvm/tools/ton-assembly/content.md)
+- [Instructions](https://docs.ton.org/llms/tvm/instructions/content.md): Interactive reference for TVM instructions
+- [Builders and Slices](https://docs.ton.org/llms/tvm/builders-and-slices/content.md)
+- [Continuations](https://docs.ton.org/llms/tvm/continuations/content.md)
+- [TVM registers](https://docs.ton.org/llms/tvm/registers/content.md)
+- [Gas](https://docs.ton.org/llms/tvm/gas/content.md)
+- [Initialization](https://docs.ton.org/llms/tvm/initialization/content.md): State of TVM before smart contract execution
+- [Exit codes](https://docs.ton.org/llms/tvm/exit-codes/content.md)
+- [Get methods](https://docs.ton.org/llms/tvm/get-method/content.md)
+
+- **Blockchain foundations**
+- [Blockchain foundations overview](https://docs.ton.org/llms/foundations/overview/content.md): Core TON concepts, data formats, transaction mechanics, network internals, and reference materials
+- TL-B
+  - [TL-B overview](https://docs.ton.org/llms/foundations/tlb/overview/content.md)
+  - [TL-B syntax and semantics](https://docs.ton.org/llms/foundations/tlb/syntax-and-semantics/content.md)
+  - [Simple TL-B examples](https://docs.ton.org/llms/foundations/tlb/simple-examples/content.md)
+  - [Complex and non-trivial TL-B examples](https://docs.ton.org/llms/foundations/tlb/complex-and-non-trivial-examples/content.md)
+  - [TEP TL-B examples](https://docs.ton.org/llms/foundations/tlb/tep-examples/content.md)
+  - [TL-B tooling](https://docs.ton.org/llms/foundations/tlb/tooling/content.md)
+- Serialization
+  - [Cells](https://docs.ton.org/llms/foundations/serialization/cells/content.md)
+  - [Library references](https://docs.ton.org/llms/foundations/serialization/library/content.md)
+  - [Merkle proofs](https://docs.ton.org/llms/foundations/serialization/merkle/content.md)
+  - [Merkle updates](https://docs.ton.org/llms/foundations/serialization/merkle-update/content.md)
+  - [Pruned branches](https://docs.ton.org/llms/foundations/serialization/pruned/content.md)
+  - [Bag of cells](https://docs.ton.org/llms/foundations/serialization/boc/content.md)
+- Addresses
+  - [Addresses overview](https://docs.ton.org/llms/foundations/addresses/overview/content.md)
+  - [Internal address formats](https://docs.ton.org/llms/foundations/addresses/formats/content.md)
+  - [Reading and writing addresses](https://docs.ton.org/llms/foundations/addresses/serialize/content.md)
+  - [Deriving addresses](https://docs.ton.org/llms/foundations/addresses/derive/content.md)
+- Messages and transactions
+  - [Messages and transactions overview](https://docs.ton.org/llms/foundations/messages/overview/content.md)
+  - [Internal messages](https://docs.ton.org/llms/foundations/messages/internal/content.md)
+  - [Incoming external messages](https://docs.ton.org/llms/foundations/messages/external-in/content.md)
+  - [Outbound external messages](https://docs.ton.org/llms/foundations/messages/external-out/content.md)
+  - [Deploy message](https://docs.ton.org/llms/foundations/messages/deploy/content.md)
+  - [Sending modes](https://docs.ton.org/llms/foundations/messages/modes/content.md)
+  - [Ordinary transactions](https://docs.ton.org/llms/foundations/messages/ordinary-tx/content.md)
+- Actions
+  - [Actions](https://docs.ton.org/llms/foundations/actions/overview/content.md)
+  - [Send message](https://docs.ton.org/llms/foundations/actions/send/content.md)
+  - [Reserve coins](https://docs.ton.org/llms/foundations/actions/reserve/content.md)
+  - [Set code](https://docs.ton.org/llms/foundations/actions/set-code/content.md)
+  - [Change library](https://docs.ton.org/llms/foundations/actions/change-library/content.md)
+- Consensus
+  - [Catchain 1.0 overview](https://docs.ton.org/llms/foundations/consensus/catchain-overview/content.md)
+  - [Catchain 1.0 and BCP visualizer](https://docs.ton.org/llms/foundations/consensus/catchain-visualizer/content.md): Interactive visual simulation of Catchain 1.0 and BCP rounds
+- [Account status](https://docs.ton.org/llms/foundations/status/content.md)
+- [Execution phases](https://docs.ton.org/llms/foundations/phases/content.md)
+- [Transaction fees](https://docs.ton.org/llms/foundations/fees/content.md)
+- [Traces](https://docs.ton.org/llms/foundations/traces/content.md)
+- [Blockchain sharding](https://docs.ton.org/llms/foundations/shards/content.md)
+- [Blockchain limits](https://docs.ton.org/llms/foundations/limits/content.md)
+- [Blockchain configuration](https://docs.ton.org/llms/foundations/config/content.md)
+- Web3 services
+  - [Web3 services](https://docs.ton.org/llms/foundations/web3/overview/content.md)
+  - [TON DNS](https://docs.ton.org/llms/foundations/web3/ton-dns/content.md): On-chain hierarchical domain name service for TON Network
+  - [TON Storage](https://docs.ton.org/llms/foundations/web3/ton-storage/content.md): Distributed file storage for the TON Blockchain using torrent-like technology and on-chain payment contracts
+  - [TON Proxy](https://docs.ton.org/llms/foundations/web3/ton-proxy/content.md): HTTP-to-ADNL bridge for accessing and hosting TON Sites from a conventional browser
+  - [TON Sites](https://docs.ton.org/llms/foundations/web3/ton-sites/content.md): Web services accessible through TON Network via ADNL and RLDP
+- Merkle proofs
+  - [Proofs overview](https://docs.ton.org/llms/foundations/proofs/overview/content.md)
+  - [Liteserver proof verification](https://docs.ton.org/llms/foundations/proofs/verifying-liteserver-proofs/content.md)
+- [System contracts](https://docs.ton.org/llms/foundations/system/content.md)
+- [Precompiled contracts](https://docs.ton.org/llms/foundations/precompiled/content.md)
+- Whitepapers
+  - [Overview of TON whitepapers](https://docs.ton.org/llms/foundations/whitepapers/overview/content.md)
+  - [Whitepaper comments](https://docs.ton.org/llms/foundations/whitepapers/comments/content.md)
+  - [Telegram Open Network Virtual Machine](https://docs.ton.org/llms/foundations/whitepapers/tvm/content.md): Whitepaper by Dr. Nikolai Durov
+  - [Telegram Open Network (TON) Blockchain Specification](https://docs.ton.org/llms/foundations/whitepapers/tblkch/content.md): Whitepaper by Dr. Nikolai Durov
+  - [The Open Network](https://docs.ton.org/llms/foundations/whitepapers/ton/content.md): Whitepaper by Dr. Nikolai Durov
+  - [Catchain consensus: an outline](https://docs.ton.org/llms/foundations/whitepapers/catchain/content.md): Whitepaper by Dr. Nikolai Durov
+- [Glossary](https://docs.ton.org/llms/foundations/glossary/content.md)
+
+- **Legacy languages**
+- Fift
+  - [Fift language overview](https://docs.ton.org/llms/languages/fift/overview/content.md)
+  - [Fift types](https://docs.ton.org/llms/languages/fift/types/content.md)
+  - [Basic values and literals in Fift](https://docs.ton.org/llms/languages/fift/basic-values/content.md)
+  - [Words, constants, and variables in Fift](https://docs.ton.org/llms/languages/fift/variables/content.md)
+  - [Control flow in Fift](https://docs.ton.org/llms/languages/fift/control/content.md)
+  - [Fift assembler](https://docs.ton.org/llms/languages/fift/fift-assembler/content.md)
+  - [Fift and TVM assembly](https://docs.ton.org/llms/languages/fift/fift-and-tvm-assembly/content.md)
+  - [Fift deep dive](https://docs.ton.org/llms/languages/fift/deep-dive/content.md)
+  - [Simple multisig contract with Fift](https://docs.ton.org/llms/languages/fift/multisig/content.md)
+  - [How to change TON configuration parameters with Fift](https://docs.ton.org/llms/languages/fift/ton-config/content.md)
+  - [Fift: A Brief Introduction](https://docs.ton.org/llms/languages/fift/whitepaper/content.md): Whitepaper by Dr. Nikolai Durov
+- FunC
+  - [FunC language overview](https://docs.ton.org/llms/languages/func/overview/content.md)
+  - [FunC cookbook](https://docs.ton.org/llms/languages/func/cookbook/content.md)
+  - [FunC changelog](https://docs.ton.org/llms/languages/func/changelog/content.md)
+  - [Known issues of FunC](https://docs.ton.org/llms/languages/func/known-issues/content.md)
+
+  - **Language**
+  - [FunC comments](https://docs.ton.org/llms/languages/func/comments/content.md)
+  - [FunC types](https://docs.ton.org/llms/languages/func/types/content.md)
+  - [FunC literals](https://docs.ton.org/llms/languages/func/literals/content.md)
+  - [FunC operators](https://docs.ton.org/llms/languages/func/operators/content.md)
+  - [FunC expressions](https://docs.ton.org/llms/languages/func/expressions/content.md)
+  - [FunC statements](https://docs.ton.org/llms/languages/func/statements/content.md)
+
+  - **Program declarations**
+  - [FunC program declarations](https://docs.ton.org/llms/languages/func/declarations-overview/content.md)
+  - [FunC functions](https://docs.ton.org/llms/languages/func/functions/content.md)
+  - [Reserved functions of FunC](https://docs.ton.org/llms/languages/func/special-functions/content.md)
+  - [FunC assembler functions](https://docs.ton.org/llms/languages/func/asm-functions/content.md)
+  - [FunC global variables](https://docs.ton.org/llms/languages/func/global-variables/content.md)
+  - [FunC compiler directives](https://docs.ton.org/llms/languages/func/compiler-directives/content.md)
+
+  - **Libraries**
+  - [Standard library of FunC](https://docs.ton.org/llms/languages/func/stdlib/content.md)
+  - [Other FunC libraries](https://docs.ton.org/llms/languages/func/libraries/content.md)
+
+- **Contributing**
+- [Documentation style guide](https://docs.ton.org/llms/contribute/style-guide/content.md)
+- Components and snippets
+  - [Using components and snippets](https://docs.ton.org/llms/contribute/snippets/overview/content.md)
+  - [Aside component](https://docs.ton.org/llms/contribute/snippets/aside/content.md)
+  - [Image component](https://docs.ton.org/llms/contribute/snippets/image/content.md)
+  - [FileTree component](https://docs.ton.org/llms/contribute/snippets/filetree/content.md)
+
+- **Separator**
+- [Other resources](https://docs.ton.org/llms/more-tutorials/content.md)
+- [Docs for agents: llms.txt](https://docs.ton.org/llms.txt)
+- [Old documentation](https://old-docs.ton.org/)

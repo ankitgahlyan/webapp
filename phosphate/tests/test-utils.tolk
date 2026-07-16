@@ -228,6 +228,7 @@ fun hasSetCodeAction(res: SendResultList, account: address): bool {
 }
 
 fun setupTest(): (FossFi, FossFiWallet, Treasury, Treasury) {
+    testing.setNow(0);
     val deployer = testing.treasury("deployer");
     val notDeployer = testing.treasury("not-deployer");
 

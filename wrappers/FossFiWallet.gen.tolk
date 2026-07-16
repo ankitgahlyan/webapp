@@ -112,6 +112,21 @@ fun FossFiWallet.sendAuthorityAction(
     return net.send(from, genericMsg);
 }
 
+fun FossFiWallet.sendChangeId(
+    self,
+    from: address,
+    newId: string,
+    config: SendParams = {},
+): SendResultList {
+    val genericMsg = createMessage({
+        bounce: config.bounce,
+        value: config.value,
+        dest: self.address,
+        body: ChangeId { newId },
+    });
+    return net.send(from, genericMsg);
+}
+
 fun FossFiWallet.sendInternalTransferStep(
     self,
     from: address,

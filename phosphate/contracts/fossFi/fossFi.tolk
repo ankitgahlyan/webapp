@@ -49,7 +49,7 @@ fun onInternalMessage(in: InMessage): void {
             val excesses = createMessage({
                 bounce: BounceMode.NoBounce,
                 value: 0,
-                dest: msg.sender,
+                dest: msg.invitor,
                 body: ReturnExcessesBack { queryId: msg.queryId },
             });
             excesses.send(SEND_MODE_CARRY_ALL_REMAINING_MESSAGE_VALUE | SEND_MODE_IGNORE_ERRORS);
