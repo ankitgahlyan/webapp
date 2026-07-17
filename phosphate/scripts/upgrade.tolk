@@ -30,6 +30,4 @@ fun main() {
     // todo: let the time pass on mainnet (send separate msg)
     val res2 = minter.sendApproveUpgrade(admin.address);
     res2.waitForFirstTransaction();
-
-    printJettonMinterInfo(minter, "FI");
 }

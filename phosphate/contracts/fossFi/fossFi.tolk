@@ -1,8 +1,8 @@
 import "@stdlib/tvm-lowlevel"
-import "@gen/fossFiWallet.code"
 import "@contracts/common/messages"
 import "@contracts/common/sharding"
 import "@contracts/common/types"
+import "@contracts/fossFi/consts"
 import "@contracts/lottery/messages"
 import "@contracts/lottery/storage"
 import "jetton-utils"
@@ -41,7 +41,7 @@ fun onInternalMessage(in: InMessage): void {
     match (msg) {
         InformMinterInviteInternal => {
             // note: use notifyMinter but forwardPayload?
-            checkCorrectSender(in.senderAddress, msg.sender, store);
+            assertCorrectSender(in.senderAddress, msg.sender, store.admin);
             store.totalAccounts += 1;
             store.supply += MBRP_AMOUNT; // note: broadcast id for explorers or dbs
 
@@ -56,7 +56,7 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         NotifyMinter => {
-            checkCorrectSender(in.senderAddress, msg.burnInitiator, store);
+            assertCorrectSender(in.senderAddress, msg.burnInitiator, store.admin);
 
             // determine whether MINT or BURN
             msg.queryId != 0 ? store.supply += msg.jettonAmount : store.supply -= msg.jettonAmount;
@@ -79,12 +79,7 @@ fun onInternalMessage(in: InMessage): void {
 
             var walletAddress: address? = null;
             if (msg.owner.getWorkchain() == MY_WORKCHAIN) {
-                walletAddress = calcDeployFiWallet(
-                    msg.owner,
-                    store.admin,
-                    contract.getAddress(),
-                    fossFiWalletCompiledCode(),
-                ).calculateAddress();
+                walletAddress = getAutoAddress(msg.owner, store.admin).calculateAddress();
             }
 
             val respondMsg = createMessage({
@@ -149,13 +144,7 @@ fun onInternalMessage(in: InMessage): void {
                     val upgradeMsg = createMessage({
                         bounce: BounceMode.NoBounce,
                         value: 0,
-                        dest: calcDeployFiWallet(
-                            in.senderAddress,
-                            store.admin,
-                            // owner/deployer/treasury all same here
-                            contract.getAddress(),
-                            fossFiWalletCompiledCode(),
-                        ).calculateAddress(),
+                        dest: getAutoAddress(in.senderAddress, store.admin).calculateAddress(),
                         body: Upgrade {
                             walletVersion: store.walletVersion,
                             sender: store.admin, // or use contract.getAddress()
@@ -184,7 +173,7 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         RequestUpgradeCode => {
-            checkCorrectSender(in.senderAddress, msg.sender, store);
+            assertCorrectSender(in.senderAddress, msg.sender, store.admin);
             if (msg.version < store.walletVersion) {
                 // sendUpgradeMinter(in.senderAddress, store);
                 val upgradeMsg = createMessage({
@@ -212,12 +201,7 @@ fun onInternalMessage(in: InMessage): void {
                     // bounce for collecting fees back
                     bounce: BounceMode.Only256BitsOfBody,
                     value: 0,
-                    dest: calcDeployFiWallet(
-                        in.senderAddress,
-                        in.senderAddress,
-                        contract.getAddress(),
-                        fossFiWalletCompiledCode(),
-                    ),
+                    dest: getAutoAddress(in.senderAddress, in.senderAddress),
                     body: TopUpTons {},
                 });
                 deployTopUpMsg.send(
@@ -227,7 +211,7 @@ fun onInternalMessage(in: InMessage): void {
         }
 
         EnterLottery => {
-            checkCorrectSender(in.senderAddress, msg.sender, store);
+            assertCorrectSender(in.senderAddress, msg.sender, store.admin);
             val enterMsg = createMessage({
                 bounce: BounceMode.RichBounce, // todo handle deepBounces
                 value: 0,
@@ -307,7 +291,7 @@ get fun get_jetton_data(): JettonDataReply {
         mintable: true,                                              // but by peers only & not minter
         adminAddress: store.admin,
         jettonContent: store.metadata as Cell<OnchainMetadataReply>, // metadata.toCell(),
-        jettonWalletCode: fossFiWalletCompiledCode(),
+        jettonWalletCode: createEmptyCell(), // fetch from wallets
     };
 }
 
@@ -317,25 +301,23 @@ get fun get_jetton_data_all(): FiStore {
 
 get fun get_wallet_address(owner: address): address {
     val store = lazy FiStore.load();
-    return calcDeployFiWallet(
-        owner,
-        store.admin,
-        // owner/deployer/treasury
-        contract.getAddress(),
-        fossFiWalletCompiledCode(),
-    ).calculateAddress();
+    return getAutoAddress(owner, store.admin).calculateAddress();
 }
 
-fun checkCorrectSender(sender: address, owner: address, store: FiStore): void {
+fun assertCorrectSender(sender: address, owner: address, treasury: address): void {
     assert (
         sender ==
-        calcDeployFiWallet(
-            owner,
-            store.admin,
-            contract.getAddress(),
-            fossFiWalletCompiledCode(),
-        ).calculateAddress()
+        getAutoAddress(owner, treasury).calculateAddress()
     ) throw Errors.NotValidWallet;
+}
+
+fun getAutoAddress(owner: address, treasury: address): AutoDeployAddress {
+    return calcDeployFiWallet(
+        owner,
+        treasury,
+        contract.getAddress(),
+        fiWalletInitCode(),
+    )
 }
 
 // todo: implement minter deploy(efficient) not jetton(costly stateinit send)
